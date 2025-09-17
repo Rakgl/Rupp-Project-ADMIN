@@ -1,12 +1,10 @@
 <script setup lang="ts" generic="TData">
 import type { Table } from '@tanstack/vue-table';
+import { BadgePlus, Sparkles, X } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
-import { roleStatuses } from '../data/data'; // Assuming this path is correct
-import DataTableFacetedFilter from './DataTableFacetedFilter.vue'; // Assuming this path is correct
-import DataTableViewOptions from './DataTableViewOptions.vue'; // Assuming this path is correct
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useI18n } from 'vue-i18n';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -23,35 +22,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/components/ui/toast/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 import { Toaster } from '@/components/ui/toast';
-// import { Icon } from '#components'; // Assuming Icon is globally available or imported if using Nuxt UI / Iconify
+import { useToast } from '@/components/ui/toast/use-toast';
+import { useApi } from '@/composables/useApi';
+import { roleStatuses } from '../data/data';
 
-// Mock useApi for standalone example if not provided
-const useApi = () => {
-  return async <T extends { success: boolean; message?: string; data?: any }>(
-    url: string,
-    options: { method: string; body: any }
-  ): Promise<T> => {
-    console.log('Mock API call:', url, options);
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    // Simulate a successful response
-    if (options.body.name === 'fail') {
-      return { success: false, message: 'Simulated API failure to create role.' } as T;
-    }
-    return { success: true, data: { id: Date.now(), ...options.body } } as T;
-  };
-};
+import DataTableFacetedFilter from './DataTableFacetedFilter.vue';
 
 interface DataTableToolbarProps {
   table: Table<TData>;
-  onDataChanged?: () => void;
 }
 
 const props = defineProps<DataTableToolbarProps>();
+const { t } = useI18n();
 const { toast } = useToast();
+const api = useApi();
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0);
+
+// Debounced search input logic
 const localSearchValue = ref<string>(
   (props.table.getColumn('name')?.getFilterValue() as string) ?? ''
 );
@@ -77,6 +66,7 @@ watch(
   }
 );
 
+// --- Manual "New Role" Dialog State ---
 const isNewRoleDialogOpen = ref(false);
 const newRoleData = ref({
   name: '',
@@ -86,226 +76,378 @@ const newRoleData = ref({
 
 watch(isNewRoleDialogOpen, (isOpen) => {
   if (isOpen) {
-    newRoleData.value = {
-      name: '',
-      status: 'ACTIVE',
-      description: '',
-    };
+    newRoleData.value = { name: '', status: 'ACTIVE', description: '' };
   }
 });
 
-const api = useApi();
-
-const handleCreateRole = async () => {
-  if (!newRoleData.value.name.trim()) {
+async function handleCreateRole() {
+  // Validation for single role creation
+  if (!newRoleData.value.name?.trim()) {
     toast({
-      title: 'Validation Error',
-      description: 'Role name cannot be empty.',
+      title: t('roles.toast.validation.title'),
+      description: t('roles.toast.validation.nameRequired'),
       variant: 'destructive',
     });
     return;
   }
-  if (!newRoleData.value.status) {
-    toast({
-      title: 'Validation Error',
-      description: 'Please select a role status.',
-      variant: 'destructive',
-    });
-    return;
-  }
+  // ... other validations
 
   try {
-    const response = await api<{ success: boolean; message?: string; data?: any }>('/roles', {
+    const response = await api('/roles', {
       method: 'POST',
       body: newRoleData.value,
     });
 
-    if (!response.success) {
-      throw new Error(response.message || `Failed to create role.`);
+    if (!(response as any).success) {
+      throw new Error((response as any).message || `Failed to create role.`);
     }
+
     isNewRoleDialogOpen.value = false;
     toast({
-      title: 'Role Created Successfully!',
-      description: `The role "${newRoleData.value.name}" has been added.`,
-      variant: 'default', // Or 'success' if you have one
+      title: t('roles.toast.create.success.title'),
+      description: t('roles.toast.create.success.description', {
+        roleName: newRoleData.value.name,
+      }),
     });
-    props.onDataChanged?.();
+    props.table.options.meta?.onDataChanged?.();
   } catch (error: any) {
-    console.error('Error creating role:', error);
     toast({
-      title: 'Error Creating Role',
-      description: error.message || 'An unexpected error occurred. Please try again.',
+      title: t('roles.toast.create.error.title'),
+      description: error.message || t('roles.toast.create.error.description'),
       variant: 'destructive',
     });
   }
-};
+}
+
+// --- AI Suggestion & Bulk Create Dialog State ---
+interface SuggestedRole {
+  name: string;
+  description: string;
+}
+const isSuggestionDialogOpen = ref(false);
+const suggestionContext = ref('');
+const isLoadingSuggestions = ref(false);
+const isBulkCreating = ref(false);
+const suggestionError = ref<string | null>(null);
+const suggestedRoles = ref<SuggestedRole[]>([]);
+const selectedSuggestedRoles = ref<SuggestedRole[]>([]);
+
+watch(isSuggestionDialogOpen, (isOpen) => {
+  if (isOpen) {
+    // Reset AI suggestion state when dialog opens
+    suggestionContext.value = '';
+    suggestedRoles.value = [];
+    selectedSuggestedRoles.value = [];
+    suggestionError.value = null;
+  }
+});
+
+async function handleSuggestRoles() {
+  if (!suggestionContext.value.trim()) {
+    suggestionError.value = t('roles.dialog.ai.validation.contextRequired');
+    return;
+  }
+
+  isLoadingSuggestions.value = true;
+  suggestionError.value = null;
+  suggestedRoles.value = [];
+  selectedSuggestedRoles.value = [];
+
+  try {
+    const response = await api<{ success: boolean; data: SuggestedRole[]; error?: string }>(
+      '/roles/suggest',
+      { method: 'POST', body: { context: suggestionContext.value } }
+    );
+
+    if (response.success) {
+      suggestedRoles.value = response.data;
+    } else {
+      throw new Error(response.error || t('roles.dialog.ai.error.fetchFailed'));
+    }
+  } catch (error: any) {
+    suggestionError.value = error.message || t('roles.dialog.ai.error.unexpected');
+  } finally {
+    isLoadingSuggestions.value = false;
+  }
+}
+
+async function handleCreateMultipleRoles() {
+  if (selectedSuggestedRoles.value.length === 0) {
+    toast({
+      title: t('roles.toast.validation.title'),
+      description: t('roles.toast.validation.selectionRequired'),
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  isBulkCreating.value = true;
+  const creationPromises = selectedSuggestedRoles.value.map((role) =>
+    api('/roles', {
+      method: 'POST',
+      body: {
+        name: role.name,
+        description: role.description,
+        status: 'ACTIVE',
+      },
+    })
+  );
+
+  try {
+    const results = await Promise.allSettled(creationPromises);
+    const successfulCreations = results.filter(
+      (r) => r.status === 'fulfilled' && (r.value as any).success
+    ).length;
+    const failedCreations = results.length - successfulCreations;
+
+    toast({
+      title: t('roles.toast.bulkCreate.title'),
+      description: t('roles.toast.bulkCreate.description', {
+        count: successfulCreations,
+        failed: failedCreations,
+      }),
+    });
+
+    if (successfulCreations > 0) {
+      isSuggestionDialogOpen.value = false;
+      props.table.options.meta?.onDataChanged?.();
+    }
+  } catch (error: any) {
+    toast({
+      title: t('roles.toast.create.error.title'),
+      description: error.message || t('roles.toast.create.error.description'),
+      variant: 'destructive',
+    });
+  } finally {
+    isBulkCreating.value = false;
+  }
+}
 </script>
 
 <template>
   <div>
-    <div class="flex items-center justify-between py-4">
-      <div class="flex flex-1 items-center space-x-2">
+    <!-- Main toolbar -->
+    <div class="flex flex-col items-center gap-4 md:flex-row md:justify-between">
+      <div class="w-full flex flex-1 flex-wrap items-center gap-2">
         <Input
-          placeholder="Filter by name..."
           v-model="localSearchValue"
-          class="h-9 w-[180px] lg:w-[280px] rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          :placeholder="t('roles.toolbar.filterByName')"
+          class="h-9 w-full rounded-md lg:max-w-[280px] sm:min-w-[180px] sm:w-auto sm:flex-1"
         />
-
         <DataTableFacetedFilter
           v-if="table.getColumn('status')"
           :column="table.getColumn('status')"
-          title="Status"
+          :title="t('roles.toolbar.status')"
           :options="roleStatuses"
         />
-
         <Button
           v-if="isFiltered"
           variant="ghost"
-          class="h-9 px-3 lg:px-4 text-sm"
+          class="h-9 px-3 text-sm lg:px-4"
           @click="
             () => {
               table.resetColumnFilters();
-              localSearchValue = ''; // Also clear the local search input
+              localSearchValue = '';
             }
           "
         >
-          Reset
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 15 15"
-            class="ml-2 h-4 w-4"
-          >
-            <path
-              fill="currentColor"
-              fill-rule="evenodd"
-              d="M11.782 4.032a.575.575 0 1 0-.813-.814L7.5 6.687L4.032 3.218a.575.575 0 0 0-.814.814L6.687 7.5l-3.469 3.468a.575.575 0 0 0 .814.814L7.5 8.313l3.469 3.469a.575.575 0 0 0 .813-.814L8.313 7.5l3.469-3.468Z"
-              clip-rule="evenodd"
-            ></path>
-          </svg>
+          {{ t('roles.toolbar.reset') }}
+          <X class="ml-2 h-4 w-4" />
         </Button>
       </div>
 
-      <div class="flex items-center space-x-2">
-        <Dialog v-model:open="isNewRoleDialogOpen">
+      <div class="w-full flex items-center gap-2 md:w-auto">
+        <!-- AI Suggestion Dialog Trigger -->
+        <Dialog v-model:open="isSuggestionDialogOpen">
           <DialogTrigger as-child>
-            <Button
-              variant="outline"
-              class="h-9 flex items-center text-sm rounded-md border-input bg-background hover:bg-accent hover:text-accent-foreground"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 15 15"
-                class="mr-2 h-4 w-4"
-              >
-                <path
-                  fill="currentColor"
-                  d="M7.5 1a.5.5 0 0 0-.5.5V7H1a.5.5 0 0 0 0 1h6.5v6.5a.5.5 0 0 0 1 0V8H14a.5.5 0 0 0 0-1H8V1.5a.5.5 0 0 0-.5-.5Z"
-                ></path>
-              </svg>
-              Add New Role
+            <Button variant="outline" class="h-9 w-full md:w-auto">
+              <Sparkles class="mr-2 h-4 w-4" /> {{ t('roles.toolbar.suggest') }}
             </Button>
           </DialogTrigger>
-          <DialogContent class="sm:max-w-md bg-card text-card-foreground rounded-lg shadow-lg">
+          <DialogContent
+            class="max-h-[90vh] w-[90vw] flex flex-col overflow-hidden rounded-lg bg-card text-card-foreground shadow-lg sm:max-w-xl"
+          >
             <DialogHeader class="p-6">
-              <DialogTitle class="text-xl font-semibold">Create New Role</DialogTitle>
-              <DialogDescription class="text-sm text-muted-foreground mt-1">
-                Define the properties for the new role. Required fields are marked with an asterisk
-                (*).
-              </DialogDescription>
+              <DialogTitle v-t="'roles.dialog.ai.title'" class="text-xl font-semibold" />
+              <DialogDescription
+                v-t="'roles.dialog.ai.description'"
+                class="mt-1 text-sm text-muted-foreground"
+              />
             </DialogHeader>
-            <form @submit.prevent="handleCreateRole" class="px-6 pb-6 space-y-6">
+            <div class="px-6 pb-4 border-b">
+              <div class="flex items-center gap-2">
+                <Input
+                  id="ai-suggestion-context"
+                  v-model="suggestionContext"
+                  :placeholder="t('roles.dialog.ai.placeholder')"
+                  class="h-10 flex-grow"
+                  :disabled="isLoadingSuggestions"
+                  @keydown.enter.prevent="handleSuggestRoles"
+                />
+                <Button
+                  type="button"
+                  class="h-10"
+                  :disabled="isLoadingSuggestions || !suggestionContext"
+                  @click="handleSuggestRoles"
+                >
+                  {{
+                    isLoadingSuggestions
+                      ? t('roles.dialog.ai.loading')
+                      : t('roles.dialog.ai.button')
+                  }}
+                </Button>
+              </div>
+              <p v-if="suggestionError" class="mt-2 text-sm text-destructive">
+                {{ suggestionError }}
+              </p>
+            </div>
+            <div class="flex-grow overflow-y-auto px-6 py-4">
+              <div v-if="isLoadingSuggestions" class="text-center text-muted-foreground">
+                {{ t('roles.dialog.ai.loading') }}...
+              </div>
+              <div v-else-if="suggestedRoles.length > 0" class="space-y-2">
+                <p class="text-sm text-muted-foreground mb-2">{{ t('roles.dialog.ai.results') }}</p>
+                <label
+                  v-for="role in suggestedRoles"
+                  :key="role.name"
+                  class="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-accent hover:text-accent-foreground has-[:checked]:bg-accent"
+                >
+                  <Checkbox
+                    :id="`role-${role.name}`"
+                    :value="role"
+                    :checked="selectedSuggestedRoles.some((r) => r.name === role.name)"
+                    @update:checked="
+                      (checked) => {
+                        if (checked) {
+                          selectedSuggestedRoles.push(role);
+                        } else {
+                          selectedSuggestedRoles = selectedSuggestedRoles.filter(
+                            (r) => r.name !== role.name
+                          );
+                        }
+                      }
+                    "
+                  />
+                  <div class="grid gap-1.5 leading-none">
+                    <span class="font-semibold">{{ role.name }}</span>
+                    <span class="text-sm text-muted-foreground">{{ role.description }}</span>
+                  </div>
+                </label>
+              </div>
+              <div v-else class="text-center text-muted-foreground">
+                {{ t('roles.dialog.ai.noResults') }}
+              </div>
+            </div>
+            <DialogFooter
+              class="flex flex-col-reverse p-6 border-t sm:flex-row sm:justify-end sm:space-x-2"
+            >
+              <Button type="button" variant="outline" @click="isSuggestionDialogOpen = false">
+                {{ t('roles.dialog.buttons.cancel') }}
+              </Button>
+              <Button
+                type="button"
+                :disabled="selectedSuggestedRoles.length === 0 || isBulkCreating"
+                @click="handleCreateMultipleRoles"
+              >
+                {{
+                  isBulkCreating
+                    ? t('roles.dialog.buttons.creating')
+                    : t('roles.dialog.buttons.createSelected', {
+                      count: selectedSuggestedRoles.length,
+                    })
+                }}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <!-- Manual Create Dialog Trigger -->
+        <Dialog v-model:open="isNewRoleDialogOpen">
+          <DialogTrigger as-child>
+            <Button class="h-9 w-full md:w-auto" @click="isNewRoleDialogOpen = true">
+              <BadgePlus class="mr-2 h-4 w-4" /> {{ t('roles.toolbar.newRole') }}
+            </Button>
+          </DialogTrigger>
+          <DialogContent
+            class="max-h-[90vh] w-[90vw] overflow-y-auto rounded-lg bg-card text-card-foreground shadow-lg sm:max-w-md"
+          >
+            <DialogHeader class="p-6">
+              <DialogTitle v-t="'roles.dialog.create.title'" class="text-xl font-semibold" />
+              <DialogDescription
+                v-t="'roles.dialog.create.description'"
+                class="mt-1 text-sm text-muted-foreground"
+              />
+            </DialogHeader>
+            <form class="px-6 pb-6 space-y-6" @submit.prevent="handleCreateRole">
               <div class="space-y-2">
-                <label for="new-role-name" class="block text-sm font-medium text-foreground">
-                  Role Name <span class="text-destructive">*</span>
+                <label for="new-role-name" class="block text-sm text-foreground font-medium">
+                  {{ t('roles.dialog.form.name.label') }} <span class="text-destructive">*</span>
                 </label>
                 <Input
                   id="new-role-name"
                   v-model="newRoleData.name"
-                  class="w-full h-10 rounded-md border-input bg-background px-3 py-2 text-sm"
-                  placeholder="e.g., Content Editor"
+                  class="h-10 w-full rounded-md"
+                  :placeholder="t('roles.dialog.form.name.placeholder')"
                   required
                 />
               </div>
-
               <div class="space-y-2">
-                <label for="new-role-status" class="block text-sm font-medium text-foreground">
-                  Status <span class="text-destructive">*</span>
+                <label for="new-role-status" class="block text-sm text-foreground font-medium">
+                  {{ t('roles.dialog.form.status.label') }} <span class="text-destructive">*</span>
                 </label>
                 <Select v-model="newRoleData.status" required>
-                  <SelectTrigger
-                    class="w-full h-10 rounded-md border-input bg-background px-3 py-2 text-sm"
-                    id="new-role-status"
-                  >
-                    <SelectValue placeholder="Select a status" />
+                  <SelectTrigger id="new-role-status" class="h-10 w-full rounded-md">
+                    <SelectValue :placeholder="t('roles.dialog.form.status.placeholder')" />
                   </SelectTrigger>
-                  <SelectContent class="bg-popover text-popover-foreground rounded-md shadow-lg">
+                  <SelectContent class="rounded-md bg-popover text-popover-foreground shadow-lg">
                     <SelectItem
                       v-for="statusOption in roleStatuses"
                       :key="statusOption.value"
                       :value="statusOption.value"
-                      class="hover:bg-accent focus:bg-accent"
+                      class="focus:bg-accent hover:bg-accent"
                     >
                       {{ statusOption.label }}
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
               <div class="space-y-2">
-                <label for="new-role-description" class="block text-sm font-medium text-foreground">
-                  Description <span class="text-xs text-muted-foreground">(Optional)</span>
+                <label for="new-role-description" class="block text-sm text-foreground font-medium">
+                  {{ t('roles.dialog.form.description.label') }}
+                  <span class="text-xs text-muted-foreground">{{
+                      t('roles.dialog.form.description.optional')
+                    }}</span>
                 </label>
                 <Textarea
                   id="new-role-description"
                   v-model="newRoleData.description"
-                  class="w-full min-h-[80px] rounded-md border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Provide a brief summary of the role's responsibilities and permissions."
+                  class="min-h-[80px] w-full rounded-md"
+                  :placeholder="t('roles.dialog.form.description.placeholder')"
                 />
               </div>
-
               <DialogFooter
-                class="pt-6 flex flex-col sm:flex-row sm:justify-end sm:space-x-2 space-y-2 sm:space-y-0"
+                class="flex flex-col-reverse pt-6 sm:flex-row sm:justify-end sm:space-x-2"
               >
                 <Button
                   type="button"
                   variant="outline"
+                  class="h-9 rounded-md text-sm"
                   @click="isNewRoleDialogOpen = false"
-                  class="w-full sm:w-auto h-9 rounded-md text-sm"
                 >
-                  Cancel
+                  {{ t('roles.dialog.buttons.cancel') }}
                 </Button>
                 <Button
                   type="submit"
-                  class="w-full sm:w-auto h-9 rounded-md text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+                  class="h-9 rounded-md bg-primary text-sm text-primary-foreground hover:bg-primary/90"
                 >
-                  Save Role
+                  {{ t('roles.dialog.buttons.save') }}
                 </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
-        <DataTableViewOptions :table="table" />
       </div>
     </div>
     <Toaster />
   </div>
 </template>
-
-<style>
-/* Add any global styles or component-specific styles here if needed */
-/* For example, to ensure the dialog overlay is dark enough */
-/* This might be handled by shadcn/ui defaults already */
-
-/* Placeholder for roleStatuses if not provided */
-/*
-const roleStatuses = [
-  { value: 'ACTIVE', label: 'Active', icon: 'i-lucide-check-circle' },
-  { value: 'INACTIVE', label: 'Inactive', icon: 'i-lucide-x-circle' },
-  { value: 'PENDING', label: 'Pending', icon: 'i-lucide-clock' },
-];
-*/
-</style>

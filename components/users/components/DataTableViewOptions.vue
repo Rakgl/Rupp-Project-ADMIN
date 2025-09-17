@@ -1,29 +1,25 @@
 <script setup lang="ts">
-import type { Table } from '@tanstack/vue-table'
-import type { Task } from '../data/schema'
-import { computed } from 'vue'
+import type { Table } from '@tanstack/vue-table';
+import type { Task } from '../data/schema';
+import { computed } from 'vue';
 
 interface DataTableViewOptionsProps {
-  table: Table<Task>
+  table: Table<Task>;
 }
 
-const props = defineProps<DataTableViewOptionsProps>()
+const props = defineProps<DataTableViewOptionsProps>();
 
-const columns = computed(() => props.table.getAllColumns()
-  .filter(
-    column =>
-      typeof column.accessorFn !== 'undefined' && column.getCanHide(),
-  ))
+const columns = computed(() =>
+  props.table
+    .getAllColumns()
+    .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
+);
 </script>
 
 <template>
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
-      <Button
-        variant="outline"
-        size="sm"
-        class="ml-auto hidden h-8 lg:flex"
-      >
+      <Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
         <Icon name="i-radix-icons-mixer-horizontal" class="mr-2 h-4 w-4" />
         View
       </Button>

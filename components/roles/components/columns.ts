@@ -1,39 +1,51 @@
 import type { ColumnDef, Table } from '@tanstack/vue-table'; // ✨ ADDED Table type
 import { h } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { Role } from '../data/schema';
 import { Checkbox } from '@/components/ui/checkbox';
 import DataTableColumnHeader from './DataTableColumnHeader.vue';
 import RoleRowActions from './DataTableRowActions.vue';
+import { Badge } from '@/components/ui/badge';
 
 interface CustomTableMeta {
   onDataChanged?: () => void;
 }
 
+// --- Configuration for Status Column ---
+interface StatusDisplayConfig {
+  label: string;
+  badgeClass: string;
+  dotClass: string;
+}
+
+const statusConfigurations: Record<string, StatusDisplayConfig> = {
+  ACTIVE: {
+    label: 'roles.status.active',
+    badgeClass:
+      'bg-green-100 text-green-700 dark:bg-green-700/20 dark:text-green-400 border border-green-200 dark:border-green-600/30',
+    dotClass: 'bg-green-500 dark:bg-green-400',
+  },
+  INACTIVE: {
+    label: 'roles.status.inactive',
+    badgeClass:
+      'bg-red-100 text-red-700 dark:bg-red-700/20 dark:text-red-400 border border-red-200 dark:border-red-600/30',
+    dotClass: 'bg-red-500 dark:bg-red-400',
+  },
+  DEFAULT: {
+    label: 'roles.status.unknown',
+    badgeClass:
+      'bg-gray-100 text-gray-600 dark:bg-gray-600/20 dark:text-gray-400 border border-gray-200 dark:border-gray-500/30',
+    dotClass: 'bg-gray-400',
+  },
+};
+
 export const roleColumns: ColumnDef<Role>[] = [
   {
-    id: 'select',
-    header: ({ table }) =>
-      h(Checkbox, {
-        checked:
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate'),
-        'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: 'Select all',
-        class: 'translate-y-0.5',
-      }),
-    cell: ({ row }) =>
-      h(Checkbox, {
-        checked: row.getIsSelected(),
-        'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
-        ariaLabel: 'Select row',
-        class: 'translate-y-0.5',
-      }),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     id: 'index',
-    header: ({ column }) => h(DataTableColumnHeader, { column, title: '#' }),
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.index') });
+    },
     cell: ({ row, table }) => {
       const { pageIndex, pageSize } = table.getState().pagination;
       const globalIndex = pageIndex * pageSize + row.index + 1;
@@ -44,43 +56,57 @@ export const roleColumns: ColumnDef<Role>[] = [
   },
   {
     accessorKey: 'name',
-    header: ({ column }) => h(DataTableColumnHeader, { column, title: 'Name' }),
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.name') });
+    },
     cell: ({ row }) => h('div', { class: 'font-medium' }, row.getValue('name')),
     enableSorting: true,
   },
   {
     accessorKey: 'description',
-    header: ({ column }) => h(DataTableColumnHeader, { column, title: 'Description' }),
-    cell: ({ row }) => h('div', {}, row.getValue('description') || 'N/A'),
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.description') });
+    },
+    cell: ({ row }) => {
+      const { t } = useI18n();
+      return h('div', {}, row.getValue('description') || t('roles.table.noDescription'));
+    },
     enableSorting: false,
   },
   {
     accessorKey: 'status',
-    header: ({ column }) => h(DataTableColumnHeader, { column, title: 'Status' }),
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.status') });
+    },
     cell: ({ row }) => {
-      const statusValue = row.getValue('status');
-      const status = String(statusValue || '').toLowerCase();
-      const statusText = status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A';
-      let statusClass = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200';
+      const { t } = useI18n();
+      const statusValue = row.getValue('status') as string;
+      const configKey = statusValue?.toUpperCase();
+      const config = statusConfigurations[configKey] || statusConfigurations.DEFAULT;
 
-      if (String(statusValue) === 'ACTIVE') {
-        statusClass = 'bg-green-100 text-green-700 dark:bg-green-700/30 dark:text-green-400';
-      } else if (String(statusValue) === 'INACTIVE') {
-        statusClass = 'bg-red-100 text-red-700 dark:bg-red-700/30 dark:text-red-400';
-      }
       return h(
-        'div',
+        Badge,
         {
-          class: `px-2 py-1 inline-block rounded font-semibold ${statusClass}`,
+          class: `px-2.5 py-1 text-xs rounded-md font-medium inline-flex items-center ${config.badgeClass}`,
         },
-        statusText
+        () => [
+          h('span', { class: `w-2 h-2 mr-1.5 rounded-full ${config.dotClass}` }),
+          t(config.label),
+        ]
       );
     },
-    enableSorting: true,
+    minSize: 120,
+    meta: { cellClass: 'text-center' },
   },
   {
     id: 'actions',
-    header: ({ column }) => h(DataTableColumnHeader, { column, title: 'Actions' }),
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.actions') });
+    },
     cell: ({ row, table }) => {
       // ✨ table is available in cell context
       // Access onDataChanged from table.options.meta

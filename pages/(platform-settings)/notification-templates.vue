@@ -1,0 +1,276 @@
+<script setup lang="ts">
+import { ref, onMounted, computed, watch } from 'vue';
+import { useToast } from '@/components/ui/toast/use-toast';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertCircle, Loader2Icon, ClipboardCopyIcon, PencilIcon } from 'lucide-vue-next';
+
+// @ts-ignore
+import { useApi } from '@/composables/useApi';
+
+interface NotificationTemplate {
+  id: string;
+  slug: string;
+  name: string;
+  group: string;
+  email_subject: string | null;
+  email_body_html: string | null;
+  push_notification_title: string | null;
+  push_notification_body: string | null;
+  placeholders: Record<string, string> | null;
+  is_active: boolean;
+}
+
+const api = useApi();
+const { toast } = useToast();
+
+const templates = ref<Record<string, NotificationTemplate[]>>({});
+const isLoading = ref(true);
+const error = ref<string | null>(null);
+
+const isEditDialogOpen = ref(false);
+const isSaving = ref(false);
+const currentTemplate = ref<NotificationTemplate | null>(null);
+
+async function fetchData() {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    const response: any = await api('/notification-templates?grouped=true');
+    if (response.success) {
+      templates.value = response.data;
+    } else {
+      throw new Error(response.message || 'Failed to fetch templates.');
+    }
+  } catch (err: any) {
+    error.value = err.message;
+    toast({ title: 'Error', description: err.message, variant: 'destructive' });
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+function openEditDialog(template: NotificationTemplate) {
+  // Create a deep copy to avoid editing the original object directly
+  currentTemplate.value = JSON.parse(JSON.stringify(template));
+  isEditDialogOpen.value = true;
+}
+
+async function saveChanges() {
+  if (!currentTemplate.value) return;
+
+  isSaving.value = true;
+  try {
+    const response: any = await api(`/notification-templates/${currentTemplate.value.id}`, {
+      method: 'PUT',
+      body: currentTemplate.value,
+    });
+    if (response.success) {
+      toast({ title: 'Success', description: 'Template updated successfully.' });
+      isEditDialogOpen.value = false;
+      fetchData(); // Refresh the list
+    } else {
+      throw new Error(response.message || 'Failed to update template.');
+    }
+  } catch (err: any) {
+    toast({ title: 'Error', description: err.message, variant: 'destructive' });
+  } finally {
+    isSaving.value = false;
+  }
+}
+
+function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text).then(() => {
+    toast({ title: 'Copied!', description: `"${text}" copied to clipboard.` });
+  });
+}
+
+onMounted(fetchData);
+</script>
+
+<template>
+  <div class="w-full flex flex-col items-stretch gap-4 p-4 md:p-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight">Notification Templates</h2>
+        <p class="text-muted-foreground">Manage the content for emails and push notifications.</p>
+      </div>
+    </div>
+
+    <div v-if="isLoading" class="flex justify-center items-center py-20">
+      <Loader2Icon class="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+
+    <div
+      v-else-if="error"
+      class="bg-destructive/10 text-destructive border border-destructive/20 rounded-lg p-4 flex items-center gap-4"
+    >
+      <AlertCircle class="h-6 w-6" />
+      <div>
+        <h3 class="font-semibold">Failed to load templates</h3>
+        <p class="text-sm">{{ error }}</p>
+      </div>
+    </div>
+
+    <div v-else class="space-y-8">
+      <Card v-for="(groupTemplates, groupName) in templates" :key="groupName">
+        <CardHeader>
+          <CardTitle>{{ groupName }}</CardTitle>
+        </CardHeader>
+        <CardContent class="divide-y">
+          <div
+            v-for="template in groupTemplates"
+            :key="template.id"
+            class="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+          >
+            <div class="flex items-center gap-4">
+              <Switch :checked="template.is_active" disabled />
+              <div>
+                <p class="font-medium">{{ template.name }}</p>
+                <p class="text-sm text-muted-foreground">{{ template.slug }}</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" @click="openEditDialog(template)">
+              <PencilIcon class="mr-2 h-4 w-4" />
+              Edit
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Edit Dialog -->
+    <Dialog v-model:open="isEditDialogOpen">
+      <DialogContent class="w-[95vw] sm:max-w-4xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader class="p-6 pb-4 flex-shrink-0 border-b">
+          <DialogTitle>Edit Template: {{ currentTemplate?.name }}</DialogTitle>
+          <DialogDescription
+            >Modify the content for this notification. Use the placeholders provided on the
+            right.</DialogDescription
+          >
+        </DialogHeader>
+
+        <div
+          v-if="currentTemplate"
+          class="flex-grow grid grid-cols-1 lg:grid-cols-3 overflow-hidden"
+        >
+          <!-- Main Content Area -->
+          <div class="lg:col-span-2 p-6 overflow-y-auto custom-scrollbar space-y-6">
+            <!-- General -->
+            <div class="space-y-1.5">
+              <Label for="template-name">Template Name</Label>
+              <Input id="template-name" v-model="currentTemplate.name" />
+            </div>
+            <div class="flex items-center space-x-2">
+              <Switch
+                id="template-active"
+                :checked="currentTemplate.is_active"
+                @update:checked="currentTemplate.is_active = $event"
+              />
+              <Label for="template-active">Template is Active</Label>
+            </div>
+            <div class="border-b"></div>
+
+            <!-- Email Content -->
+            <h3 class="font-semibold text-lg">Email Content</h3>
+            <div class="space-y-1.5">
+              <Label for="email-subject">Email Subject</Label>
+              <Input id="email-subject" v-model="currentTemplate.email_subject" />
+            </div>
+            <div class="space-y-1.5">
+              <Label for="email-body">Email Body (HTML)</Label>
+              <Textarea
+                id="email-body"
+                v-model="currentTemplate.email_body_html"
+                class="min-h-[250px] font-mono"
+                placeholder="Enter the HTML for your email here. Use a tool like BeeFree.io to build responsive emails and paste the HTML here."
+              />
+              <!-- For a full experience, replace Textarea with a WYSIWYG editor like VueQuill or Tiptap -->
+            </div>
+            <div class="border-b"></div>
+
+            <!-- Push Notification Content -->
+            <h3 class="font-semibold text-lg">Push Notification Content</h3>
+            <div class="space-y-1.5">
+              <Label for="push-title">Push Title</Label>
+              <Input id="push-title" v-model="currentTemplate.push_notification_title" />
+            </div>
+            <div class="space-y-1.5">
+              <Label for="push-body">Push Body</Label>
+              <Textarea
+                id="push-body"
+                v-model="currentTemplate.push_notification_body"
+                class="min-h-[100px]"
+              />
+            </div>
+          </div>
+
+          <!-- Placeholders Sidebar -->
+          <div class="lg:col-span-1 bg-muted/30 border-l p-6 overflow-y-auto custom-scrollbar">
+            <h3 class="font-semibold mb-4">Available Placeholders</h3>
+            <p v-if="!currentTemplate.placeholders" class="text-sm text-muted-foreground">
+              No placeholders defined for this template.
+            </p>
+            <div v-else class="space-y-3">
+              <div
+                v-for="(description, placeholder) in currentTemplate.placeholders"
+                :key="placeholder"
+              >
+                <div class="flex items-center justify-between">
+                  <code class="font-mono text-sm bg-muted px-2 py-1 rounded">{{
+                    placeholder
+                  }}</code>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    class="h-7 w-7"
+                    @click="copyToClipboard(placeholder)"
+                  >
+                    <ClipboardCopyIcon class="h-4 w-4" />
+                  </Button>
+                </div>
+                <p class="text-xs text-muted-foreground mt-1">{{ description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter class="p-6 pt-4 flex-shrink-0 border-t">
+          <Button variant="outline" @click="isEditDialogOpen = false" class="w-full sm:w-auto"
+            >Cancel</Button
+          >
+          <Button @click="saveChanges" :disabled="isSaving" class="w-full sm:w-auto">
+            <Loader2Icon v-if="isSaving" class="mr-2 h-4 w-4 animate-spin" />
+            Save Changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </div>
+</template>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--border));
+  border-radius: 10px;
+}
+</style>

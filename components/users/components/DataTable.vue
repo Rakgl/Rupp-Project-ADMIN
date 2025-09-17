@@ -28,6 +28,7 @@ interface DataTableProps {
   onPaginationChange: (updater: Updater<PaginationState>) => void;
   onSortingChange?: (updater: Updater<SortingState>) => void;
   onColumnFiltersChange?: (updater: Updater<ColumnFiltersState>) => void;
+  meta?: any;
 
   // Flags to enable server-side processing
   manualPagination?: boolean;
@@ -90,6 +91,8 @@ const table = useVueTable({
   onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
 
   getCoreRowModel: getCoreRowModel(),
+
+  meta: props.meta,
 });
 </script>
 
@@ -122,7 +125,11 @@ const table = useVueTable({
             </TableRow>
           </template>
           <TableRow v-else>
-            <TableCell :colspan="columns.length" class="h-24 text-center"> No results. </TableCell>
+            <TableCell
+              :colspan="columns.length"
+              class="h-24 text-center"
+              v-t="'users.table.noResults'"
+            ></TableCell>
           </TableRow>
         </TableBody>
       </Table>

@@ -1,21 +1,26 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils'
-import { toTypedSchema } from '@vee-validate/zod'
-import { useForm } from 'vee-validate'
-import { h } from 'vue'
-import * as z from 'zod'
-import { buttonVariants } from '~/components/ui/button'
-import { toast } from '~/components/ui/toast'
+import { cn } from '@/lib/utils';
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { h } from 'vue';
+import * as z from 'zod';
+import { useI18n } from 'vue-i18n';
+import { buttonVariants } from '~/components/ui/button';
+import { toast } from '~/components/ui/toast';
 
-const appearanceFormSchema = toTypedSchema(z.object({
-  theme: z.enum(['light', 'dark'], {
-    required_error: 'Please select a theme.',
-  }),
-  font: z.enum(['inter', 'manrope', 'system'], {
-    invalid_type_error: 'Select a font',
-    required_error: 'Please select a font.',
-  }),
-}))
+const { t } = useI18n();
+
+const appearanceFormSchema = toTypedSchema(
+  z.object({
+    theme: z.enum(['light', 'dark'], {
+      required_error: t('appearance.validation.themeRequired'),
+    }),
+    font: z.enum(['inter', 'manrope', 'system'], {
+      invalid_type_error: t('appearance.validation.fontInvalid'),
+      required_error: t('appearance.validation.fontRequired'),
+    }),
+  })
+);
 
 const { handleSubmit } = useForm({
   validationSchema: appearanceFormSchema,
@@ -23,62 +28,67 @@ const { handleSubmit } = useForm({
     theme: 'light',
     font: 'inter',
   },
-})
+});
 
-const color = useColorMode()
+const color = useColorMode();
 
 const onSubmit = handleSubmit((values) => {
   toast({
-    title: 'You submitted the following values:',
-    description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
-  })
+    title: t('appearance.toast.submittedTitle'),
+    description: h(
+      'pre',
+      { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
+      h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
+    ),
+  });
   if (values.theme === 'dark') {
-    color.preference = 'dark'
+    color.preference = 'dark';
+  } else {
+    color.preference = 'light';
   }
-  else {
-    color.preference = 'light'
-  }
-})
+});
 </script>
 
 <template>
   <div>
     <h3 class="text-lg font-medium">
-      Appearance
+      {{ t('appearance.title') }}
     </h3>
     <p class="text-sm text-muted-foreground">
-      Customize the appearance of the app. Automatically switch between day and night themes.
+      {{ t('appearance.description') }}
     </p>
   </div>
   <Separator />
   <form class="space-y-8" @submit="onSubmit">
     <FormField v-slot="{ field }" name="font">
       <FormItem>
-        <FormLabel>Font</FormLabel>
+        <FormLabel>{{ t('appearance.font.label') }}</FormLabel>
         <div class="relative w-[200px]">
           <FormControl>
             <select
-              :class="cn(
-                buttonVariants({ variant: 'outline' }),
-                'w-[200px] appearance-none font-normal',
-              )"
+              :class="
+                cn(buttonVariants({ variant: 'outline' }), 'w-[200px] appearance-none font-normal')
+              "
               v-bind="field"
             >
               <option value="inter">
-                Inter
+                {{ t('appearance.font.inter') }}
               </option>
               <option value="manrope">
-                Manrope
+                {{ t('appearance.font.manrope') }}
               </option>
               <option value="system">
-                System
+                {{ t('appearance.font.system') }}
               </option>
             </select>
           </FormControl>
-          <Icon name="i-radix-icons-chevron-down" class="pointer-events-none absolute right-3 top-2.5 h-4 w-4 opacity-50" />
+          <Icon
+            name="i-radix-icons-chevron-down"
+            class="pointer-events-none absolute right-3 top-2.5 h-4 w-4 opacity-50"
+          />
         </div>
         <FormDescription>
-          Set the font you want to use in the dashboard.
+          {{ t('appearance.font.description') }}
         </FormDescription>
         <FormMessage />
       </FormItem>
@@ -86,16 +96,13 @@ const onSubmit = handleSubmit((values) => {
 
     <FormField v-slot="{ componentField }" type="radio" name="theme">
       <FormItem class="space-y-1">
-        <FormLabel>Theme</FormLabel>
+        <FormLabel>{{ t('appearance.theme.label') }}</FormLabel>
         <FormDescription>
-          Select the theme for the dashboard.
+          {{ t('appearance.theme.description') }}
         </FormDescription>
         <FormMessage />
 
-        <RadioGroup
-          class="grid grid-cols-2 max-w-md gap-8 pt-2"
-          v-bind="componentField"
-        >
+        <RadioGroup class="grid grid-cols-2 max-w-md gap-8 pt-2" v-bind="componentField">
           <FormItem>
             <FormLabel class="[&:has([data-state=checked])>div]:border-primary">
               <FormControl>
@@ -118,7 +125,7 @@ const onSubmit = handleSubmit((values) => {
                 </div>
               </div>
               <span class="block w-full p-2 text-center font-normal">
-                Light
+                {{ t('appearance.theme.light') }}
               </span>
             </FormLabel>
           </FormItem>
@@ -127,7 +134,9 @@ const onSubmit = handleSubmit((values) => {
               <FormControl>
                 <RadioGroupItem value="dark" class="sr-only" />
               </FormControl>
-              <div class="items-center border-2 border-muted rounded-md bg-popover p-1 hover:bg-accent hover:text-accent-foreground">
+              <div
+                class="items-center border-2 border-muted rounded-md bg-popover p-1 hover:bg-accent hover:text-accent-foreground"
+              >
                 <div class="rounded-sm bg-slate-950 p-2 space-y-2">
                   <div class="rounded-md bg-slate-800 p-2 shadow-sm space-y-2">
                     <div class="h-2 w-20 rounded-lg bg-slate-400" />
@@ -144,7 +153,7 @@ const onSubmit = handleSubmit((values) => {
                 </div>
               </div>
               <span class="block w-full p-2 text-center font-normal">
-                Dark
+                {{ t('appearance.theme.dark') }}
               </span>
             </FormLabel>
           </FormItem>
@@ -154,7 +163,7 @@ const onSubmit = handleSubmit((values) => {
 
     <div class="flex justify-start">
       <Button type="submit">
-        Update preferences
+        {{ t('appearance.updateButton') }}
       </Button>
     </div>
   </form>

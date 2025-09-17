@@ -1,11 +1,11 @@
 // import { useAuth } from '#auth'
 export function useApi() {
   const config = useRuntimeConfig();
-  const adminApiBase = config.public.adminApiBase;
+  const apiURL = config.public.apiURL;
   const { token } = useAuth();
 
   return $fetch.create({
-    baseURL: adminApiBase,
+    baseURL: apiURL,
     async onRequest({ options }) {
       if (token.value) {
         options.headers = {

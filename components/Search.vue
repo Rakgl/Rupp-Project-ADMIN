@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { NavGroup, NavMenu } from '~/types/nav'; // Assuming these types are correctly defined
-import { navMenu } from '@/constants/menus'; // Your navMenu import
+// Assuming these types are correctly defined
+import { navMenu } from '@/constants/menus' // Your navMenu import
 
-const { metaSymbol } = useShortcuts();
-const openCommand = ref(false);
-const router = useRouter();
+const { metaSymbol } = useShortcuts()
+const openCommand = ref(false)
+const router = useRouter()
 
 defineShortcuts({
   Meta_K: () => (openCommand.value = true),
-});
+})
 
 // componentsNav is no longer needed as we iterate through the whole navMenu directly.
 
 function handleSelectLink(link: string) {
   if (link) {
-    router.push(link);
-    openCommand.value = false;
+    router.push(link)
+    openCommand.value = false
   }
 }
 </script>
@@ -25,7 +25,7 @@ function handleSelectLink(link: string) {
     <Button variant="outline" size="sm" class="text-xs" @click="openCommand = !openCommand">
       <Icon name="i-lucide-search" />
       <span class="font-normal group-data-[collapsible=icon]:hidden">Search documentation</span>
-      <div class="ml-auto flex items-center space-x-0.5 group-data-[collapsible=icon]:hidden">
+      <div class="ml-auto flex items-center group-data-[collapsible=icon]:hidden space-x-0.5">
         <BaseKbd>{{ metaSymbol }}</BaseKbd>
         <BaseKbd>K</BaseKbd>
       </div>
@@ -69,11 +69,11 @@ function handleSelectLink(link: string) {
                 <Icon v-if="child.icon" :name="child.icon" class="h-4 w-4" />
                 <span
                   v-else-if="item.icon"
-                  class="h-4 w-4 opacity-50 flex items-center justify-center"
+                  class="h-4 w-4 flex items-center justify-center opacity-50"
                 >
                   <Icon :name="item.icon" class="h-3 w-3" />
                 </span>
-                <span v-else class="h-4 w-4"></span> {{ child.title }}
+                <span v-else class="h-4 w-4" /> {{ child.title }}
               </CommandItem>
             </template>
             <template v-else-if="item.link">
@@ -84,7 +84,7 @@ function handleSelectLink(link: string) {
                 @select="() => handleSelectLink(item.link)"
               >
                 <Icon v-if="item.icon" :name="item.icon" class="h-4 w-4" />
-                <span v-else class="h-4 w-4"></span> {{ item.title }}
+                <span v-else class="h-4 w-4" /> {{ item.title }}
               </CommandItem>
             </template>
           </template>

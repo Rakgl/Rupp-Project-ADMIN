@@ -18,22 +18,25 @@ export function useAuthPermission() {
   })
 
   function hasRole(expectedRole: string): boolean {
-    if (!isAuthenticated.value || !role.value) return false
+    if (!isAuthenticated.value || !role.value)
+      return false
     return role.value === expectedRole
   }
 
   function hasPermission(permissionOrPermissions: string | string[]): boolean {
-	
-    if (!isAuthenticated.value || permissions.value.length === 0) return false
+    if (!isAuthenticated.value || permissions.value.length === 0)
+      return false
     const permissionsToCheck = Array.isArray(permissionOrPermissions) ? permissionOrPermissions : [permissionOrPermissions]
-	console.log( permissionsToCheck.some(perm => permissions.value.includes(perm)));
-	
+    console.log(permissionsToCheck.some(perm => permissions.value.includes(perm)))
+
     return permissionsToCheck.some(perm => permissions.value.includes(perm))
   }
 
   function hasAllPermissions(requiredPermissions: string[]): boolean {
-    if (!isAuthenticated.value || permissions.value.length === 0) return false
-    if (requiredPermissions.length === 0) return true
+    if (!isAuthenticated.value || permissions.value.length === 0)
+      return false
+    if (requiredPermissions.length === 0)
+      return true
     return requiredPermissions.every(perm => permissions.value.includes(perm))
   }
 

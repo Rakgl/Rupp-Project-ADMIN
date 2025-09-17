@@ -1,22 +1,29 @@
 <script setup lang="ts">
 import type { Table } from '@tanstack/vue-table';
 import type { Task } from '../data/schema';
+import { useI18n } from 'vue-i18n';
 
 interface DataTablePaginationProps {
   table: Table<Task>;
 }
 defineProps<DataTablePaginationProps>();
+
+const { t } = useI18n();
 </script>
 
 <template>
   <div class="flex items-center justify-between px-2">
     <div class="flex-1 text-sm text-muted-foreground">
-      {{ table.getFilteredSelectedRowModel().rows.length }} of
-      {{ table.getFilteredRowModel().rows.length }} row(s) selected.
+      {{
+        t('pagination.selected', {
+          selected: table.getFilteredSelectedRowModel().rows.length,
+          total: table.getFilteredRowModel().rows.length,
+        })
+      }}
     </div>
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
-        <p class="text-sm font-medium">Rows per page</p>
+        <p class="text-sm font-medium" v-t="'pagination.rowsPerPage'"></p>
         <Select
           :model-value="`${table.getState().pagination.pageSize}`"
           @update:model-value="table.setPageSize"
@@ -36,8 +43,12 @@ defineProps<DataTablePaginationProps>();
         </Select>
       </div>
       <div class="w-[100px] flex items-center justify-center text-sm font-medium">
-        Page {{ table.getState().pagination.pageIndex + 1 }} of
-        {{ table.getPageCount() }}
+        {{
+          t('pagination.page', {
+            current: table.getState().pagination.pageIndex + 1,
+            total: table.getPageCount(),
+          })
+        }}
       </div>
       <div class="flex items-center space-x-2">
         <Button
@@ -46,7 +57,7 @@ defineProps<DataTablePaginationProps>();
           :disabled="!table.getCanPreviousPage()"
           @click="table.setPageIndex(0)"
         >
-          <span class="sr-only">Go to first page</span>
+          <span class="sr-only" v-t="'pagination.goToFirst'"></span>
           <Icon name="i-radix-icons-double-arrow-left" class="h-4 w-4" />
         </Button>
         <Button
@@ -55,7 +66,7 @@ defineProps<DataTablePaginationProps>();
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
-          <span class="sr-only">Go to previous page</span>
+          <span class="sr-only" v-t="'pagination.goToPrevious'"></span>
           <Icon name="i-radix-icons-chevron-left" class="h-4 w-4" />
         </Button>
         <Button
@@ -64,7 +75,7 @@ defineProps<DataTablePaginationProps>();
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >
-          <span class="sr-only">Go to next page</span>
+          <span class="sr-only" v-t="'pagination.goToNext'"></span>
           <Icon name="i-radix-icons-chevron-right" class="h-4 w-4" />
         </Button>
         <Button
@@ -73,7 +84,7 @@ defineProps<DataTablePaginationProps>();
           :disabled="!table.getCanNextPage()"
           @click="table.setPageIndex(table.getPageCount() - 1)"
         >
-          <span class="sr-only">Go to last page</span>
+          <span class="sr-only" v-t="'pagination.goToLast'"></span>
           <Icon name="i-radix-icons-double-arrow-right" class="h-4 w-4" />
         </Button>
       </div>

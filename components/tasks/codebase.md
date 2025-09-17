@@ -4,9 +4,9 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 
 import type { Task } from '../data/schema'
+import { h } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { h } from 'vue'
 import { labels, priorities, statuses } from '../data/data'
 import DataTableColumnHeader from './DataTableColumnHeader.vue'
 import DataTableRowActions from './DataTableRowActions.vue'
@@ -90,7 +90,6 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => h(DataTableRowActions, { row }),
   },
 ]
-
 ```
 
 # components/DataTable.vue
@@ -105,7 +104,6 @@ import type {
 } from '@tanstack/vue-table'
 
 import type { Task } from '../data/schema'
-import { valueUpdater } from '@/lib/utils'
 import {
   FlexRender,
   getCoreRowModel,
@@ -116,6 +114,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
+import { valueUpdater } from '@/lib/utils'
 import DataTablePagination from './DataTablePagination.vue'
 import DataTableToolbar from './DataTableToolbar.vue'
 
@@ -193,7 +192,6 @@ const table = useVueTable({
     <DataTablePagination :table="table" />
   </div>
 </template>
-
 ```
 
 # components/DataTableColumnHeader.vue
@@ -255,7 +253,6 @@ export default {
     {{ title }}
   </div>
 </template>
-
 ```
 
 # components/DataTableFacetedFilter.vue
@@ -265,8 +262,8 @@ export default {
 import type { Column } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 import type { Task } from '../data/schema'
-import { cn } from '@/lib/utils'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 interface DataTableFacetedFilter {
   column?: Column<Task, any>
@@ -384,7 +381,6 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
     </PopoverContent>
   </Popover>
 </template>
-
 ```
 
 # components/DataTablePagination.vue
@@ -470,7 +466,6 @@ defineProps<DataTablePaginationProps>()
     </div>
   </div>
 </template>
-
 ```
 
 # components/DataTableRowActions.vue
@@ -525,7 +520,6 @@ const task = computed(() => taskSchema.parse(props.row.original))
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
-
 ```
 
 # components/DataTableToolbar.vue
@@ -583,7 +577,6 @@ const isFiltered = computed(() => props.table.getState().columnFilters.length > 
     <DataTableViewOptions :table="table" />
   </div>
 </template>
-
 ```
 
 # components/DataTableViewOptions.vue
@@ -635,7 +628,6 @@ const columns = computed(() => props.table.getAllColumns()
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
-
 ```
 
 # data/data.ts
@@ -704,7 +696,6 @@ export const priorities = [
     icon: h(Icon, { name: 'i-radix-icons-arrow-up' }),
   },
 ]
-
 ```
 
 # data/schema.ts
@@ -723,7 +714,6 @@ export const taskSchema = z.object({
 })
 
 export type Task = z.infer<typeof taskSchema>
-
 ```
 
 # data/tasks.json
@@ -1433,6 +1423,4 @@ export type Task = z.infer<typeof taskSchema>
     }
   ]
 }
-
 ```
-

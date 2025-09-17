@@ -1,9 +1,10 @@
 // nuxt.config.ts - Updated configuration
-const appBaseUrl = process.env.NUXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
-const adminApiBase = process.env.NUXT_PUBLIC_ADMIN_API_BASE || 'http://localhost:8000/api/v1/admin';
-
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true, // or false to disable
+    vscode: {},
+  },
+  ssr: false,
 
   modules: [
     '@unocss/nuxt',
@@ -14,33 +15,26 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
     '@sidebase/nuxt-auth',
+    '@nuxtjs/i18n',
   ],
 
   // Expose base URLs to your app if needed elsewhere
   runtimeConfig: {
     public: {
-      appBaseUrl: appBaseUrl,
-      adminApiBase: adminApiBase,
+      apiURL: '/api/v1/admin',
     },
   },
 
   auth: {
-    originEnvKey: 'appBaseUrl',
-    globalAppMiddleware: true,
-    // origin: appBaseUrl,
+    baseURL: '/api/v1/admin/auth',
+    globalAppMiddleware: false,
     provider: {
       type: 'local',
       endpoints: {
-        signIn: { path: `${adminApiBase}/auth/login`, method: 'post' },
-        signOut: { path: `${adminApiBase}/auth/logout`, method: 'post' },
+        signIn: { path: `/login`, method: 'post' },
+        signOut: { path: `/logout`, method: 'post' },
         signUp: false,
-        getSession: {
-          path: `${adminApiBase}/auth/info`,
-          method: 'get',
-          headers: {
-            Accept: 'application/json',
-          },
-        },
+        getSession: { path: `/info`, method: 'get' },
       },
       pages: {
         login: '/login',
@@ -52,33 +46,12 @@ export default defineNuxtConfig({
         maxAgeInSeconds: 365 * 24 * 60 * 60,
         sameSiteAttribute: 'lax',
       },
-      // Updated session data type to include permissions
-      sessionDataType: {
-        user: {
-          id: 'string',
-          name: 'string',
-          username: 'string',
-          email: 'string',
-          role: 'string',
-          status: 'object',
-          created_at: 'string',
-          updated_at: 'string',
-        },
-        permissions: 'array',
-      },
       refresh: {
         isEnabled: false,
-        endpoint: {
-          path: `${adminApiBase}/auth/refresh-token`,
-          method: 'post',
-          headers: {
-            Accept: 'application/json',
-          },
-        },
+        endpoint: { path: `/refresh-token`, method: 'post' },
         token: {
           signInResponseRefreshTokenPointer: '/data/refresh_token',
           refreshResponseTokenPointer: '/data/access_token',
-          refreshResponseRefreshTokenPointer: '/data/refresh_token',
           refreshRequestTokenPointer: '/refresh_token',
           maxAgeInSeconds: 365 * 24 * 60 * 60,
           sameSiteAttribute: 'lax',
@@ -87,7 +60,32 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ['@unocss/reset/tailwind.css'],
+  vite: process.env.PROXY_API_URL
+    ? {
+      server: {
+        proxy: {
+          '/api/v1/admin': {
+            target: process.env.PROXY_API_URL,
+            changeOrigin: true,
+            secure: false,
+            configure: (proxy, _options) => {
+              console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL);
+              proxy.on('proxyReq', (proxyReq, req, _res) => {
+                console.log('📤 Proxying:', req.method, req.url);
+              });
+              proxy.on('proxyRes', (proxyRes, req, _res) => {
+                console.log('📥 Response:', proxyRes.statusCode, req.url);
+              });
+            },
+          },
+        },
+      },
+    }
+    : {},
+
+  css: [
+    '@unocss/reset/tailwind.css',
+  ],
 
   colorMode: {
     classSuffix: '',
@@ -104,13 +102,13 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // '/**': { headers: { 'Cache-Control': 'no-cache' } },
     '/components': { redirect: '/components/accordion' },
     '/settings': { redirect: '/settings/profile' },
-    // Permission-protected routes
     '/admin/**': { middleware: 'permission' },
     '/customers/**': { middleware: 'permission' },
     '/stations/**': { middleware: 'permission' },
-    '/users/**': { middleware: 'admin' }, // Only admin can access user management
+    '/users/**': { middleware: 'admin' },
     '/roles/**': { middleware: 'admin' },
     '/reports/**': { middleware: 'permission' },
   },
@@ -120,6 +118,22 @@ export default defineNuxtConfig({
       './lib',
       './stores', // Auto-import stores
       './composables', // Auto-import composables
+    ],
+  },
+
+  i18n: {
+    lazy: false,
+    defaultLocale: 'en',
+    vueI18n: './i18n.config.ts',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+    },
+    locales: [
+      { code: 'en', name: 'English' },
+      { code: 'km', name: 'Khmer' },
+      { code: 'zh', name: 'Chinese' },
     ],
   },
 

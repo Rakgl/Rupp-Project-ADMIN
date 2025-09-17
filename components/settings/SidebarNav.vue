@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+const route = useRoute();
 
 interface Item {
-  title: string;
+  titleKey: string;
   href: string;
 }
 
-const route = useRoute();
-
 const sidebarNavItems: Item[] = [
   {
-    title: 'Profile',
+    titleKey: 'settings.sidebar.profile',
     href: '/settings/profile',
   },
   {
-    title: 'Account',
+    titleKey: 'settings.sidebar.account',
     href: '/settings/account',
   },
   {
-    title: 'Appearance',
+    titleKey: 'settings.sidebar.appearance',
     href: '/settings/appearance',
   },
-  //   {
-  //     title: 'Notifications',
-  //     href: '/settings/notifications',
-  //   },
-  //   {
-  //     title: 'Display',
-  //     href: '/settings/display',
-  //   },
+  // {
+  //   titleKey: 'settings.sidebar.notifications',
+  //   href: '/settings/notifications',
+  // },
+  {
+    titleKey: 'settings.sidebar.security',
+    href: '/settings/security',
+  },
 ];
 </script>
 
@@ -36,7 +38,7 @@ const sidebarNavItems: Item[] = [
   <nav class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-1">
     <Button
       v-for="item in sidebarNavItems"
-      :key="item.title"
+      :key="item.titleKey"
       variant="ghost"
       :class="
         cn(
@@ -47,7 +49,7 @@ const sidebarNavItems: Item[] = [
       as-child
     >
       <NuxtLink :to="item.href">
-        {{ item.title }}
+        {{ t(item.titleKey) }}
       </NuxtLink>
     </Button>
   </nav>

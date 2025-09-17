@@ -28,7 +28,7 @@ export const roleSchema = z.object({
   id: z.number(), // Or z.string()
   name: z.string(),
   description: z.string().nullable().optional(),
-  status: z.string().optional(), // e.g., 'active', 'inactive'
+  status: z.string().optional(), // e.g., 'ACTIVE', 'INACTIVE'
   created_by: z.string().optional(),
   permissions: z.array(permissionSchema).optional(), // Assuming permissions are part of the response
   // created_at: z.string().optional(), // If you need to display/use this

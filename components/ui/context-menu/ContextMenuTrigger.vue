@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ContextMenuTriggerProps } from 'radix-vue'
-import { ContextMenuTrigger, useForwardProps } from 'radix-vue'
+import type { ContextMenuTriggerProps } from 'radix-vue';
+import { ContextMenuTrigger, useForwardProps } from 'radix-vue';
 
-const props = defineProps<ContextMenuTriggerProps>()
+const props = defineProps<ContextMenuTriggerProps>();
 
-const forwardedProps = useForwardProps(props)
+const forwardedProps = useForwardProps(props);
 </script>
 
 <template>

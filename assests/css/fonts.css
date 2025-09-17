@@ -1,0 +1,14 @@
+/* Import Parkinsans */
+@import '@fontsource/parkinsans/400.css';
+@import '@fontsource/parkinsans/500.css';
+@import '@fontsource/parkinsans/600.css';
+@import '@fontsource/parkinsans/700.css';
+
+/* Import Kantumruy Pro */
+@import '@fontsource/kantumruy-pro/500.css';
+@import '@fontsource/kantumruy-pro/700.css';
+
+/* Import JetBrains Mono */
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/600.css';

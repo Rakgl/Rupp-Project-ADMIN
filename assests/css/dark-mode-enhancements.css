@@ -1,0 +1,268 @@
+/**
+ * Enhanced Dark Mode Styling
+ * Modern, high-contrast dark mode improvements
+ */
+
+/* Enhanced dark mode base styles */
+.dark {
+  /* Improved color transitions */
+  color-scheme: dark;
+
+  /* Better text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Enhanced dark mode animations */
+.dark * {
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+/* Better focus states in dark mode */
+.dark *:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--ring) / 0.3);
+}
+
+/* Enhanced dark mode cards */
+.dark .bg-card {
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.95));
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 8px 32px hsl(var(--foreground) / 0.04),
+    0 4px 16px hsl(var(--foreground) / 0.02),
+    inset 0 1px 0 hsl(var(--foreground) / 0.08);
+}
+
+/* Enhanced dark mode buttons */
+.dark button,
+.dark [role='button'] {
+  text-shadow: none;
+}
+
+.dark button:hover,
+.dark [role='button']:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px hsl(var(--foreground) / 0.06);
+}
+
+/* Enhanced dark mode inputs */
+.dark input,
+.dark textarea,
+.dark select {
+  background: linear-gradient(145deg, hsl(var(--input)), hsl(var(--input) / 0.95));
+  border: 1px solid hsl(var(--border));
+  box-shadow: inset 0 1px 3px hsl(var(--foreground) / 0.05);
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background: hsl(var(--background));
+  border-color: hsl(var(--ring));
+  box-shadow:
+    0 0 0 3px hsl(var(--ring) / 0.15),
+    inset 0 1px 3px hsl(var(--foreground) / 0.05);
+}
+
+/* Enhanced dark mode tables */
+.dark table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dark tbody tr {
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  transition: background-color 0.15s ease-in-out;
+}
+
+.dark tbody tr:hover {
+  background: linear-gradient(90deg, hsl(var(--muted) / 0.3), hsl(var(--muted) / 0.1));
+  backdrop-filter: blur(4px);
+}
+
+/* Enhanced dark mode navigation */
+.dark nav a,
+.dark .nav-link {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.dark nav a:hover,
+.dark .nav-link:hover {
+  color: hsl(var(--primary));
+  text-shadow: 0 0 8px hsl(var(--primary) / 0.3);
+}
+
+.dark nav a.active,
+.dark .nav-link.active {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.1), hsl(var(--primary) / 0.05));
+  border-left: 3px solid hsl(var(--primary));
+  box-shadow: inset 0 1px 0 hsl(var(--primary) / 0.1);
+}
+
+/* Enhanced dark mode badges */
+.dark .badge,
+.dark [role='status'] {
+  background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.8));
+  border: 1px solid hsl(var(--border));
+  text-shadow: 0 1px 2px hsl(var(--foreground) / 0.1);
+}
+
+/* Enhanced dark mode alerts */
+.dark [role='alert'],
+.dark .alert {
+  background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.9));
+  border: 1px solid hsl(var(--border));
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px hsl(var(--foreground) / 0.03);
+}
+
+/* Enhanced dark mode modals/dialogs */
+.dark [role='dialog'],
+.dark .modal {
+  background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--card) / 0.98));
+  backdrop-filter: blur(16px);
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    0 25px 50px hsl(var(--foreground) / 0.08),
+    0 10px 20px hsl(var(--foreground) / 0.04),
+    inset 0 1px 0 hsl(var(--foreground) / 0.1);
+}
+
+/* Enhanced dark mode dropdown menus */
+.dark [role='menu'],
+.dark .dropdown-menu {
+  background: linear-gradient(145deg, hsl(var(--popover)), hsl(var(--popover) / 0.95));
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    0 20px 40px hsl(var(--foreground) / 0.06),
+    0 8px 16px hsl(var(--foreground) / 0.04),
+    inset 0 1px 0 hsl(var(--foreground) / 0.08);
+}
+
+/* Enhanced dark mode tooltips */
+.dark [role='tooltip'],
+.dark .tooltip {
+  background: linear-gradient(135deg, hsl(var(--popover)), hsl(var(--popover) / 0.9));
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(var(--border) / 0.5);
+  box-shadow: 0 8px 24px hsl(var(--foreground) / 0.1);
+  text-shadow: 0 1px 2px hsl(var(--foreground) / 0.1);
+}
+
+/* Enhanced dark mode code blocks */
+.dark code,
+.dark pre {
+  background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--muted) / 0.8));
+  border: 1px solid hsl(var(--border) / 0.5);
+  box-shadow: inset 0 1px 3px hsl(var(--foreground) / 0.05);
+}
+
+/* Enhanced dark mode progress bars */
+.dark progress,
+.dark .progress-bar {
+  background: hsl(var(--muted));
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px hsl(var(--foreground) / 0.1);
+}
+
+.dark progress::-webkit-progress-value,
+.dark .progress-bar-fill {
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  border-radius: 10px;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.3);
+}
+
+/* Enhanced dark mode separators */
+.dark hr,
+.dark .separator {
+  background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+  height: 1px;
+  border: none;
+  opacity: 0.6;
+}
+
+/* Enhanced dark mode loading states */
+.dark .loading,
+.dark [aria-busy='true'] {
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.1), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  to {
+    left: 100%;
+  }
+}
+
+/* Enhanced dark mode image handling */
+.dark img {
+  filter: brightness(0.9) contrast(1.1);
+  transition: filter 0.2s ease-in-out;
+}
+
+.dark img:hover {
+  filter: brightness(1) contrast(1);
+}
+
+/* Enhanced dark mode text highlighting */
+.dark mark,
+.dark .highlight {
+  background: linear-gradient(120deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.1));
+  color: hsl(var(--primary-foreground));
+  padding: 0.1em 0.3em;
+  border-radius: 0.2em;
+}
+
+/* Responsive enhancements for dark mode */
+@media (max-width: 768px) {
+  .dark .bg-card {
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 16px hsl(var(--foreground) / 0.03);
+  }
+
+  .dark [role='dialog'],
+  .dark .modal {
+    backdrop-filter: blur(8px);
+    box-shadow: 0 15px 30px hsl(var(--foreground) / 0.06);
+  }
+}
+
+/* Accessibility improvements for dark mode */
+@media (prefers-reduced-motion: reduce) {
+  .dark * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .dark {
+    --border: 0 0% 30%;
+    --input: 0 0% 20%;
+    --muted: 0 0% 25%;
+  }
+}

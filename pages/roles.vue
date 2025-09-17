@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 
-import DataTable from '@/components/roles/components/DataTable.vue'; // Adjust path as needed
-import { roleColumns } from '@/components/roles/components/columns'; // Adjust path
-import type { Role } from '@/components/roles/data/schema'; // Adjust path
+import DataTable from '@/components/roles/components/DataTable.vue';
+import { roleColumns } from '@/components/roles/components/columns';
+import type { Role } from '@/components/roles/data/schema';
 
 import type {
   ColumnFiltersState,
@@ -13,16 +13,13 @@ import type {
 } from '@tanstack/vue-table';
 import { valueUpdater } from '@/lib/utils'; // Your existing utility
 
-// Assuming useApi composable or similar for API calls
-// import { useApi } from '@/composables/useApi'; // Example
-
 const rolesData = ref<Role[]>([]);
 const isLoading = ref(true);
 
 // --- Table States for Server-Side Control ---
 const pagination = ref<PaginationState>({
-  pageIndex: 0, // TanStack Table is 0-indexed for page
-  pageSize: 10, // Default page size
+  pageIndex: 0,
+  pageSize: 10,
 });
 
 const sorting = ref<SortingState>([]);
@@ -105,60 +102,18 @@ const handleColumnFiltersChange = (updaterOrValue: Updater<ColumnFiltersState>) 
 };
 
 onMounted(fetchRoles);
+
+const onDataChanged = () => fetchRoles();
 </script>
 
 <template>
   <div class="w-full flex flex-col items-stretch gap-4">
     <div class="flex flex-wrap items-end justify-between gap-2">
       <div>
-        <h2 class="text-2xl font-bold tracking-tight">Role Permission</h2>
-        <p class="text-muted-foreground">Here&apos;s a list of your permission for this month!</p>
+        <h2 class="text-2xl font-bold tracking-tight" v-t="'roles.title'"></h2>
+        <p class="text-muted-foreground" v-t="'roles.description'"></p>
       </div>
     </div>
-
-    <!-- <div v-if="isLoading && rolesData.length === 0" class="w-full">
-      <div class="rounded-md border border-gray-200 dark:border-gray-700 shadow-sm">
-        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div class="h-6 rounded animate-pulse w-1/3 mb-2"></div>
-          <div class="h-4 rounded animate-pulse w-1/2"></div>
-        </div>
-
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="">
-            <tr>
-              <th
-                v-for="(_, index) in roleColumns"
-                :key="'header-skeleton-' + index"
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-              >
-                <div class="h-4 rounded animate-pulse w-3/4"></div>
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="i in pagination.pageSize" :key="'row-skeleton-' + i" class="animate-pulse">
-              <td
-                v-for="(_, j) in roleColumns"
-                :key="'cell-skeleton-' + i + '-' + j"
-                class="px-6 py-4 whitespace-nowrap"
-              >
-                <div class="h-4 rounded"></div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div
-          class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700"
-        >
-          <div class="h-8 rounded animate-pulse w-1/4"></div>
-          <div class="flex space-x-2">
-            <div class="h-8 w-16 rounded animate-pulse"></div>
-            <div class="h-8 w-16 rounded animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-    </div> -->
 
     <DataTable
       :columns="roleColumns"
@@ -173,6 +128,7 @@ onMounted(fetchRoles);
       :manualPagination="true"
       :manualSorting="true"
       :manualFiltering="true"
+      :meta="{ onDataChanged: onDataChanged }"
     />
   </div>
 </template>

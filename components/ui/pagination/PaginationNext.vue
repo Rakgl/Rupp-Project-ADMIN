@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import type { PaginationNextProps } from 'radix-vue'
-import type { HTMLAttributes } from 'vue'
-import {
-  Button,
-} from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { PaginationNext } from 'radix-vue'
-import { computed } from 'vue'
+import type { PaginationNextProps } from 'radix-vue';
+import type { HTMLAttributes } from 'vue';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { PaginationNext } from 'radix-vue';
+import { computed } from 'vue';
 
-const props = withDefaults(defineProps<PaginationNextProps & { class?: HTMLAttributes['class'] }>(), {
-  asChild: true,
-})
+const props = withDefaults(
+  defineProps<PaginationNextProps & { class?: HTMLAttributes['class'] }>(),
+  {
+    asChild: true,
+  }
+);
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props
+  const { class: _, ...delegated } = props;
 
-  return delegated
-})
+  return delegated;
+});
 </script>
 
 <template>

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { cn } from '@/lib/utils';
-// import { Switch } from '@/components/ui/switch'
-// import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toTypedSchema } from '@vee-validate/zod';
 import { ref, onMounted } from 'vue';
 import * as z from 'zod';
+import { useI18n } from 'vue-i18n';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,28 +21,29 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from '~/components/ui/toast';
 import { useApi } from '@/composables/useApi';
 
-const username = ref('Loading...');
+const { t } = useI18n();
+
+const username = ref(t('account.loadingText'));
 const userId = ref<string | null>(null);
 
 const isLoading = ref(false);
 const apiError = ref<string | null>(null);
+const userDataLoaded = ref(false);
 
-// --- New refs for password visibility ---
 const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 
 const accountFormSchema = toTypedSchema(
   z.object({
-    currentPassword: z.string().min(1, 'Current password is required.'),
+    currentPassword: z.string().min(1, t('account.validation.currentPasswordRequired')),
     newPassword: z
       .string()
-      .min(8, { message: 'New password must be at least 8 characters.' })
+      .min(8, { message: t('account.validation.newPasswordMinLength') })
       .optional()
       .or(z.literal('')),
   })
 );
 
-// --- New functions to toggle password visibility ---
 function toggleCurrentPasswordVisibility() {
   showCurrentPassword.value = !showCurrentPassword.value;
 }
@@ -52,7 +52,10 @@ function toggleNewPasswordVisibility() {
   showNewPassword.value = !showNewPassword.value;
 }
 
-onMounted(async () => {
+// Function to load user data
+async function loadUserData() {
+  if (userDataLoaded.value) return; // Prevent duplicate calls
+
   isLoading.value = true;
   apiError.value = null;
   try {
@@ -63,22 +66,21 @@ onMounted(async () => {
       const userData = response.data;
       username.value = userData.username || 'N/A';
       userId.value = userData.id;
+      userDataLoaded.value = true;
     } else {
-      const errorMessage =
-        response?.message ||
-        'Failed to load user data. API response was not successful or data was missing.';
+      const errorMessage = response?.message || t('account.toast.loadError.defaultMessage');
       apiError.value = errorMessage;
-      username.value = 'Error loading username';
+      username.value = t('account.errorLoadingUsername');
       userId.value = null;
       toast({
-        title: 'Load Error',
+        title: t('account.toast.loadError.title'),
         description: errorMessage,
         variant: 'destructive',
       });
     }
   } catch (err: any) {
     console.error('API call to auth/get-user failed:', err);
-    let errorMessage = 'An unexpected error occurred while fetching user data.';
+    let errorMessage = t('account.toast.unexpectedError');
 
     if (err && err.response && err.response.data && err.response.data.message) {
       errorMessage = err.response.data.message;
@@ -89,23 +91,27 @@ onMounted(async () => {
     }
 
     apiError.value = errorMessage;
-    username.value = 'Error loading username';
+    username.value = t('account.errorLoadingUsername');
     userId.value = null;
     toast({
-      title: 'API Error',
+      title: t('account.toast.apiError.title'),
       description: errorMessage,
       variant: 'destructive',
     });
   } finally {
     isLoading.value = false;
   }
+}
+
+onMounted(() => {
+  loadUserData();
 });
 
 async function onSubmit(values: z.infer<typeof accountFormSchema>) {
   if (!userId.value) {
     toast({
-      title: 'Error',
-      description: 'User ID is missing. Cannot update password. Please refresh.',
+      title: t('common.error'),
+      description: t('account.toast.missingUserId'),
       variant: 'destructive',
     });
     return;
@@ -127,22 +133,18 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
 
     if (response && response.data && response.success) {
       toast({
-        title: 'Success!',
-        description: response.data.message || 'Password updated successfully.',
+        title: t('common.success'),
+        description: response.data.message || t('account.toast.updateSuccess.defaultMessage'),
       });
-      // Optionally reset form or clear password fields after successful update
-      // For example, by resetting vee-validate form if you have a handle to it
-      // or manually clearing componentField.value if needed, though often not required
-      // for password change forms.
     } else {
-      let errorMessage = 'Could not update password.';
+      let errorMessage = t('account.toast.updateFailed.defaultMessage');
       if (response && response.data && typeof response.data.message === 'string') {
         errorMessage = response.data.message;
       } else if (response && typeof response.message === 'string') {
         errorMessage = response.message;
       }
       toast({
-        title: 'Update Failed',
+        title: t('account.toast.updateFailed.title'),
         description: errorMessage,
         variant: 'destructive',
       });
@@ -150,12 +152,12 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
   } catch (error: any) {
     console.error('Password update failed:', error);
 
-    let toastTitle = 'Error';
-    let toastMessage = 'An unexpected error occurred during password update.';
+    let toastTitle = t('common.error');
+    let toastMessage = t('account.toast.unexpectedUpdateError');
 
     if (error && error.data && typeof error.data.message === 'string') {
       toastMessage = error.data.message;
-      toastTitle = 'Update Failed';
+      toastTitle = t('account.toast.updateFailed.title');
     } else if (
       error &&
       error.response &&
@@ -164,11 +166,11 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
     ) {
       const errorData = error.response.data;
       toastMessage = errorData.message;
-      toastTitle = 'Update Failed';
+      toastTitle = t('account.toast.updateFailed.title');
     } else if (error && typeof error.message === 'string') {
       toastMessage = error.message;
       if (error.statusCode) {
-        toastTitle = `Error ${error.statusCode}`;
+        toastTitle = `${t('common.error')} ${error.statusCode}`;
       }
     } else if (typeof error === 'string') {
       toastMessage = error;
@@ -189,21 +191,21 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
   <div>
     <div class="flex justify-between items-center mb-4">
       <div>
-        <h3 class="text-lg font-medium">Account</h3>
-        <p class="text-sm text-muted-foreground">Change the details of your profile here.</p>
+        <h3 class="text-lg font-medium">{{ t('account.title') }}</h3>
+        <p class="text-sm text-muted-foreground">{{ t('account.description') }}</p>
       </div>
     </div>
     <Separator />
     <Form :validation-schema="accountFormSchema" class="space-y-8 mt-6" @submit="onSubmit">
       <FormField name="username_display">
         <FormItem>
-          <FormLabel>Username</FormLabel>
+          <FormLabel>{{ t('account.usernameLabel') }}</FormLabel>
           <FormControl>
             <Input
               type="text"
               :model-value="username"
               readonly
-              placeholder="Your username"
+              :placeholder="t('account.usernamePlaceholder')"
               class="bg-muted/50"
             />
           </FormControl>
@@ -212,12 +214,12 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
 
       <FormField v-slot="{ componentField }" name="currentPassword">
         <FormItem>
-          <FormLabel>Current Password</FormLabel>
+          <FormLabel>{{ t('account.currentPasswordLabel') }}</FormLabel>
           <div class="relative w-full">
             <FormControl>
               <Input
                 :type="showCurrentPassword ? 'text' : 'password'"
-                placeholder="Current Password"
+                :placeholder="t('account.currentPasswordPlaceholder')"
                 v-bind="componentField"
                 class="pr-10"
               />
@@ -228,9 +230,14 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
               size="icon"
               class="absolute inset-y-0 right-0 h-full px-3 flex items-center text-muted-foreground hover:text-foreground"
               @click="toggleCurrentPasswordVisibility"
-              :aria-label="showCurrentPassword ? 'Hide current password' : 'Show current password'"
+              :aria-label="
+                showCurrentPassword
+                  ? t('account.hideCurrentPassword')
+                  : t('account.showCurrentPassword')
+              "
               tabindex="-1"
             >
+              <!-- Eye icons remain as they are -->
               <svg
                 v-if="!showCurrentPassword"
                 xmlns="http://www.w3.org/2000/svg"
@@ -273,12 +280,12 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
 
       <FormField v-slot="{ componentField }" name="newPassword">
         <FormItem>
-          <FormLabel>New Password</FormLabel>
+          <FormLabel>{{ t('account.newPasswordLabel') }}</FormLabel>
           <div class="relative w-full">
             <FormControl>
               <Input
                 :type="showNewPassword ? 'text' : 'password'"
-                placeholder="New Password"
+                :placeholder="t('account.newPasswordPlaceholder')"
                 v-bind="componentField"
                 class="pr-10"
               />
@@ -289,9 +296,12 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
               size="icon"
               class="absolute inset-y-0 right-0 h-full px-3 flex items-center text-muted-foreground hover:text-foreground"
               @click="toggleNewPasswordVisibility"
-              :aria-label="showNewPassword ? 'Hide new password' : 'Show new password'"
+              :aria-label="
+                showNewPassword ? t('account.hideNewPassword') : t('account.showNewPassword')
+              "
               tabindex="-1"
             >
+              <!-- Eye icons remain as they are -->
               <svg
                 v-if="!showNewPassword"
                 xmlns="http://www.w3.org/2000/svg"
@@ -334,7 +344,7 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
 
       <div class="flex justify-start">
         <Button type="submit" :disabled="isLoading">
-          {{ isLoading ? 'Updating Account...' : 'Update Account' }}
+          {{ isLoading ? t('account.updatingButton') : t('account.updateButton') }}
         </Button>
       </div>
     </Form>
@@ -349,13 +359,4 @@ async function onSubmit(values: z.infer<typeof accountFormSchema>) {
 .dark .bg-muted\/50 {
   background-color: hsl(var(--muted) / 0.2); /* Adjust opacity for dark mode if needed */
 }
-
-/*
-  Removed custom checkbox styles (.form-checkbox) as they were not used in the template.
-  Removed explicit dark mode styles for input[type="text"] and input[type="password"]
-  as ShadCN/Vue's Input component should handle dark mode styling intrinsically
-  when the dark theme is active globally (e.g. <html class="dark">).
-  If your inputs are not styled correctly in dark mode,
-  please ensure your TailwindCSS and ShadCN theme configuration is set up properly.
-*/
 </style>

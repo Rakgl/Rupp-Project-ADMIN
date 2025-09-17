@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-
-import DataTable from '@/components/users/components/DataTable.vue'; // Adjust path as needed
-import { roleColumns } from '@/components/users/components/columns'; // Adjust path
-import type { Role } from '@/components/users/data/schema'; // Adjust path
-
 import type {
   ColumnFiltersState,
-  SortingState,
   PaginationState,
+  SortingState,
   Updater,
 } from '@tanstack/vue-table';
+
+import type { Role } from '@/components/users/data/schema'; // Adjust path
+import { onMounted, ref } from 'vue';
+import { roleColumns } from '@/components/users/components/columns'; // Adjust path
+
+import DataTable from '@/components/users/components/DataTable.vue'; // Adjust path as needed
 import { valueUpdater } from '@/lib/utils'; // Your existing utility
 
 // Assuming useApi composable or similar for API calls
@@ -33,7 +33,7 @@ const pageCount = ref(0);
 const totalRows = ref(0);
 
 // --- API Fetching Logic ---
-async function fetchRoles() {
+async function fetchData() {
   isLoading.value = true;
   const params: Record<string, any> = {
     page: pagination.value.pageIndex + 1,
@@ -79,7 +79,7 @@ async function fetchRoles() {
 }
 
 // --- Handlers for DataTable emitted events ---
-const handlePaginationChange = (updaterOrValue: Updater<PaginationState>) => {
+function handlePaginationChange(updaterOrValue: Updater<PaginationState>) {
   const oldPageSize = pagination.value.pageSize;
 
   valueUpdater(updaterOrValue, pagination);
@@ -89,46 +89,51 @@ const handlePaginationChange = (updaterOrValue: Updater<PaginationState>) => {
   if (oldPageSize !== newPageSize) {
     pagination.value.pageIndex = 0;
   }
-  fetchRoles();
-};
+  fetchData();
+}
 
-const handleSortingChange = (updaterOrValue: Updater<SortingState>) => {
+function handleSortingChange(updaterOrValue: Updater<SortingState>) {
   valueUpdater(updaterOrValue, sorting);
   pagination.value.pageIndex = 0;
-  fetchRoles();
-};
+  fetchData();
+}
 
-const handleColumnFiltersChange = (updaterOrValue: Updater<ColumnFiltersState>) => {
+function handleColumnFiltersChange(updaterOrValue: Updater<ColumnFiltersState>) {
   valueUpdater(updaterOrValue, columnFilters);
   pagination.value.pageIndex = 0;
-  fetchRoles();
-};
+  fetchData();
+}
 
-onMounted(fetchRoles);
+onMounted(fetchData);
+
+function onDataChanged() {
+  fetchData();
+}
 </script>
 
 <template>
   <div class="w-full flex flex-col items-stretch gap-4">
     <div class="flex flex-wrap items-end justify-between gap-2">
       <div>
-        <h2 class="text-2xl font-bold tracking-tight">Users</h2>
-        <p class="text-muted-foreground">Here&apos;s a list of users!</p>
+        <h2 v-t="'users.title'" class="text-2xl font-bold tracking-tight" />
+        <p v-t="'users.description'" class="text-muted-foreground" />
       </div>
     </div>
 
     <DataTable
       :columns="roleColumns"
       :data="rolesData"
-      :pageCount="pageCount"
+      :page-count="pageCount"
       :pagination="pagination"
       :sorting="sorting"
-      :columnFilters="columnFilters"
-      @paginationChange="handlePaginationChange"
-      @sortingChange="handleSortingChange"
-      @columnFiltersChange="handleColumnFiltersChange"
-      :manualPagination="true"
-      :manualSorting="true"
-      :manualFiltering="true"
+      :column-filters="columnFilters"
+      :manual-pagination="true"
+      :manual-sorting="true"
+      :manual-filtering="true"
+      :meta="{ onDataChanged }"
+      @pagination-change="handlePaginationChange"
+      @sorting-change="handleSortingChange"
+      @column-filters-change="handleColumnFiltersChange"
     />
   </div>
 </template>

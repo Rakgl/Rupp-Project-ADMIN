@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { Row } from '@tanstack/vue-table';
+import type { Row, Table } from '@tanstack/vue-table';
 import type { Role } from '../data/schema'; // This should ideally match the structure of RoleIndexResource
 import { ref, computed, watch } from 'vue';
+import { roleStatuses } from '../data/data'; // Assuming this path is correct
+import { CheckIcon, Loader2Icon, ChevronsUpDownIcon, ImageOffIcon, XIcon } from 'lucide-vue-next';
 
-// Shadcn-vue components (ensure paths are correct for your project)
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -30,21 +31,31 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'; // ✨ Import Alert Dialog components
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/toast/use-toast';
+import { useI18n } from 'vue-i18n';
 
+// ✨ UPDATED: Interface now accepts onDataChanged directly
 interface RoleRowActionsProps {
   row: Row<Role>;
+  onDataChanged?: () => void; // This will receive the function to refresh data
 }
 
 const props = defineProps<RoleRowActionsProps>();
 const { toast } = useToast();
+const { t } = useI18n();
 const apiInstance = useApi();
 const role = computed(() => props.row.original);
 
@@ -61,15 +72,17 @@ const permissionsError = ref<string | null>(null);
 const allPermissions = ref<PermissionGroup[]>([]);
 const currentRolePermissions = ref<PermissionItem[]>([]);
 const selectedPermissionSlugs = ref<Set<string>>(new Set());
+const permissionSearch = ref('');
+const expandedGroups = ref<Set<string>>(new Set());
 
-// ✨ Delete Alert Dialog State
-const isDeleteDialogOpen = ref(false); // ✨ New state for delete alert
+// Delete Alert Dialog State
+const isDeleteDialogOpen = ref(false);
 
 interface EditableRoleData {
   id: string | number;
   name: string;
   description: string | null;
-  status: boolean;
+  status: string;
   [key: string]: any;
 }
 
@@ -104,9 +117,8 @@ interface RolePermissionResponse {
 }
 
 const openEditDialog = async () => {
-  // ... (your existing openEditDialog logic)
   if (!role.value || typeof role.value.id === 'undefined') {
-    editError.value = 'Role ID is missing.';
+    editError.value = t('roles.editDialog.toast.error.missingId');
     return;
   }
   isEditDialogOpen.value = true;
@@ -123,26 +135,26 @@ const openEditDialog = async () => {
         id: fetchedData.id,
         name: fetchedData.name,
         description: fetchedData.description || '',
-        status: fetchedData.status === 'ACTIVE' ? true : false,
+        status: fetchedData.status,
       };
     } else {
-      editError.value = 'Failed to load role details: Invalid response structure.';
+      editError.value = t('roles.editDialog.toast.error.invalidResponse');
     }
   } catch (error: any) {
-    editError.value = error.data?.message || error.message || 'An unexpected error occurred.';
+    editError.value =
+      error.data?.message || error.message || t('roles.editDialog.toast.error.unexpected');
   } finally {
     isLoadingRole.value = false;
   }
 };
 
 const handleSaveChanges = async () => {
-  // ... (your existing handleSaveChanges logic)
   if (!roleToEdit.value || roleToEdit.value.id === undefined) {
-    editError.value = 'No role data to save.';
+    editError.value = t('roles.editDialog.toast.error.noDataToSave');
     return;
   }
-  if (!roleToEdit.value.name.trim()) {
-    editError.value = 'Role name cannot be empty.';
+  if (!roleToEdit.value.name?.trim()) {
+    editError.value = t('roles.editDialog.toast.error.nameEmpty');
     return;
   }
   isLoadingRole.value = true;
@@ -151,35 +163,38 @@ const handleSaveChanges = async () => {
     const payload = {
       name: roleToEdit.value.name,
       description: roleToEdit.value.description,
-      status: roleToEdit.value.status ? 'ACTIVE' : 'INACTIVE',
+      status: roleToEdit.value.status,
     };
     const response = await apiInstance<UpdateRoleApiResponse>(`/roles/${roleToEdit.value.id}`, {
       method: 'PUT',
       body: payload,
     });
     if (response.success && response.data) {
-      Object.assign(props.row.original, response.data);
+      // ✨ FIXED: Call the onDataChanged prop directly to trigger the refresh
+      props.onDataChanged?.();
       isEditDialogOpen.value = false;
       roleToEdit.value = null;
       toast({
-        title: 'Role Updated Successfully!',
-        description: `The role "${response.data.name}" has been updated.`,
+        title: t('roles.editDialog.toast.success.title'),
+        description: t('roles.editDialog.toast.success.description', {
+          roleName: response.data.name,
+        }),
       });
     } else {
-      editError.value = response.message || 'Failed to save changes.';
+      editError.value = response.message || t('roles.editDialog.toast.error.failedToSave');
     }
   } catch (error: any) {
-    editError.value = error.data?.message || error.message || 'An unexpected error occurred.';
+    editError.value =
+      error.data?.message || error.message || t('roles.editDialog.toast.error.unexpected');
   } finally {
     isLoadingRole.value = false;
   }
 };
 
 const openPermissionsDialog = async () => {
-  // ... (your existing openPermissionsDialog logic)
   if (!role.value || typeof role.value.id === 'undefined') {
     console.error('Role ID is missing for manage permissions action', role.value);
-    permissionsError.value = 'Role ID is missing.';
+    permissionsError.value = t('roles.editDialog.toast.error.missingId');
     return;
   }
   isPermissionsDialogOpen.value = true;
@@ -199,7 +214,7 @@ const openPermissionsDialog = async () => {
         'Failed to fetch all permissions: Invalid response structure',
         allPermsResponse
       );
-      permissionsError.value = 'Could not load available permissions.';
+      permissionsError.value = t('roles.permissionsDialog.error.loadPermissions');
       isLoadingPermissions.value = false;
       return;
     }
@@ -224,14 +239,14 @@ const openPermissionsDialog = async () => {
     }
   } catch (error: any) {
     console.error('Error in permissions dialog setup:', error);
-    permissionsError.value = error.data?.message || error.message || 'An error occurred.';
+    permissionsError.value =
+      error.data?.message || error.message || t('roles.permissionsDialog.error.unexpected');
   } finally {
     isLoadingPermissions.value = false;
   }
 };
 
 const handlePermissionToggle = (slug: string, checked: boolean) => {
-  // ... (your existing handlePermissionToggle logic)
   if (checked) {
     selectedPermissionSlugs.value.add(slug);
   } else {
@@ -240,9 +255,8 @@ const handlePermissionToggle = (slug: string, checked: boolean) => {
 };
 
 const handleSavePermissions = async () => {
-  // ... (your existing handleSavePermissions logic)
   if (!role.value || typeof role.value.id === 'undefined') {
-    permissionsError.value = 'Role ID is missing.';
+    permissionsError.value = t('roles.editDialog.toast.error.missingId');
     return;
   }
   isLoadingPermissions.value = true;
@@ -271,18 +285,21 @@ const handleSavePermissions = async () => {
     if (response.success) {
       isPermissionsDialogOpen.value = false;
       toast({
-        title: 'Permissions Updated!',
-        description: `Permissions for role "${role.value.name}" have been saved.`,
+        title: t('roles.permissionsDialog.toast.success.title'),
+        description: t('roles.permissionsDialog.toast.success.description', {
+          roleName: role.value.name,
+        }),
       });
     } else {
-      permissionsError.value = response.message || 'Failed to save permissions.';
+      permissionsError.value =
+        response.message || t('roles.permissionsDialog.toast.error.failedToSave');
     }
   } catch (error: any) {
     console.error('Error saving permissions:', error);
     permissionsError.value =
       error.data?.message ||
       error.message ||
-      'An unexpected error occurred while saving permissions.';
+      t('roles.permissionsDialog.toast.error.unexpectedSave');
   } finally {
     isLoadingPermissions.value = false;
   }
@@ -300,11 +317,85 @@ const getSelectedPermissionsCount = (group: PermissionGroup): string => {
   return `${selectedCount}/${totalCount}`;
 };
 
+// Enhanced permission management functions
+const totalPermissionsCount = computed(() => {
+  return allPermissions.value.reduce((total, group) => total + group.permissions.length, 0);
+});
+
+const areAllPermissionsSelected = computed(() => {
+  return (
+    totalPermissionsCount.value > 0 &&
+    selectedPermissionSlugs.value.size === totalPermissionsCount.value
+  );
+});
+
+const filteredPermissions = computed(() => {
+  if (!permissionSearch.value.trim()) {
+    return allPermissions.value;
+  }
+
+  const searchTerm = permissionSearch.value.toLowerCase();
+  return allPermissions.value
+    .map((group) => ({
+      ...group,
+      permissions: group.permissions.filter(
+        (permission) =>
+          permission.name.toLowerCase().includes(searchTerm) ||
+          permission.slug.toLowerCase().includes(searchTerm) ||
+          group.name.toLowerCase().includes(searchTerm)
+      ),
+    }))
+    .filter((group) => group.permissions.length > 0);
+});
+
+const toggleSelectAll = () => {
+  if (areAllPermissionsSelected.value) {
+    selectedPermissionSlugs.value.clear();
+  } else {
+    selectedPermissionSlugs.value.clear();
+    allPermissions.value.forEach((group) => {
+      group.permissions.forEach((permission) => {
+        selectedPermissionSlugs.value.add(permission.slug);
+      });
+    });
+  }
+};
+
+const isGroupFullySelected = (group: PermissionGroup): boolean => {
+  return (
+    group.permissions.length > 0 &&
+    group.permissions.every((p) => selectedPermissionSlugs.value.has(p.slug))
+  );
+};
+
+const isGroupPartiallySelected = (group: PermissionGroup): boolean => {
+  const selected = group.permissions.filter((p) => selectedPermissionSlugs.value.has(p.slug));
+  return selected.length > 0 && selected.length < group.permissions.length;
+};
+
+const handleGroupToggle = (group: PermissionGroup, checked: boolean) => {
+  group.permissions.forEach((permission) => {
+    if (checked) {
+      selectedPermissionSlugs.value.add(permission.slug);
+    } else {
+      selectedPermissionSlugs.value.delete(permission.slug);
+    }
+  });
+};
+
+const toggleGroupExpansion = (moduleId: string) => {
+  if (expandedGroups.value.has(moduleId)) {
+    expandedGroups.value.delete(moduleId);
+  } else {
+    expandedGroups.value.add(moduleId);
+  }
+};
+
 const confirmDeleteRole = async () => {
   if (!role.value || typeof role.value.id === 'undefined') {
     toast({
-      title: 'Error',
-      description: 'Role ID is missing, cannot delete.',
+      title: t('roles.deleteDialog.toast.error.title'),
+      description: t('roles.deleteDialog.toast.error.missingId'),
       variant: 'destructive',
     });
     return;
@@ -316,28 +407,30 @@ const confirmDeleteRole = async () => {
 
     if (response.success) {
       toast({
-        title: 'Role Deleted Successfully!',
-        description: `The role "${role.value.name}" has been deleted.`,
+        title: t('roles.deleteDialog.toast.success.title'),
+        description: t('roles.deleteDialog.toast.success.description', {
+          roleName: role.value.name,
+        }),
       });
       isDeleteDialogOpen.value = false;
-      // TODO: You'll likely want to refresh your table data here
-      // e.g., by emitting an event or calling a method passed as a prop
+      // ✨ FIXED: Call the onDataChanged prop directly to trigger the refresh
+      props.onDataChanged?.();
     } else {
       toast({
-        title: 'Deletion Failed',
-        description: response.message || 'Could not delete the role.',
+        title: t('roles.deleteDialog.toast.error.failed'),
+        description: response.message || t('roles.deleteDialog.toast.error.couldNotDelete'),
         variant: 'destructive',
       });
     }
   } catch (error: any) {
     toast({
-      title: 'Deletion Error',
-      description: error.data?.message || error.message || 'An unexpected error occurred.',
+      title: t('roles.deleteDialog.toast.error.title'),
+      description:
+        error.data?.message || error.message || t('roles.deleteDialog.toast.error.unexpected'),
       variant: 'destructive',
     });
   } finally {
-    // Reset loading state if you added one
-    isDeleteDialogOpen.value = false; // Ensure dialog closes even on error
+    isDeleteDialogOpen.value = false;
   }
 };
 
@@ -356,10 +449,18 @@ watch(isPermissionsDialogOpen, (newValue) => {
     selectedPermissionSlugs.value = new Set();
     permissionsError.value = null;
     isLoadingPermissions.value = false;
+    permissionSearch.value = '';
+    expandedGroups.value = new Set();
+  } else {
+    // Auto-expand all groups when dialog opens
+    setTimeout(() => {
+      allPermissions.value.forEach((group) => {
+        expandedGroups.value.add(group.module);
+      });
+    }, 100);
   }
 });
 
-// ✨ Watcher for delete dialog (optional, for cleanup)
 watch(isDeleteDialogOpen, (newValue) => {
   if (!newValue) {
     // You can add cleanup logic here if needed when the dialog is closed
@@ -378,179 +479,281 @@ watch(isDeleteDialogOpen, (newValue) => {
               d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2"
             />
           </svg>
-          <span class="sr-only">Open menu</span>
+          <span class="sr-only" v-t="'roles.rowActions.openMenu'"></span>
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" class="w-[160px]">
-        <DropdownMenuItem @click="openEditDialog"> Edit </DropdownMenuItem>
-        <DropdownMenuItem @click="openPermissionsDialog"> Manage Permissions </DropdownMenuItem>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem @click="openEditDialog" v-t="'roles.rowActions.edit'"></DropdownMenuItem>
+        <DropdownMenuItem
+          @click="openPermissionsDialog"
+          v-t="'roles.rowActions.managePermissions'"
+        ></DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           @click="isDeleteDialogOpen = true"
           class="text-red-600 hover:!text-red-600 focus:text-red-600 dark:hover:!text-red-500"
         >
-          Delete
+          <span v-t="'roles.rowActions.delete'"></span>
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
 
+    <!-- Edit Role Dialog -->
     <Dialog v-model:open="isEditDialogOpen">
-      <DialogContent class="sm:max-w-md rounded-lg shadow-xl">
-        <DialogHeader>
-          <DialogTitle class="text-lg font-medium text-gray-900 dark:text-gray-100"
-            >Edit
-          </DialogTitle>
-          <DialogDescription class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Make changes to the role details. Click save when you're done.
-          </DialogDescription>
+      <DialogContent
+        class="w-[90vw] max-h-[90vh] overflow-y-auto sm:max-w-xl rounded-lg bg-card text-card-foreground shadow-lg"
+      >
+        <DialogHeader class="p-6">
+          <DialogTitle class="text-xl font-semibold" v-t="'roles.editDialog.title'"></DialogTitle>
+          <DialogDescription
+            class="text-sm text-muted-foreground mt-1"
+            v-t="'roles.editDialog.description'"
+          ></DialogDescription>
         </DialogHeader>
+
         <div
-          v-if="isLoadingRole"
+          v-if="isLoadingRole && !roleToEdit"
           class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
-        >
-          Loading...
-        </div>
+          v-t="'roles.editDialog.loading'"
+        ></div>
         <div
           v-else-if="editError"
-          class="px-6 py-4 text-sm text-red-600 dark:text-red-400 rounded-md m-4"
+          class="px-6 py-4 text-sm text-red-600 dark:text-red-400 rounded-md m-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
         >
-          <strong>Error:</strong> {{ editError }}
+          <strong>{{ t('roles.editDialog.error') }}</strong> {{ editError }}
         </div>
-        <div class="grid gap-6 p-6" v-if="roleToEdit && !isLoadingRole">
-          <div class="grid grid-cols-4 items-center gap-x-4 gap-y-2">
-            <Label
-              for="roleName"
-              class="text-right text-sm font-medium text-gray-700 dark:text-gray-300 col-span-1"
-              >Name</Label
+
+        <form @submit.prevent="handleSaveChanges" class="px-6 pb-6 space-y-6" v-if="roleToEdit">
+          <div class="space-y-2">
+            <label for="roleName" class="block text-sm font-medium text-foreground"
+              >{{ t('roles.editDialog.form.name.label') }}
+              <span class="text-destructive">*</span></label
             >
             <Input
               id="roleName"
               v-model="roleToEdit.name"
-              class="col-span-3"
-              placeholder="Enter role name"
+              class="w-full h-10 rounded-md"
+              :placeholder="t('roles.editDialog.form.name.placeholder')"
               :disabled="isLoadingRole"
             />
           </div>
-          <div class="grid grid-cols-4 items-start gap-x-4 gap-y-2">
-            <Label
-              for="roleDescription"
-              class="text-right text-sm font-medium text-gray-700 dark:text-gray-300 col-span-1 pt-2"
-              >Description</Label
-            >
+          <div class="space-y-2">
+            <label for="roleDescription" class="block text-sm font-medium text-foreground">{{
+              t('roles.editDialog.form.description.label')
+            }}</label>
             <Textarea
               id="roleDescription"
               v-model="roleToEdit.description"
-              class="col-span-3 min-h-[80px]"
-              placeholder="Enter role description (optional)"
+              class="w-full min-h-[80px] rounded-md"
+              :placeholder="t('roles.editDialog.form.description.placeholder')"
               :disabled="isLoadingRole"
             />
           </div>
-          <div class="grid grid-cols-4 items-center gap-x-4 gap-y-2">
-            <Label
-              for="roleStatus"
-              class="text-right text-sm font-medium text-gray-700 dark:text-gray-300 col-span-1"
-              >Status</Label
+          <div class="space-y-2">
+            <label for="roleStatus" class="block text-sm font-medium text-foreground"
+              >{{ t('roles.editDialog.form.status.label') }} <span class="text-destructive">*</span>
+            </label>
+            <Select
+              v-model="roleToEdit.status"
+              required
+              :disabled="isLoadingRole"
+              class="w-full h-10 rounded-md"
             >
-            <div class="col-span-3 flex items-center space-x-2">
-              <Switch
-                id="roleStatus"
-                :checked="roleToEdit.status"
-                @update:checked="(newVal: boolean) => (roleToEdit!.status = newVal)"
-                :disabled="isLoadingRole"
-              />
-              <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                roleToEdit.status ? 'ACTIVE' : 'INACTIVE'
-              }}</span>
-            </div>
+              <SelectTrigger
+                class="w-full h-10 rounded-md border-input bg-background px-3 py-2 text-sm"
+                id="new-role-status"
+              >
+                <SelectValue :placeholder="t('roles.editDialog.form.status.placeholder')" />
+              </SelectTrigger>
+              <SelectContent class="bg-popover text-popover-foreground rounded-md shadow-lg">
+                <SelectItem
+                  v-for="statusOption in roleStatuses"
+                  :key="statusOption.value"
+                  :value="statusOption.value"
+                  class="hover:bg-accent focus:bg-accent"
+                >
+                  {{ statusOption.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-        <DialogFooter class="px-6 py-4 sm:flex sm:flex-row-reverse rounded-b-lg">
-          <Button
-            type="button"
-            @click="handleSaveChanges"
-            :disabled="isLoadingRole || !roleToEdit || !roleToEdit.name"
-          >
-            {{ isLoadingRole ? 'Saving...' : 'Save changes' }}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            @click="isEditDialogOpen = false"
-            :disabled="isLoadingRole"
-          >
-            Cancel
-          </Button>
-        </DialogFooter>
+
+          <DialogFooter class="pt-6 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              @click="isEditDialogOpen = false"
+              :disabled="isLoadingRole"
+              class="h-9 rounded-md text-sm"
+            >
+              {{ t('roles.editDialog.buttons.cancel') }}
+            </Button>
+            <Button
+              type="submit"
+              @click="handleSaveChanges"
+              :disabled="isLoadingRole || !roleToEdit || !roleToEdit?.name"
+              class="h-9 rounded-md text-sm bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {{
+                isLoadingRole
+                  ? t('roles.editDialog.buttons.saving')
+                  : t('roles.editDialog.buttons.saveChanges')
+              }}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
 
+    <!-- Manage Permissions Dialog -->
     <Dialog v-model:open="isPermissionsDialogOpen">
-      <DialogContent class="sm:max-w-6xl rounded-lg shadow-xl">
-        <DialogHeader>
-          <DialogTitle class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Manage Permissions for {{ role?.name }}
+      <DialogContent class="w-[95vw] max-h-[90vh] flex flex-col sm:max-w-5xl rounded-lg shadow-xl">
+        <DialogHeader class="px-6 pt-6 pb-4">
+          <DialogTitle class="text-xl font-semibold text-foreground" v-if="role">
+            {{ t('roles.permissionsDialog.title', { roleName: role.name }) }}
           </DialogTitle>
-          <DialogDescription class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Select the permissions to assign to this role. Currently selected:
-            {{ selectedPermissionSlugs.size }} permissions.
-          </DialogDescription>
+          <DialogDescription
+            class="mt-2 text-sm text-muted-foreground"
+            v-t="'roles.permissionsDialog.description'"
+          ></DialogDescription>
         </DialogHeader>
+
         <div
           v-if="isLoadingPermissions"
-          class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
+          class="flex-grow flex items-center justify-center text-center text-sm text-muted-foreground"
         >
-          <svg
-            class="animate-spin h-6 w-6 text-indigo-600 mx-auto mb-3"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          Loading permissions...
+          <div>
+            <Loader2Icon class="animate-spin" />
+            {{ t('roles.permissionsDialog.loading') }}
+          </div>
         </div>
         <div
           v-else-if="permissionsError"
-          class="px-6 py-4 text-sm text-red-600 dark:text-red-400 rounded-md m-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+          class="m-6 p-4 text-sm text-destructive rounded-md bg-destructive/10 border border-destructive/20"
         >
-          <strong>Error:</strong> {{ permissionsError }}
+          <strong>{{ t('roles.permissionsDialog.error') }}</strong> {{ permissionsError }}
         </div>
+
         <div
-          class="p-6 max-h-[60vh] overflow-y-auto"
+          class="px-6 pb-2 flex-grow overflow-y-auto"
           v-if="allPermissions.length > 0 && !isLoadingPermissions"
         >
-          <div v-for="group in allPermissions" :key="group.module" class="mb-6">
-            <div class="flex items-center justify-between mb-3">
-              <h3
-                class="text-md font-semibold text-gray-700 dark:text-gray-300 border-b pb-2 dark:border-gray-600"
+          <!-- Search and Filter Section -->
+          <div class="mb-6 space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="relative flex-1">
+                <svg
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <Input
+                  v-model="permissionSearch"
+                  :placeholder="t('roles.permissionsDialog.searchPlaceholder')"
+                  class="pl-10 h-10"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                @click="toggleSelectAll"
+                class="whitespace-nowrap"
               >
-                {{ group.name }}
-              </h3>
-              <span
-                class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded"
-              >
-                {{ getSelectedPermissionsCount(group) }}
-              </span>
+                {{
+                  areAllPermissionsSelected
+                    ? t('roles.permissionsDialog.deselectAll')
+                    : t('roles.permissionsDialog.selectAll')
+                }}
+              </Button>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
+
+            <!-- Permission Summary -->
+            <div class="bg-muted/50 rounded-lg p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-foreground">
+                  {{ t('roles.permissionsDialog.selectedPermissions') }}
+                </span>
+                <span class="text-sm text-muted-foreground">
+                  {{ selectedPermissionSlugs.size }} / {{ totalPermissionsCount }}
+                </span>
+              </div>
+              <div class="mt-2 h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  class="h-full bg-primary transition-all duration-300"
+                  :style="{
+                    width: `${(selectedPermissionSlugs.size / totalPermissionsCount) * 100}%`,
+                  }"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Permissions Groups -->
+          <div v-for="group in filteredPermissions" :key="group.module" class="mb-6">
+            <div class="flex items-center justify-between mb-4 p-3 bg-muted/30 rounded-lg">
+              <div class="flex items-center gap-3">
+                <Checkbox
+                  :id="`group-${group.module}`"
+                  :checked="isGroupFullySelected(group)"
+                  :indeterminate="isGroupPartiallySelected(group)"
+                  @update:checked="(checked) => handleGroupToggle(group, Boolean(checked))"
+                />
+                <Label
+                  :for="`group-${group.module}`"
+                  class="text-base font-semibold text-foreground cursor-pointer"
+                >
+                  {{ group.name }}
+                </Label>
+              </div>
+              <div class="flex items-center gap-2">
+                <span
+                  class="text-xs text-muted-foreground bg-background px-2 py-1 rounded-full font-medium"
+                >
+                  {{ getSelectedPermissionsCount(group) }}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  @click="toggleGroupExpansion(group.module)"
+                  class="h-8 w-8 p-0"
+                >
+                  <svg
+                    class="h-4 w-4 transition-transform"
+                    :class="{ 'rotate-180': expandedGroups.has(group.module) }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </Button>
+              </div>
+            </div>
+            <div
+              v-if="expandedGroups.has(group.module)"
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pl-4 ml-4 border-l-2 border-muted"
+            >
               <div
                 v-for="permission in group.permissions"
                 :key="permission.slug"
-                class="flex items-center space-x-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                class="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
               >
                 <Checkbox
                   :id="`perm-${permission.slug}`"
@@ -558,90 +761,72 @@ watch(isDeleteDialogOpen, (newValue) => {
                   @update:checked="
                     (checked) => handlePermissionToggle(permission.slug, Boolean(checked))
                   "
-                  class="form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out rounded dark:border-gray-600"
                 />
                 <Label
                   :for="`perm-${permission.slug}`"
-                  class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer flex-1"
+                  class="text-sm text-foreground cursor-pointer flex-1 leading-relaxed"
                 >
                   {{ permission.name }}
                 </Label>
-                <!-- <span class="text-xs text-gray-400 dark:text-gray-500">
-                  {{ permission.slug }}
-                </span> -->
               </div>
             </div>
           </div>
         </div>
+
         <div
           v-else-if="!isLoadingPermissions && !permissionsError"
-          class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
-        >
-          No permissions available to assign.
-        </div>
+          class="flex-grow flex items-center justify-center text-center text-sm text-muted-foreground"
+          v-t="'roles.permissionsDialog.noPermissions'"
+        ></div>
+
         <DialogFooter
-          class="px-6 py-4 sm:flex sm:flex-row-reverse rounded-b-lg border-t dark:border-gray-700"
+          class="px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t"
         >
-          <Button
-            type="button"
-            @click="handleSavePermissions"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
-            :disabled="isLoadingPermissions"
-          >
-            <svg
-              v-if="isLoadingPermissions"
-              class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            {{ isLoadingPermissions ? 'Saving...' : 'Save Permissions' }}
-          </Button>
           <Button
             type="button"
             variant="outline"
             @click="isPermissionsDialogOpen = false"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-500 shadow-sm px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
             :disabled="isLoadingPermissions"
+            class="h-10"
           >
-            Cancel
+            {{ t('roles.permissionsDialog.buttons.cancel') }}
+          </Button>
+          <Button
+            type="button"
+            @click="handleSavePermissions"
+            :disabled="isLoadingPermissions"
+            class="h-10"
+          >
+            <Loader2Icon v-if="isLoadingPermissions" class="mr-2 h-4 w-4 animate-spin" />
+            {{
+              isLoadingPermissions
+                ? t('roles.permissionsDialog.buttons.saving')
+                : t('roles.permissionsDialog.buttons.savePermissions')
+            }}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
 
+    <!-- Delete Role Alert Dialog -->
     <AlertDialog v-model:open="isDeleteDialogOpen">
-      <AlertDialogContent>
+      <AlertDialogContent class="w-[90vw] sm:max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the role "<strong>{{
-              role?.name
-            }}</strong
-            >" and remove its data from our servers.
+          <AlertDialogTitle v-t="'roles.deleteDialog.title'"></AlertDialogTitle>
+          <AlertDialogDescription v-if="role">
+            {{ t('roles.deleteDialog.description', { roleName: role.name }) }}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
+        <AlertDialogFooter class="flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <AlertDialogCancel
+            @click="isDeleteDialogOpen = false"
+            v-t="'roles.deleteDialog.buttons.cancel'"
+          ></AlertDialogCancel>
           <AlertDialogAction
             @click="confirmDeleteRole"
             class="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+            v-t="'roles.deleteDialog.buttons.confirm'"
           >
-            Yes, delete role
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

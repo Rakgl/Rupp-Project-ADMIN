@@ -1,486 +1,143 @@
 import type { NavMenu, NavMenuItems } from '~/types/nav';
 
+// Note: All 'heading' and 'title' properties are i18n keys.
+
 export const navMenu: NavMenu[] = [
   {
-    heading: 'Authentication',
+    heading: 'nav.core_administration',
     items: [
       {
-        title: 'Authentication',
+        title: 'nav.authentication',
         icon: 'i-lucide-lock-keyhole-open',
-        permission: 'setting:read',
         children: [
           {
-            title: 'Role & Permission',
+            title: 'nav.role_permission',
             icon: 'i-lucide-circle',
             link: '/roles',
-            permission: 'role:read',
           },
           {
-            title: 'User',
+            title: 'nav.system_users',
             icon: 'i-lucide-circle',
             link: '/users',
-            permission: 'user:read',
           },
         ],
       },
-      //   {
-      //     title: 'Errors',
-      //     icon: 'i-lucide-triangle-alert',
-      //     children: [
-      //       {
-      //         title: '401 - Unauthorized',
-      //         icon: 'i-lucide-circle',
-      //         link: '/401',
-      //       },
-      //       {
-      //         title: '403 - Forbidden',
-      //         icon: 'i-lucide-circle',
-      //         link: '/403',
-      //       },
-      //       {
-      //         title: '404 - Not Found',
-      //         icon: 'i-lucide-circle',
-      //         link: '/404',
-      //       },
-      //       {
-      //         title: '500 - Internal Server Error',
-      //         icon: 'i-lucide-circle',
-      //         link: '/500',
-      //       },
-      //       {
-      //         title: '503 - Service Unavailable',
-      //         icon: 'i-lucide-circle',
-      //         link: '/503',
-      //       },
-      //     ],
-      //   },
       {
-        title: 'Settings',
+        title: 'nav.platform_settings',
         icon: 'i-lucide-settings',
-        new: true,
         children: [
           {
-            title: 'Profile',
+            title: 'nav.general_settings',
             icon: 'i-lucide-circle',
-            link: '/settings/profile',
-            permission: 'profile:read',
+            link: '/general-settings',
           },
           {
-            title: 'Account',
-            icon: 'i-lucide-circle',
-            link: '/settings/account',
-            permission: 'account:read',
+            title: 'nav.translation',
+            icon: 'i-lucide-globe',
+            link: '/translations',
           },
           {
-            title: 'Appearance',
+            title: 'nav.store_notifications',
             icon: 'i-lucide-circle',
-            link: '/settings/appearance',
-            permission: 'appearance:read',
+            link: '/store-notifications',
           },
-          //   {
-          //     title: 'Notifications',
-          //     icon: 'i-lucide-circle',
-          //     link: '/settings/notifications',
-          //   },
-          //   {
-          //     title: 'Display',
-          //     icon: 'i-lucide-circle',
-          //     link: '/settings/display',
-          //   },
+          {
+            title: 'settings.sidebar.security',
+            icon: 'i-lucide-globe',
+            link: '/settings/security',
+          },
+          {
+            title: 'nav.items.account_recovery',
+            icon: 'i-lucide-shield-check',
+            link: '/account-recoveries',
+          },
+          {
+            title: 'nav.items.payment_methods',
+            icon: 'i-lucide-credit-card',
+            link: '/payment-methods',
+          },
         ],
       },
     ],
   },
-
-  //   {
-  //     heading: 'Pages',
-  //     items: [
-  //       {
-  //         title: 'Authentication',
-  //         icon: 'i-lucide-lock-keyhole-open',
-  //         permission: 'setting:read',
-  //         children: [
-  //           {
-  //             title: 'Login',
-  //             icon: 'i-lucide-circle',
-  //             link: '/login',
-  //           },
-  //           {
-  //             title: 'Login Basic',
-  //             icon: 'i-lucide-circle',
-  //             link: '/login-basic',
-  //           },
-  //           {
-  //             title: 'Register',
-  //             icon: 'i-lucide-circle',
-  //             link: '/register',
-  //           },
-  //           {
-  //             title: 'Forgot Password',
-  //             icon: 'i-lucide-circle',
-  //             link: '/forgot-password',
-  //           },
-  //         ],
-  //       },
-  //       //   {
-  //       //     title: 'Errors',
-  //       //     icon: 'i-lucide-triangle-alert',
-  //       //     children: [
-  //       //       {
-  //       //         title: '401 - Unauthorized',
-  //       //         icon: 'i-lucide-circle',
-  //       //         link: '/401',
-  //       //       },
-  //       //       {
-  //       //         title: '403 - Forbidden',
-  //       //         icon: 'i-lucide-circle',
-  //       //         link: '/403',
-  //       //       },
-  //       //       {
-  //       //         title: '404 - Not Found',
-  //       //         icon: 'i-lucide-circle',
-  //       //         link: '/404',
-  //       //       },
-  //       //       {
-  //       //         title: '500 - Internal Server Error',
-  //       //         icon: 'i-lucide-circle',
-  //       //         link: '/500',
-  //       //       },
-  //       //       {
-  //       //         title: '503 - Service Unavailable',
-  //       //         icon: 'i-lucide-circle',
-  //       //         link: '/503',
-  //       //       },
-  //       //     ],
-  //       //   },
-  //       {
-  //         title: 'Settings',
-  //         icon: 'i-lucide-settings',
-  //         new: true,
-  //         children: [
-  //           {
-  //             title: 'Profile',
-  //             icon: 'i-lucide-circle',
-  //             link: '/settings/profile',
-  //           },
-  //           {
-  //             title: 'Account',
-  //             icon: 'i-lucide-circle',
-  //             link: '/settings/account',
-  //           },
-  //           {
-  //             title: 'Appearance',
-  //             icon: 'i-lucide-circle',
-  //             link: '/settings/appearance',
-  //           },
-  //           {
-  //             title: 'Notifications',
-  //             icon: 'i-lucide-circle',
-  //             link: '/settings/notifications',
-  //           },
-  //           {
-  //             title: 'Display',
-  //             icon: 'i-lucide-circle',
-  //             link: '/settings/display',
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
-
-  //   {
-  //     heading: 'General',
-  //     items: [
-  //       {
-  //         title: 'Roles',
-  //         icon: 'i-lucide-shield-check',
-  //         link: '/roles',
-  //         new: false,
-  //         permission: 'role:read',
-  //       },
-  //       {
-  //         title: 'Users',
-  //         icon: 'i-lucide-user',
-  //         link: '/users',
-  //         new: false,
-  //         permission: 'user:read',
-  //       },
-  //     ],
-  //   },
-
-  //   {
-  //     heading: 'Components',
-  //     items: [
-  //       {
-  //         title: 'Components',
-  //         icon: 'i-lucide-component',
-  //         children: [
-  //           {
-  //             title: 'Accordion',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/accordion',
-  //           },
-  //           {
-  //             title: 'Alert',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/alert',
-  //           },
-  //           {
-  //             title: 'Alert Dialog',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/alert-dialog',
-  //           },
-  //           {
-  //             title: 'Aspect Ratio',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/aspect-ratio',
-  //           },
-  //           {
-  //             title: 'Avatar',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/avatar',
-  //           },
-  //           {
-  //             title: 'Badge',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/badge',
-  //           },
-  //           {
-  //             title: 'Breadcrumb',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/breadcrumb',
-  //           },
-  //           {
-  //             title: 'Button',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/button',
-  //           },
-  //           {
-  //             title: 'Calendar',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/calendar',
-  //           },
-  //           {
-  //             title: 'Card',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/card',
-  //           },
-  //           {
-  //             title: 'Carousel',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/carousel',
-  //           },
-  //           {
-  //             title: 'Checkbox',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/checkbox',
-  //           },
-  //           {
-  //             title: 'Collapsible',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/collapsible',
-  //           },
-  //           {
-  //             title: 'Combobox',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/combobox',
-  //           },
-  //           {
-  //             title: 'Command',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/command',
-  //           },
-  //           {
-  //             title: 'Context Menu',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/context-menu',
-  //           },
-  //           {
-  //             title: 'Dialog',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/dialog',
-  //           },
-  //           {
-  //             title: 'Drawer',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/drawer',
-  //           },
-  //           {
-  //             title: 'Dropdown Menu',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/dropdown-menu',
-  //           },
-  //           {
-  //             title: 'Form',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/form',
-  //           },
-  //           {
-  //             title: 'Hover Card',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/hover-card',
-  //           },
-  //           {
-  //             title: 'Input',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/input',
-  //           },
-  //           {
-  //             title: 'Label',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/label',
-  //           },
-  //           {
-  //             title: 'Menubar',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/menubar',
-  //           },
-  //           {
-  //             title: 'Navigation Menu',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/navigation-menu',
-  //           },
-  //           {
-  //             title: 'Number Field',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/number-field',
-  //           },
-  //           {
-  //             title: 'Pagination',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/pagination',
-  //           },
-  //           {
-  //             title: 'PIN Input',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/pin-input',
-  //           },
-  //           {
-  //             title: 'Popover',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/popover',
-  //           },
-  //           {
-  //             title: 'Progress',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/progress',
-  //           },
-  //           {
-  //             title: 'Radio Group',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/radio-group',
-  //           },
-  //           {
-  //             title: 'Range Calendar',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/range-calendar',
-  //           },
-  //           {
-  //             title: 'Resizable',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/resizable',
-  //           },
-  //           {
-  //             title: 'Scroll Area',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/scroll-area',
-  //           },
-  //           {
-  //             title: 'Select',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/select',
-  //           },
-  //           {
-  //             title: 'Separator',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/separator',
-  //           },
-  //           {
-  //             title: 'Sheet',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/sheet',
-  //           },
-  //           {
-  //             title: 'Skeleton',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/skeleton',
-  //           },
-  //           {
-  //             title: 'Slider',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/slider',
-  //           },
-  //           {
-  //             title: 'Sonner',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/sonner',
-  //           },
-  //           {
-  //             title: 'Stepper',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/stepper',
-  //             new: true,
-  //           },
-  //           {
-  //             title: 'Switch',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/switch',
-  //           },
-  //           {
-  //             title: 'Table',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/table',
-  //           },
-  //           {
-  //             title: 'Tabs',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/tabs',
-  //           },
-  //           {
-  //             title: 'Tags Input',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/tags-input',
-  //           },
-  //           {
-  //             title: 'Textarea',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/textarea',
-  //           },
-  //           {
-  //             title: 'Toast',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/toast',
-  //           },
-  //           {
-  //             title: 'Toggle',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/toggle',
-  //           },
-  //           {
-  //             title: 'Toggle Group',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/toggle-group',
-  //           },
-  //           {
-  //             title: 'Tooltip',
-  //             icon: 'i-lucide-circle',
-  //             link: '/components/tooltip',
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
+  // --- Product & Sales ---
+  {
+    heading: 'nav.product_sales',
+    items: [
+      {
+        title: 'nav.store',
+        icon: 'i-lucide-store',
+        link: '/stores',
+      },
+      {
+        title: 'nav.product_inventory',
+        icon: 'i-lucide-shopping-basket',
+        children: [
+          {
+            title: 'nav.product_list',
+            icon: 'i-lucide-circle',
+            link: '/products',
+          },
+          {
+            title: 'nav.store_inventories',
+            icon: 'i-lucide-circle',
+            link: '/store-products',
+          },
+          {
+            title: 'nav.manage_categories',
+            icon: 'i-lucide-circle',
+            link: '/categories',
+          },
+          {
+            title: 'nav.manage_brands',
+            icon: 'i-lucide-circle',
+            link: '/brands',
+          },
+        ],
+      },
+      {
+        title: 'nav.orders_sales',
+        icon: 'i-lucide-credit-card',
+        meta: { roles: ['admin'] },
+        children: [
+          {
+            title: 'nav.all_orders',
+            icon: 'i-lucide-circle',
+            link: '/orders',
+          },
+          {
+            title: 'nav.pending_orders',
+            icon: 'i-lucide-circle',
+            link: '/orders/pending',
+          },
+          // {
+          //   title: 'nav.sales_reports',
+          //   icon: 'i-lucide-circle',
+          //   link: '/reports/sales',
+          // },
+        ],
+      },
+    ],
+  },
 ];
 
 export const navMenuBottom: NavMenuItems = [
   {
-    title: 'Help & Support',
+    title: 'nav.help_support',
+    meta: { roles: ['admin'] },
     icon: 'i-lucide-circle-help',
-    link: 'https://github.com/dianprata/nuxt-shadcn-dashboard',
+    link: '/support',
   },
   {
-    title: 'Feedback',
+    title: 'nav.feedback',
+    meta: { roles: ['admin'] },
     icon: 'i-lucide-send',
-    link: 'https://github.com/dianprata/nuxt-shadcn-dashboard',
+    link: '/feedback',
+  },
+  {
+    title: 'nav.get_our_app',
+    meta: { roles: ['admin'] },
+    icon: 'i-lucide-smartphone-download',
+    link: '/get-app',
   },
 ];

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useSidebar } from '~/components/ui/sidebar'
+import { useSidebar } from '~/components/ui/sidebar';
 
 const props = defineProps<{
   teams: {
-    name: string
-    logo: string
-    plan: string
-  }[]
-}>()
+    name: string;
+    logo: string;
+    plan: string;
+  }[];
+}>();
 
-const { isMobile } = useSidebar()
+const { isMobile } = useSidebar();
 
-const activeTeam = ref(props.teams[0])
+const activeTeam = ref(props.teams[0]);
 </script>
 
 <template>
@@ -23,7 +23,9 @@ const activeTeam = ref(props.teams[0])
             size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
-            <div class="aspect-square size-8 flex items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+            <div
+              class="aspect-square size-8 flex items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+            >
               <Icon :name="activeTeam.logo" class="size-4" />
             </div>
             <div class="grid flex-1 text-left text-sm leading-tight">
@@ -40,9 +42,7 @@ const activeTeam = ref(props.teams[0])
           align="start"
           :side="isMobile ? 'bottom' : 'right'"
         >
-          <DropdownMenuLabel class="text-xs text-muted-foreground">
-            Teams
-          </DropdownMenuLabel>
+          <DropdownMenuLabel class="text-xs text-muted-foreground"> Teams </DropdownMenuLabel>
           <DropdownMenuItem
             v-for="(team, index) in teams"
             :key="team.name"
@@ -60,9 +60,7 @@ const activeTeam = ref(props.teams[0])
             <div class="size-6 flex items-center justify-center border rounded-md bg-background">
               <Icon name="i-lucide-plus" class="size-4" />
             </div>
-            <div class="text-muted-foreground font-medium">
-              Add team
-            </div>
+            <div class="text-muted-foreground font-medium">Add team</div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -70,6 +68,4 @@ const activeTeam = ref(props.teams[0])
   </SidebarMenu>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

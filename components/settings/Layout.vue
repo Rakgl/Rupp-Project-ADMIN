@@ -1,15 +1,17 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 </script>
 
 <template>
   <div class="pb-16 space-y-6">
     <div class="space-y-0.5">
       <h2 class="text-2xl font-bold tracking-tight">
-        Settings
+        {{ t('settings.layout.title') }}
       </h2>
       <p class="text-muted-foreground">
-        Manage your account settings and set e-mail preferences.
+        {{ t('settings.layout.description') }}
       </p>
     </div>
     <Separator class="my-6" />
@@ -26,6 +28,4 @@
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

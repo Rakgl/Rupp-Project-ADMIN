@@ -1,31 +1,35 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils'; // Assuming this utility exists
+import { cn } from '@/lib/utils';
 import { toTypedSchema } from '@vee-validate/zod';
-// import { FieldArray, useForm } from 'vee-validate'; // FieldArray not used in this snippet
 import { useForm } from 'vee-validate';
-import { h, ref, onMounted, computed } from 'vue'; // h not used directly
+import { ref, onMounted, computed } from 'vue';
 import * as z from 'zod';
-import { toast } from '~/components/ui/toast'; // Assuming this composable exists
-import { useApi } from '~/composables/useApi'; // Import your useApi composable
+import { toast } from '~/components/ui/toast';
+import { useApi } from '~/composables/useApi';
+import { useI18n } from 'vue-i18n';
 
-const profileFormSchema = toTypedSchema(
-  z.object({
-    userId: z.string(),
-    name: z
-      .string()
-      .min(2, { message: 'Display name must be at least 2 characters.' })
-      .max(50, { message: 'Display name must not be longer than 50 characters.' }),
-    username: z
-      .string()
-      .min(2, { message: 'Login username must be at least 2 characters.' })
-      .max(30, { message: 'Login username must not be longer than 30 characters.' }),
-    email: z
-      .union([z.literal(''), z.string().email({ message: 'Please enter a valid email address.' })])
-      .optional(),
-    image: z.string().optional(), // Avatar image URL or base64 data URL
-    avatarFallbackColor: z.string().optional(), // Stores the selected Tailwind CSS background class for fallback
-    language: z.string().optional(), // Added language field
-  })
+const { t, setLocale } = useI18n();
+
+const profileFormSchema = computed(() =>
+  toTypedSchema(
+    z.object({
+      userId: z.string(),
+      name: z
+        .string()
+        .min(2, { message: t('profile.validation.nameMinLength') })
+        .max(50, { message: t('profile.validation.nameMaxLength') }),
+      username: z
+        .string()
+        .min(2, { message: t('profile.validation.usernameMinLength') })
+        .max(30, { message: t('profile.validation.usernameMaxLength') }),
+      email: z
+        .union([z.literal(''), z.string().email({ message: t('profile.validation.emailInvalid') })])
+        .optional(),
+      image: z.string().optional(),
+      avatarFallbackColor: z.string().optional(),
+      language: z.string().optional(),
+    })
+  )
 );
 
 const defaultFormValues = {
@@ -36,19 +40,24 @@ const defaultFormValues = {
   bio: 'I own a computer.',
   urls: [{ value: 'https://shadcn.com' }, { value: 'http://twitter.com/shadcn' }],
   image: '',
-  avatarFallbackColor: '', // e.g., 'bg-blue-500' or empty for default gray
-  language: 'en', // Default language to English
+  avatarFallbackColor: '',
+  language: 'en',
 };
 
-// Define language options
-const languageOptions = ref([
-  { value: 'en', label: 'English' },
-  { value: 'km', label: 'ភាសាខ្មែរ (Khmer)' }, // Added Khmer
+// MODIFICATION: Added Chinese ('zh') to the language options.
+const languageOptions = computed(() => [
+  { value: 'en', label: t('languages.en') },
+  { value: 'km', label: t('languages.km') },
+  { value: 'zh', label: t('languages.zh') }, // Added this line
 ]);
 
-// Predefined fallback colors for initials
 const predefinedFallbackColors = ref([
-  { name: 'Default', bgClass: '', textClass: 'text-gray-600 dark:text-gray-300', isDefault: true },
+  {
+    name: 'Default',
+    bgClass: '',
+    textClass: 'text-gray-600 dark:text-gray-300',
+    isDefault: true,
+  },
   { name: 'Slate', bgClass: 'bg-slate-500', textClass: 'text-white' },
   { name: 'Red', bgClass: 'bg-red-500', textClass: 'text-white' },
   { name: 'Orange', bgClass: 'bg-orange-500', textClass: 'text-white' },
@@ -145,8 +154,8 @@ const handleFileUpload = async (event: Event) => {
 
   if (!file.type.startsWith('image/')) {
     toast({
-      title: 'Invalid File',
-      description: 'Please select an image file.',
+      title: t('profile.toast.invalidFile.title'),
+      description: t('profile.toast.invalidFile.description'),
       variant: 'destructive',
     });
     return;
@@ -154,8 +163,8 @@ const handleFileUpload = async (event: Event) => {
   const maxSize = 5 * 1024 * 1024; // 5MB
   if (file.size > maxSize) {
     toast({
-      title: 'File Too Large',
-      description: 'Please select an image smaller than 5MB.',
+      title: t('profile.toast.fileTooLarge.title'),
+      description: t('profile.toast.fileTooLarge.description'),
       variant: 'destructive',
     });
     return;
@@ -168,20 +177,23 @@ const handleFileUpload = async (event: Event) => {
       const base64String = e.target?.result as string;
       setFieldValue('image', base64String);
       showAvatarOptions.value = false;
-      toast({ title: 'Image Ready', description: 'Image selected and ready for profile update.' });
+      toast({
+        title: t('profile.toast.imageReady.title'),
+        description: t('profile.toast.imageReady.description'),
+      });
     };
     reader.onerror = () => {
       toast({
-        title: 'Read Error',
-        description: 'Could not read the selected file.',
+        title: t('profile.toast.readError.title'),
+        description: t('profile.toast.readError.description'),
         variant: 'destructive',
       });
     };
     reader.readAsDataURL(file);
   } catch (error: any) {
     toast({
-      title: 'Processing Failed',
-      description: error.message || 'Failed to process image.',
+      title: t('profile.toast.processingFailed.title'),
+      description: error.message || t('profile.toast.processingFailed.description'),
       variant: 'destructive',
     });
   } finally {
@@ -197,10 +209,12 @@ const selectFallbackColor = (color: {
   isDefault?: boolean;
 }) => {
   setFieldValue('avatarFallbackColor', color.bgClass);
-  setFieldValue('image', ''); // Clear any image
+  setFieldValue('image', '');
   toast({
-    title: 'Fallback Color Selected',
-    description: `${color.name} color chosen for initials.`,
+    title: t('profile.toast.fallbackColorSelected.title'),
+    description: t('profile.toast.fallbackColorSelected.description', {
+      colorName: color.name,
+    }),
   });
 };
 
@@ -208,9 +222,8 @@ const removeAvatar = () => {
   setFieldValue('image', '');
   showAvatarOptions.value = false;
   toast({
-    title: 'Avatar Image Removed',
-    description:
-      'Avatar image has been removed. Fallback color or default will be used for initials.',
+    title: t('profile.toast.avatarRemoved.title'),
+    description: t('profile.toast.avatarRemoved.description'),
   });
 };
 
@@ -223,6 +236,7 @@ onMounted(async () => {
 
     if (response && response.success && response.data) {
       const userData = response.data;
+      const userLanguage = (userData as any).language || defaultFormValues.language;
       setValues({
         userId: userData.id,
         name: userData.name || defaultFormValues.name,
@@ -236,20 +250,29 @@ onMounted(async () => {
         image: (userData as any).image || defaultFormValues.image,
         avatarFallbackColor:
           (userData as any).avatar_fallback_color || defaultFormValues.avatarFallbackColor,
-        language: (userData as any).language || defaultFormValues.language, // Load user language
+        language: userLanguage,
       });
+      setLocale(userLanguage);
     } else {
-      const errorMessage = response?.message || 'Failed to load user data.';
+      const errorMessage = response?.message || t('profile.toast.loadError.defaultMessage');
       apiError.value = errorMessage;
       resetForm({ values: { ...defaultFormValues, userId: '' } });
-      toast({ title: 'Load Error', description: errorMessage, variant: 'destructive' });
+      toast({
+        title: t('profile.toast.loadError.title'),
+        description: errorMessage,
+        variant: 'destructive',
+      });
     }
   } catch (err: any) {
     console.error('API call to auth/get-user failed:', err);
-    const errorMessage = err.message || 'An unexpected error occurred.';
+    const errorMessage = err.message || t('profile.toast.unexpectedError');
     apiError.value = errorMessage;
     resetForm({ values: { ...defaultFormValues, userId: '' } });
-    toast({ title: 'API Error', description: errorMessage, variant: 'destructive' });
+    toast({
+      title: t('profile.toast.apiError.title'),
+      description: errorMessage,
+      variant: 'destructive',
+    });
   } finally {
     isLoading.value = false;
   }
@@ -271,10 +294,14 @@ function dataURLtoBlob(dataurl: string): Blob {
 
 const onSubmit = handleSubmit(async (formValues) => {
   if (!formValues.userId) {
-    toast({ title: 'Error', description: 'User ID is missing.', variant: 'destructive' });
+    toast({
+      title: t('common.error'),
+      description: t('profile.toast.missingUserId'),
+      variant: 'destructive',
+    });
     return;
   }
-  isUploading.value = true; // Use isUploading for the submit button as well
+  isUploading.value = true;
   const userId = formValues.userId;
   try {
     const formData = new FormData();
@@ -288,22 +315,16 @@ const onSubmit = handleSubmit(async (formValues) => {
       }
     });
     formData.append('avatar_fallback_color', formValues.avatarFallbackColor || '');
-    formData.append('language', formValues.language || defaultFormValues.language); // Add language to form data
+    formData.append('language', formValues.language || defaultFormValues.language);
 
     if (typeof formValues.image === 'string' && formValues.image.startsWith('data:image')) {
       const imageBlob = dataURLtoBlob(formValues.image);
       const extension = imageBlob.type.split('/')[1] || 'png';
       formData.append('image', imageBlob, `avatar.${extension}`);
     } else if (formValues.image) {
-      // If it's a URL (already uploaded), send it as is or handle as per your API needs
-      // For now, assuming if it's not a data URL and exists, it's a URL to be kept or re-sent.
-      // If your backend expects an empty string or a specific signal for "no change" vs "remove", adjust here.
-      // If `formValues.image` could be an existing URL that doesn't need to be re-uploaded with user profile update,
-      // you might not need to append it unless it changed.
-      // This example assumes you always send the current image value.
       formData.append('image', formValues.image);
     } else {
-      formData.append('image', ''); // Explicitly send empty if no image
+      formData.append('image', '');
     }
 
     const api = useApi();
@@ -313,24 +334,28 @@ const onSubmit = handleSubmit(async (formValues) => {
     });
 
     if (response && response.success) {
-      toast({ title: 'Success', description: 'Profile updated successfully!' });
-      if (response.data) {
-        if (response.data.image_url !== undefined) {
-          setFieldValue('image', response.data.image_url);
-        }
-        if (response.data.avatar_fallback_color !== undefined) {
-          setFieldValue('avatarFallbackColor', response.data.avatar_fallback_color);
-        }
-        if (response.data.language !== undefined) {
-          // Update language from response
-          setFieldValue('language', response.data.language);
-        }
+      toast({
+        title: t('common.success'),
+        description: t('profile.toast.updateSuccess'),
+      });
+      if (formValues.language) {
+        setLocale(formValues.language);
+      }
+      const updatedUserData = response.data?.data;
+      if (updatedUserData) {
+        if (updatedUserData.image !== undefined) setFieldValue('image', updatedUserData.image);
+        if (updatedUserData.language !== undefined)
+          setFieldValue('language', updatedUserData.language);
       }
     } else {
-      throw new Error(response?.message || 'Failed to update profile.');
+      throw new Error(response?.message || t('profile.toast.updateFailed.defaultMessage'));
     }
   } catch (error: any) {
-    toast({ title: 'Update Failed', description: error.message, variant: 'destructive' });
+    toast({
+      title: t('profile.toast.updateFailed.title'),
+      description: error.message,
+      variant: 'destructive',
+    });
   } finally {
     isUploading.value = false;
   }
@@ -339,24 +364,20 @@ const onSubmit = handleSubmit(async (formValues) => {
 
 <template>
   <div v-if="isLoading" class="py-8 text-center">
-    <p>Loading profile data...</p>
+    <p>{{ t('profile.loadingText') }}</p>
     <div
       class="mt-2 inline-block w-8 h-8 animate-spin rounded-full border-4 border-current border-t-transparent text-blue-600"
       role="status"
     >
-      <span class="sr-only">Loading...</span>
+      <span class="sr-only">{{ t('common.loading') }}</span>
     </div>
-  </div>
-  <div v-else-if="apiError" class="py-8 text-center text-red-500">
-    <p>Error loading profile: {{ apiError }}</p>
-    <Button @click="onMounted" variant="outline" class="mt-4">Retry</Button>
   </div>
   <form v-else class="space-y-8" @submit.prevent="onSubmit">
     <FormField v-slot="{ field }" name="image">
       <FormItem>
-        <FormLabel>Profile Picture</FormLabel>
+        <FormLabel>{{ t('profile.picture.label') }}</FormLabel>
         <FormControl>
-          <div class="flex items-center space-x-4">
+          <div class="group flex items-center space-x-3">
             <div class="relative">
               <div
                 v-if="!avatarPreview"
@@ -376,7 +397,7 @@ const onSubmit = handleSubmit(async (formValues) => {
               >
                 <img
                   :src="avatarPreview.src"
-                  :alt="values.name || 'Profile picture'"
+                  :alt="t('profile.picture.alt', { name: values.name })"
                   class="w-full h-full object-cover"
                   @error="
                     (e) => {
@@ -399,8 +420,8 @@ const onSubmit = handleSubmit(async (formValues) => {
               >
                 {{
                   values.image || values.avatarFallbackColor
-                    ? 'Change Appearance'
-                    : 'Set Appearance'
+                    ? t('profile.picture.changeAppearanceButton')
+                    : t('profile.picture.setAppearanceButton')
                 }}
               </Button>
               <Button
@@ -412,7 +433,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                 :disabled="isUploading"
                 class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-all duration-200 hover:scale-105"
               >
-                Remove Image
+                {{ t('profile.picture.removeImageButton') }}
               </Button>
             </div>
           </div>
@@ -435,7 +456,7 @@ const onSubmit = handleSubmit(async (formValues) => {
             <div class="space-y-3">
               <h4 class="font-semibold text-md sm:text-lg flex items-center gap-2">
                 <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                Upload Custom Image
+                {{ t('profile.picture.uploadTitle') }}
               </h4>
               <Button
                 type="button"
@@ -466,17 +487,21 @@ const onSubmit = handleSubmit(async (formValues) => {
                   v-if="isUploading"
                   class="inline-block w-4 h-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"
                 ></div>
-                {{ isUploading ? 'Processing...' : 'Choose File' }}
+                {{
+                  isUploading
+                    ? t('profile.picture.processingButton')
+                    : t('profile.picture.chooseFileButton')
+                }}
               </Button>
               <p class="text-xs text-muted-foreground">
-                Supports JPG, PNG, GIF, WEBP. Max file size: 5MB.
+                {{ t('profile.picture.fileRequirements') }}
               </p>
             </div>
 
             <div class="space-y-3">
               <h4 class="font-semibold text-md sm:text-lg flex items-center gap-2">
                 <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                Or Select an Initials Background Color
+                {{ t('profile.picture.selectColorTitle') }}
               </h4>
               <div class="grid grid-cols-7 sm:grid-cols-8 md:grid-cols-9 lg:grid-cols-10 gap-2">
                 <button
@@ -495,7 +520,7 @@ const onSubmit = handleSubmit(async (formValues) => {
                     )
                   "
                   @click="selectFallbackColor(color)"
-                  :aria-label="`Select ${color.name} background`"
+                  :aria-label="t('profile.picture.selectColorAria', { colorName: color.name })"
                   :disabled="isUploading"
                   :title="color.name"
                 ></button>
@@ -504,47 +529,47 @@ const onSubmit = handleSubmit(async (formValues) => {
           </div>
         </div>
 
-        <FormDescription>
-          Upload an image or choose a background color for your initials.
-        </FormDescription>
+        <FormDescription>{{ t('profile.picture.description') }}</FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
     <FormField v-slot="{ componentField }" name="name">
       <FormItem>
-        <FormLabel>Display Name</FormLabel>
+        <FormLabel>{{ t('profile.name.label') }}</FormLabel>
         <FormControl>
-          <Input type="text" placeholder="Your display name" v-bind="componentField" />
+          <Input type="text" :placeholder="t('profile.name.placeholder')" v-bind="componentField" />
         </FormControl>
-        <FormDescription>
-          This is your public display name. (Used for initials if no image)
-        </FormDescription>
+        <FormDescription>{{ t('profile.name.description') }}</FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
     <FormField v-slot="{ componentField }" name="email">
       <FormItem>
-        <FormLabel>Email</FormLabel>
+        <FormLabel>{{ t('profile.email.label') }}</FormLabel>
         <FormControl>
-          <Input type="email" placeholder="you@example.com" v-bind="componentField" />
+          <Input
+            type="email"
+            :placeholder="t('profile.email.placeholder')"
+            v-bind="componentField"
+          />
         </FormControl>
-        <FormDescription> Your primary email address. </FormDescription>
+        <FormDescription>{{ t('profile.email.description') }}</FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
     <FormField name="language">
       <FormItem>
-        <FormLabel>Preferred Language</FormLabel>
+        <FormLabel>{{ t('profile.language.label') }}</FormLabel>
         <Select
           @update:modelValue="(value) => setFieldValue('language', value)"
           :defaultValue="values.language"
         >
           <FormControl>
             <SelectTrigger :disabled="isUploading">
-              <SelectValue placeholder="Select a language" />
+              <SelectValue :placeholder="t('profile.language.placeholder')" />
             </SelectTrigger>
           </FormControl>
           <SelectContent>
@@ -553,7 +578,7 @@ const onSubmit = handleSubmit(async (formValues) => {
             </SelectItem>
           </SelectContent>
         </Select>
-        <FormDescription> Choose your preferred language for the interface. </FormDescription>
+        <FormDescription>{{ t('profile.language.description') }}</FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
@@ -563,7 +588,7 @@ const onSubmit = handleSubmit(async (formValues) => {
           v-if="isUploading"
           class="inline-block w-4 h-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"
         ></span>
-        {{ isUploading ? 'Updating...' : 'Update Profile' }}
+        {{ isUploading ? t('profile.updateButton.updating') : t('profile.updateButton.update') }}
       </Button>
 
       <Button
@@ -581,7 +606,7 @@ const onSubmit = handleSubmit(async (formValues) => {
         "
         :disabled="isUploading"
       >
-        Reset Form
+        {{ t('profile.resetButton') }}
       </Button>
     </div>
   </form>
@@ -592,11 +617,13 @@ const onSubmit = handleSubmit(async (formValues) => {
 .animate-pulse {
   animation: pulse 2s infinite ease-in-out;
 }
+
 @keyframes pulse {
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.8;
   }
