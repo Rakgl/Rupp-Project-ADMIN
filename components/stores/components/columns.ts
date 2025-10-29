@@ -46,7 +46,9 @@ interface StatusDisplayConfig {
   translationKey: string;
   badgeClass: string;
   dotClass: string;
+  textClass: string; // Add this
 }
+
 
 const statusConfigurations: Record<string, StatusDisplayConfig> = {
   ACTIVE: {
@@ -68,6 +70,7 @@ const statusConfigurations: Record<string, StatusDisplayConfig> = {
     dotClass: 'bg-gray-400',
   },
 };
+
 
 // --- Column Definitions for the Store Table ---
 export const storesColumns: ColumnDef<Store>[] = [
@@ -176,7 +179,7 @@ export const storesColumns: ColumnDef<Store>[] = [
         },
         () => [
           h('span', { class: `w-2 h-2 mr-1.5 rounded-full ${config.dotClass}` }),
-          t(config.translationKey),
+          h('span', { class: config.textClass }, t(config.translationKey)),
         ]
       );
     },

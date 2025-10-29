@@ -3,10 +3,10 @@ import { useRouter, useRoute, useNuxtApp, useRuntimeConfig } from '#app'; // Aut
 import moment from 'moment'; // Assuming you still want to use moment
 
 // --- Actual Nuxt 3 Integrations ---
-// 1. Pinia Stores (Assumed to be created by you in '~/stores')
-// You'll need to create these files, e.g., stores/loadingStore.ts, stores/setupStore.ts
-import { useLoadingStore } from '@/stores/loadingStore'; // Example: define this store
-import { useSetupStore } from '@/stores/setupStore'; // Example: define this store
+// 1. Pinia Stores (Assumed to be created by you in '~/stores.vue')
+// You'll need to create these files, e.g., stores.vue/loadingStore.ts, stores.vue/setupStore.ts
+import { useLoadingStore } from '@/stores.vue/loadingStore'; // Example: define this store
+import { useSetupStore } from '@/stores.vue/setupStore'; // Example: define this store
 
 // 2. Nuxt Auth (from @sidebase/nuxt-auth, auto-imported composables)
 // useAuth is auto-imported by @sidebase/nuxt-auth
@@ -63,7 +63,7 @@ export function useGlobalUtils() {
   const is_scroll = ref(false);
   const validations = allValidations;
 
-  // Computed properties using actual stores and auth
+  // Computed properties using actual stores.vue and auth
   const isDataLoading = computed(() => loadingStore.isDataLoading); // Assuming 'isDataLoading' is a state in your loadingStore
   const isTableLoading = computed(() => loadingStore.isTableLoading); // Assuming 'isTableLoading' is a state in your loadingStore
 
