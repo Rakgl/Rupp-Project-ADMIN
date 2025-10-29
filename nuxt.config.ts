@@ -60,31 +60,44 @@ export default defineNuxtConfig({
     },
   },
 
+  // THE CORRECT (FIXED) CODE
   vite: process.env.PROXY_API_URL
-    ? {
-      server: {
-        proxy: {
-          '/api/v1/admin': {
-            target: process.env.PROXY_API_URL,
-            changeOrigin: true,
-            secure: false,
-            configure: (proxy, _options) => {
-              console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL);
-              proxy.on('proxyReq', (proxyReq, req, _res) => {
-                console.log('📤 Proxying:', req.method, req.url);
-              });
-              proxy.on('proxyRes', (proxyRes, req, _res) => {
-                console.log('📥 Response:', proxyRes.statusCode, req.url);
-              });
+      ? {
+        server: {
+          // 1. ADD THIS LINE
+          compression: false,
+
+          proxy: {
+            '/api/v1/admin': {
+              target: process.env.PROXY_API_URL,
+              changeOrigin: true,
+              secure: false,
+
+              // 2. ADD THIS BLOCK
+              headers: {
+                'Accept-Encoding': 'identity',
+              },
+
+              configure: (proxy, _options) => {
+                console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL);
+                proxy.on('proxyReq', (proxyReq, req, _res) => {
+                  console.log('📤 Proxying:', req.method, req.url);
+                });
+                proxy.on('proxyRes', (proxyRes, req, _res) => {
+                  console.log('📥 Response:', proxyRes.statusCode, req.url);
+                });
+              },
             },
           },
         },
-      },
-    }
-    : {},
+      }
+      : {},
 
   css: [
+    '~/assets/css/fonts.css',
     '@unocss/reset/tailwind.css',
+    '~/assets/css/language-fonts.css',
+    '~/assets/css/dark-mode-enhancements.css',
   ],
 
   colorMode: {
@@ -114,11 +127,7 @@ export default defineNuxtConfig({
   },
 
   imports: {
-    dirs: [
-      './lib',
-      './stores', // Auto-import stores
-      './composables', // Auto-import composables
-    ],
+    dirs: ['./lib', './stores', './composables'],
   },
 
   i18n: {

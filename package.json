@@ -44,6 +44,10 @@
     "format": "eslint --fix ."
   },
   "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@fontsource/kantumruy-pro": "^5.2.8",
+    "@fontsource/open-sans": "^5.2.7",
+    "@fontsource/parkinsans": "^5.2.7",
     "@iconify-json/lucide": "^1.2.30",
     "@iconify-json/radix-icons": "^1.2.2",
     "@internationalized/date": "^3.7.0",
