@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Table } from '@tanstack/vue-table';
-import type { Task } from '../data/schema';
-import { useI18n } from 'vue-i18n';
+import type { Table } from '@tanstack/vue-table'
+import type { Task } from '../data/schema'
+import { useI18n } from 'vue-i18n'
 
 interface DataTablePaginationProps {
-  table: Table<Task>;
+  table: Table<Task>
 }
-defineProps<DataTablePaginationProps>();
+defineProps<DataTablePaginationProps>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 </script>
 
 <template>
@@ -23,7 +23,7 @@ const { t } = useI18n();
     </div>
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
-        <p class="text-sm font-medium" v-t="'pagination.rowsPerPage'"></p>
+        <p v-t="'pagination.rowsPerPage'" class="text-sm font-medium" />
         <Select
           :model-value="`${table.getState().pagination.pageSize}`"
           @update:model-value="table.setPageSize"
@@ -57,7 +57,7 @@ const { t } = useI18n();
           :disabled="!table.getCanPreviousPage()"
           @click="table.setPageIndex(0)"
         >
-          <span class="sr-only" v-t="'pagination.goToFirst'"></span>
+          <span v-t="'pagination.goToFirst'" class="sr-only" />
           <Icon name="i-radix-icons-double-arrow-left" class="h-4 w-4" />
         </Button>
         <Button
@@ -66,7 +66,7 @@ const { t } = useI18n();
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
-          <span class="sr-only" v-t="'pagination.goToPrevious'"></span>
+          <span v-t="'pagination.goToPrevious'" class="sr-only" />
           <Icon name="i-radix-icons-chevron-left" class="h-4 w-4" />
         </Button>
         <Button
@@ -75,7 +75,7 @@ const { t } = useI18n();
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >
-          <span class="sr-only" v-t="'pagination.goToNext'"></span>
+          <span v-t="'pagination.goToNext'" class="sr-only" />
           <Icon name="i-radix-icons-chevron-right" class="h-4 w-4" />
         </Button>
         <Button
@@ -84,7 +84,7 @@ const { t } = useI18n();
           :disabled="!table.getCanNextPage()"
           @click="table.setPageIndex(table.getPageCount() - 1)"
         >
-          <span class="sr-only" v-t="'pagination.goToLast'"></span>
+          <span v-t="'pagination.goToLast'" class="sr-only" />
           <Icon name="i-radix-icons-double-arrow-right" class="h-4 w-4" />
         </Button>
       </div>

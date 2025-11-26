@@ -1,17 +1,17 @@
 # components/columns.ts
 
 ```ts
-import type { ColumnDef, Table } from '@tanstack/vue-table'; // ✨ ADDED Table type
-import { h } from 'vue';
-import type { Role } from '../data/schema'; // Adjust path as necessary
-import { Checkbox } from '@/components/ui/checkbox';
-import DataTableColumnHeader from './DataTableColumnHeader.vue';
-import RoleRowActions from './DataTableRowActions.vue';
+import type { ColumnDef, Table } from '@tanstack/vue-table' // ✨ ADDED Table type
+import type { Role } from '../data/schema' // Adjust path as necessary
+import { h } from 'vue'
+import { Checkbox } from '@/components/ui/checkbox'
+import DataTableColumnHeader from './DataTableColumnHeader.vue'
+import RoleRowActions from './DataTableRowActions.vue'
 
 // ✨ Define a type for your custom meta if you haven't in DataTable.vue
 // You might want to have a shared types file for this
 interface CustomTableMeta {
-  onDataChanged?: () => void;
+  onDataChanged?: () => void
 }
 
 export const roleColumns: ColumnDef<Role>[] = [
@@ -19,19 +19,19 @@ export const roleColumns: ColumnDef<Role>[] = [
     id: 'select',
     header: ({ table }) =>
       h(Checkbox, {
-        checked:
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate'),
+        'checked':
+          table.getIsAllPageRowsSelected()
+          || (table.getIsSomePageRowsSelected() && 'indeterminate'),
         'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: 'Select all',
-        class: 'translate-y-0.5',
+        'ariaLabel': 'Select all',
+        'class': 'translate-y-0.5',
       }),
     cell: ({ row }) =>
       h(Checkbox, {
-        checked: row.getIsSelected(),
+        'checked': row.getIsSelected(),
         'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
-        ariaLabel: 'Select row',
-        class: 'translate-y-0.5',
+        'ariaLabel': 'Select row',
+        'class': 'translate-y-0.5',
       }),
     enableSorting: false,
     enableHiding: false,
@@ -40,9 +40,9 @@ export const roleColumns: ColumnDef<Role>[] = [
     id: 'index',
     header: ({ column }) => h(DataTableColumnHeader, { column, title: '#' }),
     cell: ({ row, table }) => {
-      const { pageIndex, pageSize } = table.getState().pagination;
-      const globalIndex = pageIndex * pageSize + row.index + 1;
-      return h('div', { class: 'font-medium' }, globalIndex);
+      const { pageIndex, pageSize } = table.getState().pagination
+      const globalIndex = pageIndex * pageSize + row.index + 1
+      return h('div', { class: 'font-medium' }, globalIndex)
     },
     enableSorting: false,
     enableHiding: false,
@@ -63,15 +63,16 @@ export const roleColumns: ColumnDef<Role>[] = [
     accessorKey: 'status',
     header: ({ column }) => h(DataTableColumnHeader, { column, title: 'Status' }),
     cell: ({ row }) => {
-      const statusValue = row.getValue('status');
-      const status = String(statusValue || '').toLowerCase();
-      const statusText = status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A';
-      let statusClass = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200';
+      const statusValue = row.getValue('status')
+      const status = String(statusValue || '').toLowerCase()
+      const statusText = status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'
+      let statusClass = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
 
       if (String(statusValue) === 'ACTIVE') {
-        statusClass = 'bg-green-100 text-green-700 dark:bg-green-700/30 dark:text-green-400';
-      } else if (String(statusValue) === 'INACTIVE') {
-        statusClass = 'bg-red-100 text-red-700 dark:bg-red-700/30 dark:text-red-400';
+        statusClass = 'bg-green-100 text-green-700 dark:bg-green-700/30 dark:text-green-400'
+      }
+      else if (String(statusValue) === 'INACTIVE') {
+        statusClass = 'bg-red-100 text-red-700 dark:bg-red-700/30 dark:text-red-400'
       }
       return h(
         'div',
@@ -79,7 +80,7 @@ export const roleColumns: ColumnDef<Role>[] = [
           class: `px-2 py-1 inline-block rounded font-semibold ${statusClass}`,
         },
         statusText
-      );
+      )
     },
     enableSorting: true,
   },
@@ -89,11 +90,11 @@ export const roleColumns: ColumnDef<Role>[] = [
     cell: ({ row, table }) => {
       // ✨ table is available in cell context
       // Access onDataChanged from table.options.meta
-      const meta = table.options.meta as CustomTableMeta; // Cast to your custom meta type
+      const meta = table.options.meta as CustomTableMeta // Cast to your custom meta type
       return h(RoleRowActions, {
         row,
         onDataChanged: meta?.onDataChanged, // ✨ Pass it to RoleRowActions
-      });
+      })
     },
     enableSorting: false,
     enableHiding: false,
@@ -101,8 +102,7 @@ export const roleColumns: ColumnDef<Role>[] = [
       cellClass: 'text-right',
     },
   },
-];
-
+]
 ```
 
 # components/DataTable.vue
@@ -112,76 +112,76 @@ export const roleColumns: ColumnDef<Role>[] = [
 import type {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   PaginationState, // Added for server-side pagination state
+  SortingState,
   Updater,
-} from '@tanstack/vue-table';
-import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
-import { ref } from 'vue'; // Make sure ref is imported if not already
+  VisibilityState,
+} from '@tanstack/vue-table'
+import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table'
+import { ref } from 'vue' // Make sure ref is imported if not already
 
-import { valueUpdater } from '@/lib/utils'; // Assuming this utility exists
-import DataTablePagination from './DataTablePagination.vue';
-import DataTableToolbar from './DataTableToolbar.vue'; // Toolbar will need to be adapted for Role data
+import { valueUpdater } from '@/lib/utils' // Assuming this utility exists
+import DataTablePagination from './DataTablePagination.vue'
+import DataTableToolbar from './DataTableToolbar.vue' // Toolbar will need to be adapted for Role data
 
 interface DataTableProps {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
 
   // --- NEW Props for Server-Side Operations ---
-  pageCount: number; // Total number of pages from the API (meta.last_page)
-  pagination: PaginationState; // Controlled pagination state
-  sorting?: SortingState; // Controlled sorting state
-  columnFilters?: ColumnFiltersState; // Controlled column filters state
+  pageCount: number // Total number of pages from the API (meta.last_page)
+  pagination: PaginationState // Controlled pagination state
+  sorting?: SortingState // Controlled sorting state
+  columnFilters?: ColumnFiltersState // Controlled column filters state
 
   // Event emitters for state changes to be handled by parent
-  onPaginationChange: (updater: Updater<PaginationState>) => void;
-  onSortingChange?: (updater: Updater<SortingState>) => void;
-  onColumnFiltersChange?: (updater: Updater<ColumnFiltersState>) => void;
+  onPaginationChange: (updater: Updater<PaginationState>) => void
+  onSortingChange?: (updater: Updater<SortingState>) => void
+  onColumnFiltersChange?: (updater: Updater<ColumnFiltersState>) => void
 
   // Flags to enable server-side processing
-  manualPagination?: boolean;
-  manualSorting?: boolean;
-  manualFiltering?: boolean;
+  manualPagination?: boolean
+  manualSorting?: boolean
+  manualFiltering?: boolean
   // --- END NEW Props ---
 }
-const props = defineProps<DataTableProps>();
+const props = defineProps<DataTableProps>()
 
 // Local states for features not (yet) server-controlled or always client-side
-const columnVisibility = ref<VisibilityState>({});
-const rowSelection = ref({}); // Keep if you use row selection
+const columnVisibility = ref<VisibilityState>({})
+const rowSelection = ref({}) // Keep if you use row selection
 
 const table = useVueTable({
   get data() {
-    return props.data;
+    return props.data
   },
   get columns() {
-    return props.columns;
+    return props.columns
   },
   state: {
     // Controlled states from props
     get pagination() {
-      return props.pagination;
+      return props.pagination
     },
     get sorting() {
-      return props.sorting;
+      return props.sorting
     },
     get columnFilters() {
-      return props.columnFilters;
+      return props.columnFilters
     },
     // Local states
     get columnVisibility() {
-      return columnVisibility.value;
+      return columnVisibility.value
     },
     get rowSelection() {
-      return rowSelection.value;
+      return rowSelection.value
     },
   },
   // --- Configuration for Server-Side Operations ---
   // pageCount: props.pageCount, // <<< OLD LINE
   get pageCount() {
     // <<< MODIFIED LINE: Use a getter for reactivity
-    return props.pageCount;
+    return props.pageCount
   },
   manualPagination: props.manualPagination ?? true, // Default to true if not provided
   manualSorting: props.manualSorting ?? true,
@@ -196,11 +196,11 @@ const table = useVueTable({
   onColumnFiltersChange: props.onColumnFiltersChange,
 
   // Event handlers for local states
-  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
-  onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
+  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
+  onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
 
   getCoreRowModel: getCoreRowModel(),
-});
+})
 </script>
 
 <template>
@@ -232,7 +232,9 @@ const table = useVueTable({
             </TableRow>
           </template>
           <TableRow v-else>
-            <TableCell :colspan="columns.length" class="h-24 text-center"> No results. </TableCell>
+            <TableCell :colspan="columns.length" class="h-24 text-center">
+              No results.
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -240,29 +242,28 @@ const table = useVueTable({
     <DataTablePagination :table="table" />
   </div>
 </template>
-
 ```
 
 # components/DataTableColumnHeader.vue
 
 ```vue
 <script setup lang="ts">
-import type { Column } from '@tanstack/vue-table';
-import type { Task } from '../data/schema';
-import { cn } from '@/lib/utils';
+import type { Column } from '@tanstack/vue-table'
+import type { Task } from '../data/schema'
+import { cn } from '@/lib/utils'
 
 interface DataTableColumnHeaderProps {
-  column: Column<Task, any>;
-  title: string;
+  column: Column<Task, any>
+  title: string
 }
 
-defineProps<DataTableColumnHeaderProps>();
+defineProps<DataTableColumnHeaderProps>()
 </script>
 
 <script lang="ts">
 export default {
   inheritAttrs: false,
-};
+}
 </script>
 
 <template>
@@ -306,7 +307,6 @@ export default {
     {{ title }}
   </div>
 </template>
-
 ```
 
 # components/DataTableFacetedFilter.vue
@@ -316,8 +316,8 @@ export default {
 import type { Column } from '@tanstack/vue-table'
 import type { Component } from 'vue'
 import type { Task } from '../data/schema'
-import { cn } from '@/lib/utils'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 interface DataTableFacetedFilter {
   column?: Column<Task, any>
@@ -435,20 +435,19 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
     </PopoverContent>
   </Popover>
 </template>
-
 ```
 
 # components/DataTablePagination.vue
 
 ```vue
 <script setup lang="ts">
-import type { Table } from '@tanstack/vue-table';
-import type { Task } from '../data/schema';
+import type { Table } from '@tanstack/vue-table'
+import type { Task } from '../data/schema'
 
 interface DataTablePaginationProps {
-  table: Table<Task>;
+  table: Table<Task>
 }
-defineProps<DataTablePaginationProps>();
+defineProps<DataTablePaginationProps>()
 </script>
 
 <template>
@@ -459,7 +458,9 @@ defineProps<DataTablePaginationProps>();
     </div>
     <div class="flex items-center space-x-6 lg:space-x-8">
       <div class="flex items-center space-x-2">
-        <p class="text-sm font-medium">Rows per page</p>
+        <p class="text-sm font-medium">
+          Rows per page
+        </p>
         <Select
           :model-value="`${table.getState().pagination.pageSize}`"
           @update:model-value="table.setPageSize"
@@ -523,35 +524,16 @@ defineProps<DataTablePaginationProps>();
     </div>
   </div>
 </template>
-
 ```
 
 # components/DataTableRowActions.vue
 
 ```vue
 <script setup lang="ts">
-import type { Row } from '@tanstack/vue-table';
-import type { Role } from '../data/schema'; // This should ideally match the structure of RoleIndexResource
-import { ref, computed, watch } from 'vue';
+import type { Row } from '@tanstack/vue-table'
+import type { Role } from '../data/schema' // This should ideally match the structure of RoleIndexResource
+import { computed, ref, watch } from 'vue'
 
-// Shadcn-vue components (ensure paths are correct for your project)
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -562,342 +544,377 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'; // ✨ Import Alert Dialog components
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/components/ui/toast/use-toast';
+} from '@/components/ui/alert-dialog' // ✨ Import Alert Dialog components
+// Shadcn-vue components (ensure paths are correct for your project)
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/components/ui/toast/use-toast'
 
 interface RoleRowActionsProps {
-  row: Row<Role>;
+  row: Row<Role>
 }
 
-const props = defineProps<RoleRowActionsProps>();
-const { toast } = useToast();
-const apiInstance = useApi();
-const role = computed(() => props.row.original);
+const props = defineProps<RoleRowActionsProps>()
+const { toast } = useToast()
+const apiInstance = useApi()
+const role = computed(() => props.row.original)
 
 // Edit Dialog States
-const isEditDialogOpen = ref(false);
-const isLoadingRole = ref(false);
-const editError = ref<string | null>(null);
-const roleToEdit = ref<EditableRoleData | null>(null);
+const isEditDialogOpen = ref(false)
+const isLoadingRole = ref(false)
+const editError = ref<string | null>(null)
+const roleToEdit = ref<EditableRoleData | null>(null)
 
 // Permissions Dialog States
-const isPermissionsDialogOpen = ref(false);
-const isLoadingPermissions = ref(false);
-const permissionsError = ref<string | null>(null);
-const allPermissions = ref<PermissionGroup[]>([]);
-const currentRolePermissions = ref<PermissionItem[]>([]);
-const selectedPermissionSlugs = ref<Set<string>>(new Set());
+const isPermissionsDialogOpen = ref(false)
+const isLoadingPermissions = ref(false)
+const permissionsError = ref<string | null>(null)
+const allPermissions = ref<PermissionGroup[]>([])
+const currentRolePermissions = ref<PermissionItem[]>([])
+const selectedPermissionSlugs = ref<Set<string>>(new Set())
 
 // ✨ Delete Alert Dialog State
-const isDeleteDialogOpen = ref(false); // ✨ New state for delete alert
+const isDeleteDialogOpen = ref(false) // ✨ New state for delete alert
 
 interface EditableRoleData {
-  id: string | number;
-  name: string;
-  description: string | null;
-  status: boolean;
-  [key: string]: any;
+  id: string | number
+  name: string
+  description: string | null
+  status: boolean
+  [key: string]: any
 }
 
 interface GetRoleApiResponse {
-  data: EditableRoleData;
+  data: EditableRoleData
 }
 
 interface UpdateRoleApiResponse {
-  success: boolean;
-  data: EditableRoleData;
-  message?: string;
+  success: boolean
+  data: EditableRoleData
+  message?: string
 }
 
 interface PermissionItem {
-  id: number;
-  module: string;
-  name: string;
-  slug: string;
+  id: number
+  module: string
+  name: string
+  slug: string
 }
 
 interface PermissionGroup {
-  module: string;
-  name: string;
-  slug: string;
-  permissions: PermissionItem[];
+  module: string
+  name: string
+  slug: string
+  permissions: PermissionItem[]
 }
 
 interface RolePermissionResponse {
-  success: boolean;
-  data: PermissionItem[];
-  message?: string;
+  success: boolean
+  data: PermissionItem[]
+  message?: string
 }
 
-const openEditDialog = async () => {
+async function openEditDialog() {
   // ... (your existing openEditDialog logic)
   if (!role.value || typeof role.value.id === 'undefined') {
-    editError.value = 'Role ID is missing.';
-    return;
+    editError.value = 'Role ID is missing.'
+    return
   }
-  isEditDialogOpen.value = true;
-  isLoadingRole.value = true;
-  editError.value = null;
-  roleToEdit.value = null;
+  isEditDialogOpen.value = true
+  isLoadingRole.value = true
+  editError.value = null
+  roleToEdit.value = null
   try {
     const response = await apiInstance<GetRoleApiResponse>(`/roles/${role.value.id}`, {
       method: 'GET',
-    });
+    })
     if (response && response.data) {
-      const fetchedData = response.data;
+      const fetchedData = response.data
       roleToEdit.value = {
         id: fetchedData.id,
         name: fetchedData.name,
         description: fetchedData.description || '',
-        status: fetchedData.status === 'ACTIVE' ? true : false,
-      };
-    } else {
-      editError.value = 'Failed to load role details: Invalid response structure.';
+        status: fetchedData.status === 'ACTIVE',
+      }
     }
-  } catch (error: any) {
-    editError.value = error.data?.message || error.message || 'An unexpected error occurred.';
-  } finally {
-    isLoadingRole.value = false;
+    else {
+      editError.value = 'Failed to load role details: Invalid response structure.'
+    }
   }
-};
+  catch (error: any) {
+    editError.value = error.data?.message || error.message || 'An unexpected error occurred.'
+  }
+  finally {
+    isLoadingRole.value = false
+  }
+}
 
-const handleSaveChanges = async () => {
+async function handleSaveChanges() {
   // ... (your existing handleSaveChanges logic)
   if (!roleToEdit.value || roleToEdit.value.id === undefined) {
-    editError.value = 'No role data to save.';
-    return;
+    editError.value = 'No role data to save.'
+    return
   }
   if (!roleToEdit.value.name.trim()) {
-    editError.value = 'Role name cannot be empty.';
-    return;
+    editError.value = 'Role name cannot be empty.'
+    return
   }
-  isLoadingRole.value = true;
-  editError.value = null;
+  isLoadingRole.value = true
+  editError.value = null
   try {
     const payload = {
       name: roleToEdit.value.name,
       description: roleToEdit.value.description,
       status: roleToEdit.value.status ? 'ACTIVE' : 'INACTIVE',
-    };
+    }
     const response = await apiInstance<UpdateRoleApiResponse>(`/roles/${roleToEdit.value.id}`, {
       method: 'PUT',
       body: payload,
-    });
+    })
     if (response.success && response.data) {
-      Object.assign(props.row.original, response.data);
-      isEditDialogOpen.value = false;
-      roleToEdit.value = null;
+      Object.assign(props.row.original, response.data)
+      isEditDialogOpen.value = false
+      roleToEdit.value = null
       toast({
         title: 'Role Updated Successfully!',
         description: `The role "${response.data.name}" has been updated.`,
-      });
-    } else {
-      editError.value = response.message || 'Failed to save changes.';
+      })
     }
-  } catch (error: any) {
-    editError.value = error.data?.message || error.message || 'An unexpected error occurred.';
-  } finally {
-    isLoadingRole.value = false;
+    else {
+      editError.value = response.message || 'Failed to save changes.'
+    }
   }
-};
+  catch (error: any) {
+    editError.value = error.data?.message || error.message || 'An unexpected error occurred.'
+  }
+  finally {
+    isLoadingRole.value = false
+  }
+}
 
-const openPermissionsDialog = async () => {
+async function openPermissionsDialog() {
   // ... (your existing openPermissionsDialog logic)
   if (!role.value || typeof role.value.id === 'undefined') {
-    console.error('Role ID is missing for manage permissions action', role.value);
-    permissionsError.value = 'Role ID is missing.';
-    return;
+    console.error('Role ID is missing for manage permissions action', role.value)
+    permissionsError.value = 'Role ID is missing.'
+    return
   }
-  isPermissionsDialogOpen.value = true;
-  isLoadingPermissions.value = true;
-  permissionsError.value = null;
-  allPermissions.value = [];
-  currentRolePermissions.value = [];
-  selectedPermissionSlugs.value = new Set();
+  isPermissionsDialogOpen.value = true
+  isLoadingPermissions.value = true
+  permissionsError.value = null
+  allPermissions.value = []
+  currentRolePermissions.value = []
+  selectedPermissionSlugs.value = new Set()
   try {
     const allPermsResponse = await apiInstance<PermissionGroup[]>('/role-permissions', {
       method: 'GET',
-    });
+    })
     if (allPermsResponse && Array.isArray(allPermsResponse)) {
-      allPermissions.value = allPermsResponse;
-    } else {
+      allPermissions.value = allPermsResponse
+    }
+    else {
       console.error(
         'Failed to fetch all permissions: Invalid response structure',
         allPermsResponse
-      );
-      permissionsError.value = 'Could not load available permissions.';
-      isLoadingPermissions.value = false;
-      return;
+      )
+      permissionsError.value = 'Could not load available permissions.'
+      isLoadingPermissions.value = false
+      return
     }
     const currentPermsResponse = await apiInstance<RolePermissionResponse>(
       `role-permissions/role/${role.value.id}`,
       {
         method: 'GET',
       }
-    );
+    )
     if (
-      currentPermsResponse &&
-      currentPermsResponse.success &&
-      Array.isArray(currentPermsResponse.data)
+      currentPermsResponse
+      && currentPermsResponse.success
+      && Array.isArray(currentPermsResponse.data)
     ) {
-      currentRolePermissions.value = currentPermsResponse.data;
-      const currentSlugs = currentPermsResponse.data.map((permission) => permission.slug);
-      selectedPermissionSlugs.value = new Set(currentSlugs);
-    } else {
-      console.warn('No current permissions found or invalid response.', currentPermsResponse);
-      currentRolePermissions.value = [];
-      selectedPermissionSlugs.value = new Set();
+      currentRolePermissions.value = currentPermsResponse.data
+      const currentSlugs = currentPermsResponse.data.map(permission => permission.slug)
+      selectedPermissionSlugs.value = new Set(currentSlugs)
     }
-  } catch (error: any) {
-    console.error('Error in permissions dialog setup:', error);
-    permissionsError.value = error.data?.message || error.message || 'An error occurred.';
-  } finally {
-    isLoadingPermissions.value = false;
+    else {
+      console.warn('No current permissions found or invalid response.', currentPermsResponse)
+      currentRolePermissions.value = []
+      selectedPermissionSlugs.value = new Set()
+    }
   }
-};
+  catch (error: any) {
+    console.error('Error in permissions dialog setup:', error)
+    permissionsError.value = error.data?.message || error.message || 'An error occurred.'
+  }
+  finally {
+    isLoadingPermissions.value = false
+  }
+}
 
-const handlePermissionToggle = (slug: string, checked: boolean) => {
+function handlePermissionToggle(slug: string, checked: boolean) {
   // ... (your existing handlePermissionToggle logic)
   if (checked) {
-    selectedPermissionSlugs.value.add(slug);
-  } else {
-    selectedPermissionSlugs.value.delete(slug);
+    selectedPermissionSlugs.value.add(slug)
   }
-};
+  else {
+    selectedPermissionSlugs.value.delete(slug)
+  }
+}
 
-const handleSavePermissions = async () => {
+async function handleSavePermissions() {
   // ... (your existing handleSavePermissions logic)
   if (!role.value || typeof role.value.id === 'undefined') {
-    permissionsError.value = 'Role ID is missing.';
-    return;
+    permissionsError.value = 'Role ID is missing.'
+    return
   }
-  isLoadingPermissions.value = true;
-  permissionsError.value = null;
+  isLoadingPermissions.value = true
+  permissionsError.value = null
   try {
-    const selectedPermissions = Array.from(selectedPermissionSlugs.value);
-    const permissionIds: number[] = [];
+    const selectedPermissions = Array.from(selectedPermissionSlugs.value)
+    const permissionIds: number[] = []
     allPermissions.value.forEach((group) => {
       group.permissions.forEach((permission) => {
         if (selectedPermissions.includes(permission.slug)) {
-          permissionIds.push(permission.id);
+          permissionIds.push(permission.id)
         }
-      });
-    });
+      })
+    })
     const payload = {
       role_id: role.value.id,
       permission_ids: permissionIds,
-    };
-    const response = await apiInstance<{ success: boolean; message?: string; data?: any }>(
+    }
+    const response = await apiInstance<{ success: boolean, message?: string, data?: any }>(
       `/role-permissions/update`,
       {
         method: 'POST',
         body: payload,
       }
-    );
+    )
     if (response.success) {
-      isPermissionsDialogOpen.value = false;
+      isPermissionsDialogOpen.value = false
       toast({
         title: 'Permissions Updated!',
         description: `Permissions for role "${role.value.name}" have been saved.`,
-      });
-    } else {
-      permissionsError.value = response.message || 'Failed to save permissions.';
+      })
     }
-  } catch (error: any) {
-    console.error('Error saving permissions:', error);
-    permissionsError.value =
-      error.data?.message ||
-      error.message ||
-      'An unexpected error occurred while saving permissions.';
-  } finally {
-    isLoadingPermissions.value = false;
+    else {
+      permissionsError.value = response.message || 'Failed to save permissions.'
+    }
   }
-};
+  catch (error: any) {
+    console.error('Error saving permissions:', error)
+    permissionsError.value
+      = error.data?.message
+        || error.message
+        || 'An unexpected error occurred while saving permissions.'
+  }
+  finally {
+    isLoadingPermissions.value = false
+  }
+}
 
-const isPermissionSelected = (slug: string): boolean => {
-  return selectedPermissionSlugs.value.has(slug);
-};
+function isPermissionSelected(slug: string): boolean {
+  return selectedPermissionSlugs.value.has(slug)
+}
 
-const getSelectedPermissionsCount = (group: PermissionGroup): string => {
-  const selectedCount = group.permissions.filter((p) =>
+function getSelectedPermissionsCount(group: PermissionGroup): string {
+  const selectedCount = group.permissions.filter(p =>
     selectedPermissionSlugs.value.has(p.slug)
-  ).length;
-  const totalCount = group.permissions.length;
-  return `${selectedCount}/${totalCount}`;
-};
+  ).length
+  const totalCount = group.permissions.length
+  return `${selectedCount}/${totalCount}`
+}
 
 // ✨ Modified deleteRole function
-const confirmDeleteRole = async () => {
+async function confirmDeleteRole() {
   if (!role.value || typeof role.value.id === 'undefined') {
     toast({
       title: 'Error',
       description: 'Role ID is missing, cannot delete.',
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
   try {
     // Consider adding a loading state for the delete button in AlertDialog
     const response = await apiInstance(`/roles/${role.value.id}`, {
       method: 'DELETE',
-    });
+    })
 
     if (response.success) {
       toast({
         title: 'Role Deleted Successfully!',
         description: `The role "${role.value.name}" has been deleted.`,
-      });
-      isDeleteDialogOpen.value = false;
+      })
+      isDeleteDialogOpen.value = false
       // TODO: You'll likely want to refresh your table data here
       // e.g., by emitting an event or calling a method passed as a prop
-    } else {
+    }
+    else {
       toast({
         title: 'Deletion Failed',
         description: response.message || 'Could not delete the role.',
         variant: 'destructive',
-      });
+      })
     }
-  } catch (error: any) {
+  }
+  catch (error: any) {
     toast({
       title: 'Deletion Error',
       description: error.data?.message || error.message || 'An unexpected error occurred.',
       variant: 'destructive',
-    });
-  } finally {
-    // Reset loading state if you added one
-    isDeleteDialogOpen.value = false; // Ensure dialog closes even on error
+    })
   }
-};
+  finally {
+    // Reset loading state if you added one
+    isDeleteDialogOpen.value = false // Ensure dialog closes even on error
+  }
+}
 
 watch(isEditDialogOpen, (newValue) => {
   if (!newValue) {
-    roleToEdit.value = null;
-    editError.value = null;
-    isLoadingRole.value = false;
+    roleToEdit.value = null
+    editError.value = null
+    isLoadingRole.value = false
   }
-});
+})
 
 watch(isPermissionsDialogOpen, (newValue) => {
   if (!newValue) {
-    allPermissions.value = [];
-    currentRolePermissions.value = [];
-    selectedPermissionSlugs.value = new Set();
-    permissionsError.value = null;
-    isLoadingPermissions.value = false;
+    allPermissions.value = []
+    currentRolePermissions.value = []
+    selectedPermissionSlugs.value = new Set()
+    permissionsError.value = null
+    isLoadingPermissions.value = false
   }
-});
+})
 
 // ✨ Watcher for delete dialog (optional, for cleanup)
 watch(isDeleteDialogOpen, (newValue) => {
   if (!newValue) {
     // You can add cleanup logic here if needed when the dialog is closed
   }
-});
+})
 </script>
 
 <template>
@@ -916,12 +933,16 @@ watch(isDeleteDialogOpen, (newValue) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end" class="w-[160px]">
-        <DropdownMenuItem @click="openEditDialog"> Edit Role </DropdownMenuItem>
-        <DropdownMenuItem @click="openPermissionsDialog"> Manage Permissions </DropdownMenuItem>
+        <DropdownMenuItem @click="openEditDialog">
+          Edit Role
+        </DropdownMenuItem>
+        <DropdownMenuItem @click="openPermissionsDialog">
+          Manage Permissions
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          class="text-red-600 focus:text-red-600 hover:!text-red-600 dark:hover:!text-red-500"
           @click="isDeleteDialogOpen = true"
-          class="text-red-600 hover:!text-red-600 focus:text-red-600 dark:hover:!text-red-500"
         >
           Delete
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
@@ -930,11 +951,11 @@ watch(isDeleteDialogOpen, (newValue) => {
     </DropdownMenu>
 
     <Dialog v-model:open="isEditDialogOpen">
-      <DialogContent class="sm:max-w-md rounded-lg shadow-xl">
+      <DialogContent class="rounded-lg shadow-xl sm:max-w-md">
         <DialogHeader>
-          <DialogTitle class="text-lg font-medium text-gray-900 dark:text-gray-100"
-            >Edit Role</DialogTitle
-          >
+          <DialogTitle class="text-lg text-gray-900 font-medium dark:text-gray-100">
+            Edit Role
+          </DialogTitle>
           <DialogDescription class="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Make changes to the role details. Click save when you're done.
           </DialogDescription>
@@ -947,17 +968,16 @@ watch(isDeleteDialogOpen, (newValue) => {
         </div>
         <div
           v-else-if="editError"
-          class="px-6 py-4 text-sm text-red-600 dark:text-red-400 rounded-md m-4"
+          class="m-4 rounded-md px-6 py-4 text-sm text-red-600 dark:text-red-400"
         >
           <strong>Error:</strong> {{ editError }}
         </div>
-        <div class="grid gap-6 p-6" v-if="roleToEdit && !isLoadingRole">
+        <div v-if="roleToEdit && !isLoadingRole" class="grid gap-6 p-6">
           <div class="grid grid-cols-4 items-center gap-x-4 gap-y-2">
             <Label
               for="roleName"
-              class="text-right text-sm font-medium text-gray-700 dark:text-gray-300 col-span-1"
-              >Name</Label
-            >
+              class="col-span-1 text-right text-sm text-gray-700 font-medium dark:text-gray-300"
+            >Name</Label>
             <Input
               id="roleName"
               v-model="roleToEdit.name"
@@ -969,9 +989,8 @@ watch(isDeleteDialogOpen, (newValue) => {
           <div class="grid grid-cols-4 items-start gap-x-4 gap-y-2">
             <Label
               for="roleDescription"
-              class="text-right text-sm font-medium text-gray-700 dark:text-gray-300 col-span-1 pt-2"
-              >Description</Label
-            >
+              class="col-span-1 pt-2 text-right text-sm text-gray-700 font-medium dark:text-gray-300"
+            >Description</Label>
             <Textarea
               id="roleDescription"
               v-model="roleToEdit.description"
@@ -983,15 +1002,14 @@ watch(isDeleteDialogOpen, (newValue) => {
           <div class="grid grid-cols-4 items-center gap-x-4 gap-y-2">
             <Label
               for="roleStatus"
-              class="text-right text-sm font-medium text-gray-700 dark:text-gray-300 col-span-1"
-              >Status</Label
-            >
+              class="col-span-1 text-right text-sm text-gray-700 font-medium dark:text-gray-300"
+            >Status</Label>
             <div class="col-span-3 flex items-center space-x-2">
               <Switch
                 id="roleStatus"
                 :checked="roleToEdit.status"
-                @update:checked="(newVal: boolean) => (roleToEdit!.status = newVal)"
                 :disabled="isLoadingRole"
+                @update:checked="(newVal: boolean) => (roleToEdit!.status = newVal)"
               />
               <span class="text-sm text-gray-600 dark:text-gray-400">{{
                 roleToEdit.status ? 'ACTIVE' : 'INACTIVE'
@@ -999,19 +1017,19 @@ watch(isDeleteDialogOpen, (newValue) => {
             </div>
           </div>
         </div>
-        <DialogFooter class="px-6 py-4 sm:flex sm:flex-row-reverse rounded-b-lg">
+        <DialogFooter class="rounded-b-lg px-6 py-4 sm:flex sm:flex-row-reverse">
           <Button
             type="button"
-            @click="handleSaveChanges"
             :disabled="isLoadingRole || !roleToEdit || !roleToEdit.name"
+            @click="handleSaveChanges"
           >
             {{ isLoadingRole ? 'Saving...' : 'Save changes' }}
           </Button>
           <Button
             type="button"
             variant="outline"
-            @click="isEditDialogOpen = false"
             :disabled="isLoadingRole"
+            @click="isEditDialogOpen = false"
           >
             Cancel
           </Button>
@@ -1020,9 +1038,9 @@ watch(isDeleteDialogOpen, (newValue) => {
     </Dialog>
 
     <Dialog v-model:open="isPermissionsDialogOpen">
-      <DialogContent class="sm:max-w-6xl rounded-lg shadow-xl">
+      <DialogContent class="rounded-lg shadow-xl sm:max-w-6xl">
         <DialogHeader>
-          <DialogTitle class="text-lg font-medium text-gray-900 dark:text-gray-100">
+          <DialogTitle class="text-lg text-gray-900 font-medium dark:text-gray-100">
             Manage Permissions for {{ role?.name }}
           </DialogTitle>
           <DialogDescription class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -1035,7 +1053,7 @@ watch(isDeleteDialogOpen, (newValue) => {
           class="px-6 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
         >
           <svg
-            class="animate-spin h-6 w-6 text-indigo-600 mx-auto mb-3"
+            class="mx-auto mb-3 h-6 w-6 animate-spin text-indigo-600"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -1047,55 +1065,55 @@ watch(isDeleteDialogOpen, (newValue) => {
               r="10"
               stroke="currentColor"
               stroke-width="4"
-            ></circle>
+            />
             <path
               class="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+            />
           </svg>
           Loading permissions...
         </div>
         <div
           v-else-if="permissionsError"
-          class="px-6 py-4 text-sm text-red-600 dark:text-red-400 rounded-md m-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+          class="m-4 border border-red-200 rounded-md bg-red-50 px-6 py-4 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
         >
           <strong>Error:</strong> {{ permissionsError }}
         </div>
         <div
-          class="p-6 max-h-[60vh] overflow-y-auto"
           v-if="allPermissions.length > 0 && !isLoadingPermissions"
+          class="max-h-[60vh] overflow-y-auto p-6"
         >
           <div v-for="group in allPermissions" :key="group.module" class="mb-6">
-            <div class="flex items-center justify-between mb-3">
+            <div class="mb-3 flex items-center justify-between">
               <h3
-                class="text-md font-semibold text-gray-700 dark:text-gray-300 border-b pb-2 dark:border-gray-600"
+                class="text-md border-b pb-2 text-gray-700 font-semibold dark:border-gray-600 dark:text-gray-300"
               >
                 {{ group.name }}
               </h3>
               <span
-                class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded"
+                class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400"
               >
                 {{ getSelectedPermissionsCount(group) }}
               </span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
+            <div class="grid grid-cols-1 gap-x-4 gap-y-3 lg:grid-cols-3 sm:grid-cols-2">
               <div
                 v-for="permission in group.permissions"
                 :key="permission.slug"
-                class="flex items-center space-x-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                class="flex items-center rounded p-2 space-x-2 hover:bg-gray-50 dark:hover:bg-gray-800/50"
               >
                 <Checkbox
                   :id="`perm-${permission.slug}`"
                   :checked="isPermissionSelected(permission.slug)"
+                  class="form-checkbox h-5 w-5 rounded text-indigo-600 transition duration-150 ease-in-out dark:border-gray-600"
                   @update:checked="
                     (checked) => handlePermissionToggle(permission.slug, Boolean(checked))
                   "
-                  class="form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out rounded dark:border-gray-600"
                 />
                 <Label
                   :for="`perm-${permission.slug}`"
-                  class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer flex-1"
+                  class="flex-1 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
                 >
                   {{ permission.name }}
                 </Label>
@@ -1113,17 +1131,17 @@ watch(isDeleteDialogOpen, (newValue) => {
           No permissions available to assign.
         </div>
         <DialogFooter
-          class="px-6 py-4 sm:flex sm:flex-row-reverse rounded-b-lg border-t dark:border-gray-700"
+          class="border-t rounded-b-lg px-6 py-4 sm:flex sm:flex-row-reverse dark:border-gray-700"
         >
           <Button
             type="button"
-            @click="handleSavePermissions"
-            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+            class="w-full inline-flex justify-center border border-transparent rounded-md px-4 py-2 text-base text-white font-medium shadow-sm sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             :disabled="isLoadingPermissions"
+            @click="handleSavePermissions"
           >
             <svg
               v-if="isLoadingPermissions"
-              class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+              class="mr-3 h-5 w-5 animate-spin text-white -ml-1"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -1135,21 +1153,21 @@ watch(isDeleteDialogOpen, (newValue) => {
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             {{ isLoadingPermissions ? 'Saving...' : 'Save Permissions' }}
           </Button>
           <Button
             type="button"
             variant="outline"
-            @click="isPermissionsDialogOpen = false"
-            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-500 shadow-sm px-4 py-2 text-base font-medium text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            class="mt-3 w-full inline-flex justify-center border border-gray-300 rounded-md px-4 py-2 text-base text-gray-700 font-medium shadow-sm sm:ml-3 sm:mt-0 sm:w-auto dark:border-gray-500 sm:text-sm dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             :disabled="isLoadingPermissions"
+            @click="isPermissionsDialogOpen = false"
           >
             Cancel
           </Button>
@@ -1164,15 +1182,16 @@ watch(isDeleteDialogOpen, (newValue) => {
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete the role "<strong>{{
               role?.name
-            }}</strong
-            >" and remove its data from our servers.
+            }}</strong>" and remove its data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel @click="isDeleteDialogOpen = false">Cancel</AlertDialogCancel>
+          <AlertDialogCancel @click="isDeleteDialogOpen = false">
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
+            class="bg-red-600 dark:bg-red-500 hover:bg-red-700 dark:hover:bg-red-600"
             @click="confirmDeleteRole"
-            class="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
           >
             Yes, delete role
           </AlertDialogAction>
@@ -1181,21 +1200,15 @@ watch(isDeleteDialogOpen, (newValue) => {
     </AlertDialog>
   </div>
 </template>
-
 ```
 
 # components/DataTableToolbar.vue
 
 ```vue
 <script setup lang="ts" generic="TData">
-import type { Table } from '@tanstack/vue-table';
-import { computed, ref, watch } from 'vue';
-import { roleStatuses } from '../data/data';
-import DataTableFacetedFilter from './DataTableFacetedFilter.vue';
-import DataTableViewOptions from './DataTableViewOptions.vue';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
+import type { Table } from '@tanstack/vue-table'
+import { computed, ref, watch } from 'vue'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -1204,49 +1217,55 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/components/ui/toast/use-toast';
-import { Toaster } from '@/components/ui/toast';
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Toaster } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/toast/use-toast'
+import { roleStatuses } from '../data/data'
+import DataTableFacetedFilter from './DataTableFacetedFilter.vue'
+import DataTableViewOptions from './DataTableViewOptions.vue'
 
 interface DataTableToolbarProps {
-  table: Table<TData>;
-  onDataChanged?: () => void; // ✨ New prop
+  table: Table<TData>
+  onDataChanged?: () => void // ✨ New prop
 }
 
-const props = defineProps<DataTableToolbarProps>();
-const { toast } = useToast();
-const isFiltered = computed(() => props.table.getState().columnFilters.length > 0);
+const props = defineProps<DataTableToolbarProps>()
+const { toast } = useToast()
+const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
 const localSearchValue = ref<string>(
   (props.table.getColumn('name')?.getFilterValue() as string) ?? ''
-);
-let debounceTimer: number | undefined;
+)
+let debounceTimer: number | undefined
 
 watch(localSearchValue, (newValue) => {
   if (debounceTimer) {
-    clearTimeout(debounceTimer);
+    clearTimeout(debounceTimer)
   }
   debounceTimer = window.setTimeout(() => {
-    props.table.getColumn('name')?.setFilterValue(newValue);
-  }, 300);
-});
+    props.table.getColumn('name')?.setFilterValue(newValue)
+  }, 300)
+})
 
 watch(
   () => props.table.getColumn('name')?.getFilterValue(),
   (filterValue) => {
     if (typeof filterValue === 'string' && localSearchValue.value !== filterValue) {
-      localSearchValue.value = filterValue;
-    } else if (filterValue === undefined && localSearchValue.value !== '') {
-      localSearchValue.value = '';
+      localSearchValue.value = filterValue
+    }
+    else if (filterValue === undefined && localSearchValue.value !== '') {
+      localSearchValue.value = ''
     }
   }
-);
+)
 
 // This computed property was not actually used for v-model, localSearchValue is used directly.
 // const globalSearchValue = computed({
@@ -1256,12 +1275,12 @@ watch(
 //   },
 // });
 
-const isNewRoleDialogOpen = ref(false);
+const isNewRoleDialogOpen = ref(false)
 const newRoleData = ref({
   name: '',
   status: 'ACTIVE', // Default status
   description: '',
-});
+})
 
 watch(isNewRoleDialogOpen, (isOpen) => {
   if (isOpen) {
@@ -1270,56 +1289,57 @@ watch(isNewRoleDialogOpen, (isOpen) => {
       name: '',
       status: 'ACTIVE',
       description: '',
-    };
+    }
   }
-});
+})
 
-const api = useApi(); // Ensure useApi is correctly defined and imported/available
+const api = useApi() // Ensure useApi is correctly defined and imported/available
 
-const handleCreateRole = async () => {
+async function handleCreateRole() {
   if (!newRoleData.value.name.trim()) {
     toast({
       title: 'Validation Error',
       description: 'Role name cannot be empty.',
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
   if (!newRoleData.value.status) {
     toast({
       title: 'Validation Error',
       description: 'Please select a role status.',
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
 
   try {
     // Assuming your API composable returns a structure with a `success` boolean
-    const response = await api<{ success: boolean; message?: string; data?: any }>('/roles', {
+    const response = await api<{ success: boolean, message?: string, data?: any }>('/roles', {
       method: 'POST',
       body: newRoleData.value, // No need to JSON.stringify if useApi handles it
-    });
+    })
 
     if (!response.success) {
       // Use response.message or a default error
-      throw new Error(response.message || `Failed to create role.`);
+      throw new Error(response.message || `Failed to create role.`)
     }
-    isNewRoleDialogOpen.value = false;
+    isNewRoleDialogOpen.value = false
     toast({
       title: 'Role Created Successfully!',
       description: `The role "${newRoleData.value.name}" has been added.`,
-    });
-    props.onDataChanged?.(); // ✨ Call onDataChanged
-  } catch (error: any) {
-    console.error('Error creating role:', error);
+    })
+    props.onDataChanged?.() // ✨ Call onDataChanged
+  }
+  catch (error: any) {
+    console.error('Error creating role:', error)
     toast({
       title: 'Error Creating Role',
       description: error.message || 'An unexpected error occurred. Please try again.',
       variant: 'destructive',
-    });
+    })
   }
-};
+}
 </script>
 
 <template>
@@ -1327,8 +1347,8 @@ const handleCreateRole = async () => {
     <div class="flex items-center justify-between">
       <div class="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter by name..."
           v-model="localSearchValue"
+          placeholder="Filter by name..."
           class="h-8 w-[150px] lg:w-[250px]"
         />
 
@@ -1372,7 +1392,7 @@ const handleCreateRole = async () => {
             <form @submit.prevent="handleCreateRole">
               <div class="grid gap-4 py-4">
                 <div class="grid grid-cols-4 items-center gap-4">
-                  <label for="new-role-name" class="text-right col-span-1">Name</label>
+                  <label for="new-role-name" class="col-span-1 text-right">Name</label>
                   <Input
                     id="new-role-name"
                     v-model="newRoleData.name"
@@ -1382,9 +1402,9 @@ const handleCreateRole = async () => {
                   />
                 </div>
                 <div class="grid grid-cols-4 items-center gap-4">
-                  <label for="new-role-status" class="text-right col-span-1">Status</label>
+                  <label for="new-role-status" class="col-span-1 text-right">Status</label>
                   <Select v-model="newRoleData.status" required>
-                    <SelectTrigger class="col-span-3" id="new-role-status">
+                    <SelectTrigger id="new-role-status" class="col-span-3">
                       <SelectValue placeholder="Select a status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1399,9 +1419,7 @@ const handleCreateRole = async () => {
                   </Select>
                 </div>
                 <div class="grid grid-cols-4 items-start gap-4">
-                  <label for="new-role-description" class="text-right pt-1 col-span-1"
-                    >Description</label
-                  >
+                  <label for="new-role-description" class="col-span-1 pt-1 text-right">Description</label>
                   <Textarea
                     id="new-role-description"
                     v-model="newRoleData.description"
@@ -1411,10 +1429,12 @@ const handleCreateRole = async () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="ghost" @click="isNewRoleDialogOpen = false"
-                  >Cancel</Button
-                >
-                <Button type="submit">Save Role</Button>
+                <Button type="button" variant="ghost" @click="isNewRoleDialogOpen = false">
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  Save Role
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -1425,7 +1445,6 @@ const handleCreateRole = async () => {
     <Toaster />
   </div>
 </template>
-
 ```
 
 # components/DataTableViewOptions.vue
@@ -1477,7 +1496,6 @@ const columns = computed(() => props.table.getAllColumns()
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
-
 ```
 
 # data/data.ts
@@ -1494,17 +1512,17 @@ export const labels = [
   { value: 'bug', label: 'Bug' },
   { value: 'feature', label: 'Feature' },
   { value: 'documentation', label: 'Documentation' },
-];
+]
 
 export const statuses = [
   // For Tasks, keep if still used
   // ... your existing task statuses
-];
+]
 
 export const priorities = [
   // For Tasks, keep if still used
   // ... your existing task priorities
-];
+]
 
 // --- NEW: Data for Role Filters ---
 export const roleStatuses = [
@@ -1519,16 +1537,15 @@ export const roleStatuses = [
     // icon: h(Icon, { name: 'i-radix-icons-cross-circled' }), // Optional
   },
   // Add other role statuses if applicable
-];
+]
 // --- END: Data for Role Filters ---
-
 ```
 
 # data/schema.ts
 
 ```ts
 // data/schema.ts
-import { z } from 'zod';
+import { z } from 'zod'
 
 // We're keeping a simple non-relational schema here.
 // IRL, you will have a schema for your data models.
@@ -1538,9 +1555,9 @@ export const taskSchema = z.object({
   status: z.string(),
   label: z.string(),
   priority: z.string(),
-});
+})
 
-export type Task = z.infer<typeof taskSchema>;
+export type Task = z.infer<typeof taskSchema>
 
 // --- NEW: Role Schema ---
 // Basic permission schema, expand if needed
@@ -1548,9 +1565,9 @@ export const permissionSchema = z.object({
   id: z.number(), // Or z.string() if your API returns it as string
   name: z.string(),
   // Add other permission fields if necessary
-});
+})
 
-export type Permission = z.infer<typeof permissionSchema>;
+export type Permission = z.infer<typeof permissionSchema>
 
 // Role schema based on your Laravel API structure
 export const roleSchema = z.object({
@@ -1561,11 +1578,10 @@ export const roleSchema = z.object({
   created_by: z.string().optional(),
   permissions: z.array(permissionSchema).optional(), // Assuming permissions are part of the response
   // created_at: z.string().optional(), // If you need to display/use this
-});
+})
 
-export type Role = z.infer<typeof roleSchema>;
+export type Role = z.infer<typeof roleSchema>
 // --- END: Role Schema ---
-
 ```
 
 # data/tasks.json
@@ -2275,6 +2291,4 @@ export type Role = z.infer<typeof roleSchema>;
     }
   ]
 }
-
 ```
-

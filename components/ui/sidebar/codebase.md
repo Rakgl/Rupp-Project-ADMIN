@@ -53,38 +53,37 @@ export const sidebarMenuButtonVariants = cva(
 )
 
 export type SidebarMenuButtonVariants = VariantProps<typeof sidebarMenuButtonVariants>
-
 ```
 
 # Sidebar.vue
 
 ```vue
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue';
-import Sheet from '@/components/ui/sheet/Sheet.vue';
-import SheetContent from '@/components/ui/sheet/SheetContent.vue';
-import { cn } from '@/lib/utils';
-import { SIDEBAR_WIDTH_MOBILE, useSidebar } from './utils';
+import type { HTMLAttributes } from 'vue'
+import Sheet from '@/components/ui/sheet/Sheet.vue'
+import SheetContent from '@/components/ui/sheet/SheetContent.vue'
+import { cn } from '@/lib/utils'
+import { SIDEBAR_WIDTH_MOBILE, useSidebar } from './utils'
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
 const props = withDefaults(
   defineProps<{
-    side?: 'left' | 'right';
-    variant?: 'sidebar' | 'floating' | 'inset';
-    collapsible?: 'offcanvas' | 'icon' | 'none';
-    class?: HTMLAttributes['class'];
+    side?: 'left' | 'right'
+    variant?: 'sidebar' | 'floating' | 'inset'
+    collapsible?: 'offcanvas' | 'icon' | 'none'
+    class?: HTMLAttributes['class']
   }>(),
   {
     side: 'left',
     variant: 'sidebar',
     collapsible: 'offcanvas',
   }
-);
+)
 
-const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 </script>
 
 <template>
@@ -131,7 +130,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
           'group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
             ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_1rem)]'
-            : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]'
+            : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]',
         )
       "
     />
@@ -146,7 +145,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_1rem_+_2px)]'
             : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l',
-          props.class
+          props.class,
         )
       "
       v-bind="$attrs"
@@ -160,19 +159,18 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
     </div>
   </div>
 </template>
-
 ```
 
 # SidebarContent.vue
 
 ```vue
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
+import type { HTMLAttributes } from 'vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{
-  class?: HTMLAttributes['class'];
-}>();
+  class?: HTMLAttributes['class']
+}>()
 </script>
 
 <template>
@@ -181,14 +179,13 @@ const props = defineProps<{
     :class="
       cn(
         'flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden',
-        props.class
+        props.class,
       )
     "
   >
     <slot />
   </div>
 </template>
-
 ```
 
 # SidebarFooter.vue
@@ -211,7 +208,6 @@ const props = defineProps<{
     <slot />
   </div>
 </template>
-
 ```
 
 # SidebarGroup.vue
@@ -234,7 +230,6 @@ const props = defineProps<{
     <slot />
   </div>
 </template>
-
 ```
 
 # SidebarGroupAction.vue
@@ -243,8 +238,8 @@ const props = defineProps<{
 <script setup lang="ts">
 import type { PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { Primitive } from 'radix-vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<PrimitiveProps & {
   class?: HTMLAttributes['class']
@@ -267,7 +262,6 @@ const props = defineProps<PrimitiveProps & {
     <slot />
   </Primitive>
 </template>
-
 ```
 
 # SidebarGroupContent.vue
@@ -290,7 +284,6 @@ const props = defineProps<{
     <slot />
   </div>
 </template>
-
 ```
 
 # SidebarGroupLabel.vue
@@ -299,8 +292,8 @@ const props = defineProps<{
 <script setup lang="ts">
 import type { PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { Primitive } from 'radix-vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<PrimitiveProps & {
   class?: HTMLAttributes['class']
@@ -320,7 +313,6 @@ const props = defineProps<PrimitiveProps & {
     <slot />
   </Primitive>
 </template>
-
 ```
 
 # SidebarHeader.vue
@@ -343,7 +335,6 @@ const props = defineProps<{
     <slot />
   </div>
 </template>
-
 ```
 
 # SidebarInput.vue
@@ -370,7 +361,6 @@ const props = defineProps<{
     <slot />
   </Input>
 </template>
-
 ```
 
 # SidebarInset.vue
@@ -396,7 +386,6 @@ const props = defineProps<{
     <slot />
   </main>
 </template>
-
 ```
 
 # SidebarMenu.vue
@@ -419,7 +408,6 @@ const props = defineProps<{
     <slot />
   </ul>
 </template>
-
 ```
 
 # SidebarMenuAction.vue
@@ -428,8 +416,8 @@ const props = defineProps<{
 <script setup lang="ts">
 import type { PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { Primitive } from 'radix-vue'
+import { cn } from '@/lib/utils'
 
 const props = withDefaults(defineProps<PrimitiveProps & {
   showOnHover?: boolean
@@ -460,7 +448,6 @@ const props = withDefaults(defineProps<PrimitiveProps & {
     <slot />
   </Primitive>
 </template>
-
 ```
 
 # SidebarMenuBadge.vue
@@ -491,7 +478,6 @@ const props = defineProps<{
     <slot />
   </div>
 </template>
-
 ```
 
 # SidebarMenuButton.vue
@@ -500,10 +486,10 @@ const props = defineProps<{
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { SidebarMenuButtonProps } from './SidebarMenuButtonChild.vue'
+import { computed } from 'vue'
 import Tooltip from '@/components/ui/tooltip/Tooltip.vue'
 import TooltipContent from '@/components/ui/tooltip/TooltipContent.vue'
 import TooltipTrigger from '@/components/ui/tooltip/TooltipTrigger.vue'
-import { computed } from 'vue'
 import SidebarMenuButtonChild from './SidebarMenuButtonChild.vue'
 import { useSidebar } from './utils'
 
@@ -550,7 +536,6 @@ const delegatedProps = computed(() => {
     </TooltipContent>
   </Tooltip>
 </template>
-
 ```
 
 # SidebarMenuButtonChild.vue
@@ -560,8 +545,8 @@ const delegatedProps = computed(() => {
 import type { PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
 import type { SidebarMenuButtonVariants } from '.'
-import { cn } from '@/lib/utils'
 import { Primitive } from 'radix-vue'
+import { cn } from '@/lib/utils'
 import { sidebarMenuButtonVariants } from '.'
 
 export interface SidebarMenuButtonProps extends PrimitiveProps {
@@ -591,7 +576,6 @@ const props = withDefaults(defineProps<SidebarMenuButtonProps>(), {
     <slot />
   </Primitive>
 </template>
-
 ```
 
 # SidebarMenuItem.vue
@@ -614,7 +598,6 @@ const props = defineProps<{
     <slot />
   </li>
 </template>
-
 ```
 
 # SidebarMenuSkeleton.vue
@@ -622,9 +605,9 @@ const props = defineProps<{
 ```vue
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
+import { computed } from 'vue'
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
 import { cn } from '@/lib/utils'
-import { computed } from 'vue'
 
 const props = defineProps<{
   showIcon?: boolean
@@ -654,7 +637,6 @@ const width = computed(() => {
     />
   </div>
 </template>
-
 ```
 
 # SidebarMenuSub.vue
@@ -681,7 +663,6 @@ const props = defineProps<{
     <slot />
   </ul>
 </template>
-
 ```
 
 # SidebarMenuSubButton.vue
@@ -690,8 +671,8 @@ const props = defineProps<{
 <script setup lang="ts">
 import type { PrimitiveProps } from 'radix-vue'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { Primitive } from 'radix-vue'
+import { cn } from '@/lib/utils'
 
 const props = withDefaults(defineProps<PrimitiveProps & {
   size?: 'sm' | 'md'
@@ -722,7 +703,6 @@ const props = withDefaults(defineProps<PrimitiveProps & {
     <slot />
   </Primitive>
 </template>
-
 ```
 
 # SidebarMenuSubItem.vue
@@ -737,7 +717,6 @@ const props = withDefaults(defineProps<PrimitiveProps & {
     <slot />
   </li>
 </template>
-
 ```
 
 # SidebarProvider.vue
@@ -825,7 +804,6 @@ provideSidebarContext({
     </div>
   </TooltipProvider>
 </template>
-
 ```
 
 # SidebarRail.vue
@@ -863,7 +841,6 @@ const { toggleSidebar } = useSidebar()
     <slot />
   </button>
 </template>
-
 ```
 
 # SidebarSeparator.vue
@@ -887,7 +864,6 @@ const props = defineProps<{
     <slot />
   </Separator>
 </template>
-
 ```
 
 # SidebarTrigger.vue
@@ -895,9 +871,9 @@ const props = defineProps<{
 ```vue
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
+import { PanelLeft } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import { cn } from '@/lib/utils'
-import { PanelLeft } from 'lucide-vue-next'
 import { useSidebar } from './utils'
 
 const props = defineProps<{
@@ -919,7 +895,6 @@ const { toggleSidebar } = useSidebar()
     <span class="sr-only">Toggle Sidebar</span>
   </Button>
 </template>
-
 ```
 
 # utils.ts
@@ -944,6 +919,4 @@ export const [useSidebar, provideSidebarContext] = createContext<{
   setOpenMobile: (value: boolean) => void
   toggleSidebar: () => void
 }>('Sidebar')
-
 ```
-

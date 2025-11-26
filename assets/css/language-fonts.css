@@ -4,219 +4,222 @@
 
 /* CSS Custom Properties for fonts */
 :root {
-  --font-en: 'Parkinsans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-km: 'Kantumruy Pro', 'Khmer OS System', 'Khmer OS', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    /* --- MODIFIED THIS SECTION --- */
+    --font-en: 'Parkinsans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-km: 'kantumruy pro', 'Khmer OS System', 'Khmer OS', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    /* --- END MODIFICATION --- */
 
-  /* Dynamic current font based on locale */
-  --current-font: var(--font-en);
-  --current-line-height: 1.5;
-  --current-letter-spacing: 0;
+    /* Dynamic current font based on locale */
+    --current-font: var(--font-en);
+    --current-line-height: 1.5;
+    --current-letter-spacing: 0;
 }
 
 /* Base font smoothing */
 * {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 /* Global font application based on html class */
 html.lang-en body,
 html.lang-en .auto-font {
-  font-family: var(--font-en);
-  line-height: 1.5;
-  letter-spacing: 0;
+    font-family: var(--font-en);
+    line-height: 1.5;
+    letter-spacing: 0;
 }
 
 html.lang-km body,
 html.lang-km .auto-font {
-  font-family: var(--font-km);
-  line-height: 1.7;
-  letter-spacing: 0.01em;
+    font-family: var(--font-km);
+    line-height: 1.5;
+    letter-spacing: 0.01em;
 }
 
 /* Default body font */
 body {
-  font-family: var(--current-font);
-  line-height: var(--current-line-height);
-  letter-spacing: var(--current-letter-spacing);
+    font-family: var(--current-font);
+    line-height: var(--current-line-height);
+    letter-spacing: var(--current-letter-spacing);
 }
 
 /* Explicit font classes */
 .font-sans,
 .font-en,
 .auto-english {
-  font-family: var(--font-en) !important;
-  font-feature-settings: 'kern', 'liga';
-  line-height: 1.5;
-  letter-spacing: 0;
+    font-family: var(--font-en) !important;
+    font-feature-settings: 'kern', 'liga';
+    line-height: 1.2;
+    letter-spacing: 0;
+    font-weight: 500;
 }
 
 .font-khmer,
 .font-km,
 .auto-khmer {
-  font-family: var(--font-km) !important;
-  line-height: 1.7;
-  letter-spacing: 0.01em;
+    font-family: var(--font-km) !important;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
 }
 
 /* Language attribute based styles */
 [lang='en'] {
-  font-family: var(--font-en);
-  line-height: 1.5;
-  letter-spacing: 0;
+    font-family: var(--font-en);
+    line-height: 1.5;
+    letter-spacing: 0;
 }
 
 [lang='km'] {
-  font-family: var(--font-km);
-  line-height: 1.7;
-  letter-spacing: 0.01em;
+    font-family: var(--font-km);
+    line-height: 1.7;
+    letter-spacing: 0.01em;
 }
 
 /* Monospace font for code */
 .font-mono {
-  font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }
 
 /* Input field optimizations */
 input.font-khmer,
 textarea.font-khmer {
-  line-height: 1.6;
-  padding-top: 0.625rem; /* Better vertical spacing for Khmer text */
-  padding-bottom: 0.625rem;
+    line-height: 1.6;
+    padding-top: 0.625rem; /* Better vertical spacing for Khmer text */
+    padding-bottom: 0.625rem;
 }
 
 input.font-sans,
 textarea.font-sans {
-  line-height: 1.5;
+    line-height: 1.5;
 }
 
 /* Better spacing for mixed content */
 .mixed-language {
-  word-spacing: 0.05em;
-  letter-spacing: 0.005em;
+    word-spacing: 0.05em;
+    letter-spacing: 0.005em;
 }
 
 /* Responsive optimizations */
 @media (max-width: 640px) {
-  .font-khmer {
-    font-size: 0.95em;
-    line-height: 1.65;
-  }
+    .font-khmer {
+        font-size: 0.95em;
+        line-height: 1.65;
+    }
 }
 
 /* High DPI display optimizations */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .font-khmer {
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
+    .font-khmer {
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
 }
 
 /* Dark mode adjustments */
 .dark .font-khmer {
-  font-weight: 450; /* Slightly heavier for better visibility */
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.02); /* Subtle glow for better readability */
+    font-weight: 450; /* Slightly heavier for better visibility */
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.02); /* Subtle glow for better readability */
 }
 
 .dark .font-sans {
-  font-weight: 400;
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.01); /* Very subtle enhancement */
+    font-weight: 400;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.01); /* Very subtle enhancement */
 }
 
 /* Enhanced dark mode text styling for better contrast */
 .dark {
-  /* Better font smoothing in dark mode */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    /* Better font smoothing in dark mode */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .dark .font-khmer.text-muted {
-  opacity: 0.85; /* Better muted text visibility */
+    opacity: 0.85; /* Better muted text visibility */
 }
 
 .dark .font-sans.text-muted {
-  opacity: 0.8; /* Slightly more muted for English */
+    opacity: 0.8; /* Slightly more muted for English */
 }
 
 /* Language-specific text selection with improved dark mode support */
 .font-khmer::selection {
-  background-color: rgba(59, 130, 246, 0.25);
+    background-color: rgba(59, 130, 246, 0.25);
 }
 
 .font-sans::selection {
-  background-color: rgba(99, 102, 241, 0.25);
+    background-color: rgba(99, 102, 241, 0.25);
 }
 
 .dark .font-khmer::selection {
-  background-color: rgba(147, 197, 253, 0.35); /* Lighter blue for dark mode */
+    background-color: rgba(147, 197, 253, 0.35); /* Lighter blue for dark mode */
 }
 
 .dark .font-sans::selection {
-  background-color: rgba(165, 180, 252, 0.35); /* Lighter indigo for dark mode */
+    background-color: rgba(165, 180, 252, 0.35); /* Lighter indigo for dark mode */
 }
 
 /* Font weight consistency */
 .font-khmer.font-medium {
-  font-weight: 500;
+    font-weight: 500;
 }
 .font-khmer.font-semibold {
-  font-weight: 600;
+    font-weight: 600;
 }
 .font-khmer.font-bold {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 .font-sans.font-medium {
-  font-weight: 500;
+    font-weight: 500;
 }
 .font-sans.font-semibold {
-  font-weight: 600;
+    font-weight: 600;
 }
 .font-sans.font-bold {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 /* Sidebar-specific font optimizations */
 .sidebar-nav .font-khmer {
-  line-height: 1.5; /* Compact line height for navigation */
-  letter-spacing: 0.005em; /* Minimal letter spacing for UI */
+    line-height: 1.5; /* Compact line height for navigation */
+    letter-spacing: 0.005em; /* Minimal letter spacing for UI */
 }
 
 .sidebar-nav .font-sans {
-  line-height: 1.4; /* Tight line height for clean navigation */
-  letter-spacing: -0.01em; /* Slightly tighter for modern look */
+    line-height: 1.4; /* Tight line height for clean navigation */
+    letter-spacing: -0.01em; /* Slightly tighter for modern look */
 }
 
 /* Sidebar tooltip fonts */
 [role='tooltip'] .font-khmer {
-  line-height: 1.6;
-  font-size: 0.875rem; /* Slightly larger for readability */
+    line-height: 1.6;
+    font-size: 0.875rem; /* Slightly larger for readability */
 }
 
 [role='tooltip'] .font-sans {
-  line-height: 1.5;
-  font-size: 0.875rem;
+    line-height: 1.5;
+    font-size: 0.875rem;
 }
 
 /* Sidebar menu item fonts */
 .sidebar-menu-item .font-khmer {
-  font-weight: 450; /* Slightly lighter for menu items */
+    font-weight: 450; /* Slightly lighter for menu items */
 }
 
 .sidebar-menu-item .font-sans {
-  font-weight: 400; /* Regular weight for English */
+    font-weight: 400; /* Regular weight for English */
 }
 
 /* Responsive sidebar fonts */
 @media (max-width: 768px) {
-  .sidebar-nav .font-khmer {
-    font-size: 0.9em;
-    line-height: 1.45;
-  }
+    .sidebar-nav .font-khmer {
+        font-size: 0.9em;
+        line-height: 1.45;
+    }
 
-  .sidebar-nav .font-sans {
-    font-size: 0.95em;
-    line-height: 1.35;
-  }
+    .sidebar-nav .font-sans {
+        font-size: 0.95em;
+        line-height: 1.35;
+    }
 }

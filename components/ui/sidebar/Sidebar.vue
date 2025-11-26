@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue';
-import Sheet from '@/components/ui/sheet/Sheet.vue';
-import SheetContent from '@/components/ui/sheet/SheetContent.vue';
-import { cn } from '@/lib/utils';
-import { SIDEBAR_WIDTH_MOBILE, useSidebar } from './utils';
+import type { HTMLAttributes } from 'vue'
+import Sheet from '@/components/ui/sheet/Sheet.vue'
+import SheetContent from '@/components/ui/sheet/SheetContent.vue'
+import { cn } from '@/lib/utils'
+import { SIDEBAR_WIDTH_MOBILE, useSidebar } from './utils'
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
 const props = withDefaults(
   defineProps<{
-    side?: 'left' | 'right';
-    variant?: 'sidebar' | 'floating' | 'inset';
-    collapsible?: 'offcanvas' | 'icon' | 'none';
-    class?: HTMLAttributes['class'];
+    side?: 'left' | 'right'
+    variant?: 'sidebar' | 'floating' | 'inset'
+    collapsible?: 'offcanvas' | 'icon' | 'none'
+    class?: HTMLAttributes['class']
   }>(),
   {
     side: 'left',
     variant: 'sidebar',
     collapsible: 'icon',
-  }
-);
+  },
+)
 
-const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 </script>
 
 <template>
@@ -70,7 +70,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
           'group-data-[side=right]:rotate-180',
           variant === 'floating' || variant === 'inset'
             ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_1rem)]'
-            : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]'
+            : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon]',
         )
       "
     />
@@ -85,7 +85,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
           variant === 'floating' || variant === 'inset'
             ? 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_1rem_+_2px)]'
             : 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l',
-          props.class
+          props.class,
         )
       "
       v-bind="$attrs"

@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { AlertDialogCancelProps } from 'radix-vue';
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
-import { AlertDialogCancel } from 'radix-vue';
-import { computed } from 'vue';
-import { buttonVariants } from '../button';
+import type { AlertDialogCancelProps } from 'radix-vue'
+import type { HTMLAttributes } from 'vue'
+import { AlertDialogCancel } from 'radix-vue'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '../button'
 
-const props = defineProps<AlertDialogCancelProps & { class?: HTMLAttributes['class'] }>();
+const props = defineProps<AlertDialogCancelProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 </script>
 
 <template>

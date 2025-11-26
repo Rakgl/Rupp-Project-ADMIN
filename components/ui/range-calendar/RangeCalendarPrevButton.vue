@@ -1,21 +1,21 @@
 <script lang="ts" setup>
-import type { RangeCalendarPrevProps } from 'radix-vue';
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
-import { ChevronLeft } from 'lucide-vue-next';
-import { RangeCalendarPrev, useForwardProps } from 'radix-vue';
-import { computed } from 'vue';
-import { buttonVariants } from '../button';
+import type { RangeCalendarPrevProps } from 'radix-vue'
+import type { HTMLAttributes } from 'vue'
+import { ChevronLeft } from 'lucide-vue-next'
+import { RangeCalendarPrev, useForwardProps } from 'radix-vue'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '../button'
 
-const props = defineProps<RangeCalendarPrevProps & { class?: HTMLAttributes['class'] }>();
+const props = defineProps<RangeCalendarPrevProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
@@ -24,7 +24,7 @@ const forwardedProps = useForwardProps(delegatedProps);
       cn(
         buttonVariants({ variant: 'outline' }),
         'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
-        props.class
+        props.class,
       )
     "
     v-bind="forwardedProps"

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
+import { cn } from '@/lib/utils'
 
-const { t } = useI18n();
-const route = useRoute();
+const { t } = useI18n()
+const route = useRoute()
 
 interface Item {
-  titleKey: string;
-  href: string;
+  titleKey: string
+  href: string
 }
 
 const sidebarNavItems: Item[] = [
@@ -31,7 +31,7 @@ const sidebarNavItems: Item[] = [
     titleKey: 'settings.sidebar.security',
     href: '/settings/security',
   },
-];
+]
 </script>
 
 <template>
@@ -43,7 +43,7 @@ const sidebarNavItems: Item[] = [
       :class="
         cn(
           'w-full text-left justify-start items-start',
-          route.path === item.href && 'bg-muted hover:bg-muted'
+          route.path === item.href && 'bg-muted hover:bg-muted',
         )
       "
       as-child

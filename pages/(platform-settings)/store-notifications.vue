@@ -1,8 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed, watch } from 'vue';
-import { useToast } from '@/components/ui/toast/use-toast';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  BellRing,
+  Building,
+  DownloadCloudIcon,
+  Loader2Icon,
+  Mail,
+  MessageSquare,
+  PencilIcon,
+  PlusIcon,
+  SendIcon,
+  Trash2Icon,
+} from 'lucide-vue-next'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import AsyncCombobox from '@/components/AsyncCombobox.vue'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -10,77 +23,63 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import {
-  AlertCircle,
-  Loader2Icon,
-  PlusIcon,
-  Trash2Icon,
-  PencilIcon,
-  BellRing,
-  Building,
-  SendIcon,
-  DownloadCloudIcon,
-  Mail,
-  MessageSquare,
-} from 'lucide-vue-next';
-import AsyncCombobox from '@/components/AsyncCombobox.vue';
+} from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
+import { useToast } from '@/components/ui/toast/use-toast'
 // @ts-ignore
-import { useApi } from '@/composables/useApi';
-import { useI18n } from 'vue-i18n';
+import { useApi } from '@/composables/useApi'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
-const selectedStoreId = ref<string | null>(null);
+const selectedStoreId = ref<string | null>(null)
 
 interface Credentials {
-  bot_token?: string;
-  chat_id?: string;
-  thread_id?: string;
-  email?: string;
-  smtp_host?: string;
-  smtp_port?: number;
-  smtp_username?: string;
-  smtp_password?: string;
-  smtp_encryption?: string;
-  from_email?: string;
-  from_name?: string;
-  page_access_token?: string;
-  recipient_id?: string;
-  app_id?: string;
-  app_secret?: string;
+  bot_token?: string
+  chat_id?: string
+  thread_id?: string
+  email?: string
+  smtp_host?: string
+  smtp_port?: number
+  smtp_username?: string
+  smtp_password?: string
+  smtp_encryption?: string
+  from_email?: string
+  from_name?: string
+  page_access_token?: string
+  recipient_id?: string
+  app_id?: string
+  app_secret?: string
 }
 
 interface NotificationSetting {
-  id: string;
-  provider: string;
-  name: string;
-  credentials: Credentials;
-  is_active: boolean;
+  id: string
+  provider: string
+  name: string
+  credentials: Credentials
+  is_active: boolean
 }
 
-const api = useApi();
-const { toast } = useToast();
+const api = useApi()
+const { toast } = useToast()
 
-const settings = ref<NotificationSetting[]>([]);
-const isLoading = ref(false);
-const error = ref<string | null>(null);
+const settings = ref<NotificationSetting[]>([])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
 
-const isDialogOpen = ref(false);
-const isEditing = ref(false);
-const isSaving = ref(false);
-const isTesting = ref(false);
-const isFetchingChatId = ref(false);
+const isDialogOpen = ref(false)
+const isEditing = ref(false)
+const isSaving = ref(false)
+const isTesting = ref(false)
+const isFetchingChatId = ref(false)
 
 const form = reactive<Partial<NotificationSetting>>({
   id: undefined,
@@ -88,69 +87,74 @@ const form = reactive<Partial<NotificationSetting>>({
   name: '',
   credentials: {},
   is_active: true,
-});
+})
 
 const providerOptions = [
   { value: 'telegram', label: 'Telegram', icon: MessageSquare },
   { value: 'email', label: 'Email', icon: Mail },
   { value: 'facebook', label: 'Facebook Messenger', icon: MessageSquare },
-];
+]
 
 const smtpEncryptionOptions = [
   { value: 'none', label: 'None' },
   { value: 'tls', label: 'TLS' },
   { value: 'ssl', label: 'SSL' },
-];
+]
 
 async function fetchData() {
   if (!selectedStoreId.value) {
-    settings.value = [];
-    return;
+    settings.value = []
+    return
   }
-  isLoading.value = true;
-  error.value = null;
+  isLoading.value = true
+  error.value = null
   try {
-    const response: any = await api(`/stores/${selectedStoreId.value}/notification-settings`);
+    const response: any = await api(`/stores/${selectedStoreId.value}/notification-settings`)
     if (response.success) {
-      settings.value = response.data;
-    } else {
-      throw new Error(response.message || 'Failed to fetch settings.');
+      settings.value = response.data
     }
-  } catch (err: any) {
-    error.value = err.message;
-  } finally {
-    isLoading.value = false;
+    else {
+      throw new Error(response.message || 'Failed to fetch settings.')
+    }
+  }
+  catch (err: any) {
+    error.value = err.message
+  }
+  finally {
+    isLoading.value = false
   }
 }
 
 watch(selectedStoreId, (newId) => {
   if (newId) {
-    fetchData();
-  } else {
-    settings.value = [];
+    fetchData()
   }
-});
+  else {
+    settings.value = []
+  }
+})
 
 function resetForm() {
-  form.id = undefined;
-  form.provider = 'telegram';
-  form.name = '';
-  form.credentials = {};
-  form.is_active = true;
+  form.id = undefined
+  form.provider = 'telegram'
+  form.name = ''
+  form.credentials = {}
+  form.is_active = true
 }
 
-const isEmailProvider = computed(() => form.provider === 'email');
-const isTelegramProvider = computed(() => form.provider === 'telegram');
-const isFacebookProvider = computed(() => form.provider === 'facebook');
+const isEmailProvider = computed(() => form.provider === 'email')
+const isTelegramProvider = computed(() => form.provider === 'telegram')
+const isFacebookProvider = computed(() => form.provider === 'facebook')
 
 // Initialize credentials when provider changes
 
-const isLoadingEdit = ref(false);
+const isLoadingEdit = ref(false)
 
 watch(
   () => form.provider,
   (newProvider) => {
-    if (isLoadingEdit.value) return;
+    if (isLoadingEdit.value)
+      return
     if (newProvider === 'email') {
       form.credentials = {
         email: '',
@@ -161,41 +165,44 @@ watch(
         smtp_encryption: 'tls',
         from_email: '',
         from_name: '',
-      };
-    } else if (newProvider === 'telegram') {
+      }
+    }
+    else if (newProvider === 'telegram') {
       form.credentials = {
         bot_token: '',
         chat_id: '',
         thread_id: '',
-      };
-    } else if (newProvider === 'facebook') {
+      }
+    }
+    else if (newProvider === 'facebook') {
       form.credentials = {
         page_access_token: '',
         recipient_id: '',
         app_id: '',
         app_secret: '',
-      };
+      }
     }
   },
-  { immediate: false }
-);
+  { immediate: false },
+)
 
 function openAddDialog() {
-  resetForm();
-  isEditing.value = false;
-  isDialogOpen.value = true;
+  resetForm()
+  isEditing.value = false
+  isDialogOpen.value = true
 }
 
 function openEditDialog(setting: NotificationSetting) {
-  isLoadingEdit.value = true;
-  resetForm();
-  Object.assign(form, JSON.parse(JSON.stringify(setting)));
-  isEditing.value = true;
-  isDialogOpen.value = true;
+  isLoadingEdit.value = true
+  resetForm()
+  Object.assign(form, JSON.parse(JSON.stringify(setting)))
+  isEditing.value = true
+  isDialogOpen.value = true
 }
 
 async function handleSubmit() {
-  if (!selectedStoreId.value) return;
+  if (!selectedStoreId.value)
+    return
 
   // --- Frontend Validation ---
   if (!form.name || form.name.trim() === '') {
@@ -203,8 +210,8 @@ async function handleSubmit() {
       title: t('store_notifications.validation.error'),
       description: t('store_notifications.validation.name_required'),
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
 
   if (form.provider === 'telegram') {
@@ -213,16 +220,16 @@ async function handleSubmit() {
         title: t('store_notifications.validation.error'),
         description: t('store_notifications.validation.bot_token_required'),
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.chat_id || String(form.credentials.chat_id).trim() === '') {
       toast({
         title: t('store_notifications.validation.error'),
         description: t('store_notifications.validation.chat_id_required'),
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
   }
 
@@ -232,48 +239,48 @@ async function handleSubmit() {
         title: t('store_notifications.validation.error'),
         description: 'Email address is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.smtp_host || form.credentials.smtp_host.trim() === '') {
       toast({
         title: t('store_notifications.validation.error'),
         description: 'SMTP host is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.smtp_port) {
       toast({
         title: t('store_notifications.validation.error'),
         description: 'SMTP port is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.smtp_username || form.credentials.smtp_username.trim() === '') {
       toast({
         title: t('store_notifications.validation.error'),
         description: 'SMTP username is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.smtp_password || form.credentials.smtp_password.trim() === '') {
       toast({
         title: t('store_notifications.validation.error'),
         description: 'SMTP password is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.from_email || form.credentials.from_email.trim() === '') {
       toast({
         title: t('store_notifications.validation.error'),
         description: 'From email is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
   }
 
@@ -283,33 +290,33 @@ async function handleSubmit() {
         title: t('store_notifications.validation.error'),
         description: 'Page Access Token is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
     if (!form.credentials?.recipient_id || form.credentials.recipient_id.trim() === '') {
       toast({
         title: t('store_notifications.validation.error'),
         description: 'Recipient ID is required',
         variant: 'destructive',
-      });
-      return;
+      })
+      return
     }
   }
   // --- End Validation ---
 
-  isSaving.value = true;
+  isSaving.value = true
   try {
     const url = isEditing.value
       ? `/notification-settings/${form.id}`
-      : `/stores/${selectedStoreId.value}/notification-settings`;
-    const method = isEditing.value ? 'PUT' : 'POST';
+      : `/stores/${selectedStoreId.value}/notification-settings`
+    const method = isEditing.value ? 'PUT' : 'POST'
 
     // Ensure chat_id is a string before sending (only for Telegram)
     if (form.provider === 'telegram' && form.credentials && form.credentials.chat_id) {
-      form.credentials.chat_id = String(form.credentials.chat_id);
+      form.credentials.chat_id = String(form.credentials.chat_id)
     }
 
-    const response: any = await api(url, { method, body: form });
+    const response: any = await api(url, { method, body: form })
 
     if (response.success) {
       toast({
@@ -317,42 +324,48 @@ async function handleSubmit() {
         description: isEditing.value
           ? t('store_notifications.toast.setting_updated')
           : t('store_notifications.toast.setting_created'),
-      });
-      isDialogOpen.value = false;
-      fetchData();
-    } else {
-      throw new Error(response.message || 'An error occurred.');
+      })
+      isDialogOpen.value = false
+      fetchData()
     }
-  } catch (err: any) {
+    else {
+      throw new Error(response.message || 'An error occurred.')
+    }
+  }
+  catch (err: any) {
     toast({
       title: t('store_notifications.toast.error'),
       description: err.message,
       variant: 'destructive',
-    });
-  } finally {
-    isSaving.value = false;
+    })
+  }
+  finally {
+    isSaving.value = false
   }
 }
 
 async function handleDelete(settingId: string) {
-  if (!confirm(t('store_notifications.confirm.delete_setting'))) return;
+  if (!confirm(t('store_notifications.confirm.delete_setting')))
+    return
   try {
-    const response: any = await api(`/notification-settings/${settingId}`, { method: 'DELETE' });
+    const response: any = await api(`/notification-settings/${settingId}`, { method: 'DELETE' })
     if (response.success) {
       toast({
         title: t('store_notifications.toast.success'),
         description: t('store_notifications.toast.setting_deleted'),
-      });
-      fetchData();
-    } else {
-      throw new Error(response.message || 'Failed to delete setting.');
+      })
+      fetchData()
     }
-  } catch (err: any) {
+    else {
+      throw new Error(response.message || 'Failed to delete setting.')
+    }
+  }
+  catch (err: any) {
     toast({
       title: t('store_notifications.toast.error'),
       description: err.message,
       variant: 'destructive',
-    });
+    })
   }
 }
 
@@ -362,25 +375,28 @@ async function handleTestNotification() {
       title: t('store_notifications.toast.cannot_test'),
       description: t('store_notifications.toast.save_before_test'),
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
-  isTesting.value = true;
+  isTesting.value = true
   try {
-    const response: any = await api(`/notification-settings/${form.id}/test`, { method: 'POST' });
+    const response: any = await api(`/notification-settings/${form.id}/test`, { method: 'POST' })
     if (response.success) {
-      toast({ title: t('store_notifications.toast.success'), description: response.message });
-    } else {
-      throw new Error(response.message || 'Failed to send test notification.');
+      toast({ title: t('store_notifications.toast.success'), description: response.message })
     }
-  } catch (err: any) {
+    else {
+      throw new Error(response.message || 'Failed to send test notification.')
+    }
+  }
+  catch (err: any) {
     toast({
       title: t('store_notifications.toast.test_failed'),
       description: err.message,
       variant: 'destructive',
-    });
-  } finally {
-    isTesting.value = false;
+    })
+  }
+  finally {
+    isTesting.value = false
   }
 }
 
@@ -390,36 +406,39 @@ async function handleFetchChatId() {
       title: t('store_notifications.toast.missing_token'),
       description: t('store_notifications.toast.enter_bot_token_first'),
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
-  isFetchingChatId.value = true;
+  isFetchingChatId.value = true
   try {
     const response: any = await api('/notification-settings/get-chat-id', {
       method: 'POST',
       body: { bot_token: form.credentials.bot_token },
-    });
+    })
     if (response.success && response.data.chat_id) {
-      form.credentials.chat_id = String(response.data.chat_id);
+      form.credentials.chat_id = String(response.data.chat_id)
       toast({
         title: t('store_notifications.toast.success'),
         description: t('store_notifications.toast.chat_id_fetched'),
-      });
-    } else {
-      throw new Error(response.message || 'Could not fetch Chat ID.');
+      })
     }
-  } catch (err: any) {
+    else {
+      throw new Error(response.message || 'Could not fetch Chat ID.')
+    }
+  }
+  catch (err: any) {
     toast({
       title: t('store_notifications.toast.error'),
       description: err.message,
       variant: 'destructive',
-    });
-  } finally {
-    isFetchingChatId.value = false;
+    })
+  }
+  finally {
+    isFetchingChatId.value = false
   }
 }
 
-onMounted(fetchData);
+onMounted(fetchData)
 </script>
 
 <template>
@@ -442,11 +461,13 @@ onMounted(fetchData);
       <CardHeader class="flex flex-row items-center justify-between">
         <div>
           <CardTitle>{{ t('store_notifications.notifications.title') }}</CardTitle>
-          <CardDescription>{{
-            t('store_notifications.notifications.description')
-          }}</CardDescription>
+          <CardDescription>
+            {{
+              t('store_notifications.notifications.description')
+            }}
+          </CardDescription>
         </div>
-        <Button @click="openAddDialog" size="sm">
+        <Button size="sm" @click="openAddDialog">
           <PlusIcon class="mr-2 h-4 w-4" />
           {{ t('store_notifications.notifications.add_button') }}
         </Button>
@@ -455,38 +476,42 @@ onMounted(fetchData);
         <div v-if="isLoading" class="flex justify-center p-8">
           <Loader2Icon class="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
-        <div v-else-if="error" class="text-destructive-foreground bg-destructive p-4 rounded-md">
+        <div v-else-if="error" class="rounded-md bg-destructive p-4 text-destructive-foreground">
           {{ error }}
         </div>
         <div
           v-else-if="settings.length === 0"
-          class="text-center text-muted-foreground p-8 border-dashed border rounded-lg"
+          class="border rounded-lg border-dashed p-8 text-center text-muted-foreground"
         >
-          <BellRing class="mx-auto h-8 w-8 mb-2" />
+          <BellRing class="mx-auto mb-2 h-8 w-8" />
           <p>{{ t('store_notifications.notifications.no_providers') }}</p>
         </div>
         <div v-else class="space-y-2">
           <div
             v-for="setting in settings"
             :key="setting.id"
-            class="border rounded-lg p-3 flex items-center justify-between"
+            class="flex items-center justify-between border rounded-lg p-3"
           >
             <div class="flex items-center gap-3">
               <Switch :checked="setting.is_active" disabled />
               <div>
-                <p class="font-medium">{{ setting.name }}</p>
-                <p class="text-xs text-muted-foreground uppercase">{{ setting.provider }}</p>
+                <p class="font-medium">
+                  {{ setting.name }}
+                </p>
+                <p class="text-xs text-muted-foreground uppercase">
+                  {{ setting.provider }}
+                </p>
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <Button @click="openEditDialog(setting)" variant="ghost" size="icon" class="h-8 w-8">
+              <Button variant="ghost" size="icon" class="h-8 w-8" @click="openEditDialog(setting)">
                 <PencilIcon class="h-4 w-4" />
               </Button>
               <Button
-                @click="handleDelete(setting.id)"
                 variant="ghost"
                 size="icon"
                 class="h-8 w-8 text-destructive hover:text-destructive"
+                @click="handleDelete(setting.id)"
               >
                 <Trash2Icon class="h-4 w-4" />
               </Button>
@@ -496,19 +521,23 @@ onMounted(fetchData);
       </CardContent>
     </Card>
 
-    <Card v-else class="text-center text-muted-foreground p-8 border-dashed border-2">
-      <Building class="mx-auto h-10 w-10 mb-2" />
-      <p class="font-medium">{{ t('store_notifications.select_store.prompt') }}</p>
+    <Card v-else class="border-2 border-dashed p-8 text-center text-muted-foreground">
+      <Building class="mx-auto mb-2 h-10 w-10" />
+      <p class="font-medium">
+        {{ t('store_notifications.select_store.prompt') }}
+      </p>
     </Card>
 
     <Dialog v-model:open="isDialogOpen">
-      <DialogContent class="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{{
-            isEditing
-              ? t('store_notifications.dialog.edit_title')
-              : t('store_notifications.dialog.add_title')
-          }}</DialogTitle>
+          <DialogTitle>
+            {{
+              isEditing
+                ? t('store_notifications.dialog.edit_title')
+                : t('store_notifications.dialog.add_title')
+            }}
+          </DialogTitle>
           <DialogDescription>
             {{ t('store_notifications.dialog.description') }}
           </DialogDescription>
@@ -563,9 +592,9 @@ onMounted(fetchData);
                   :placeholder="t('store_notifications.form.chat_id_placeholder')"
                 />
                 <Button
-                  @click="handleFetchChatId"
                   variant="outline"
                   :disabled="isFetchingChatId || !form.credentials.bot_token"
+                  @click="handleFetchChatId"
                 >
                   <Loader2Icon v-if="isFetchingChatId" class="h-4 w-4 animate-spin" />
                   <DownloadCloudIcon v-else class="h-4 w-4" />
@@ -723,8 +752,10 @@ onMounted(fetchData);
               </div>
             </div>
 
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 class="font-medium text-blue-900 mb-2">📘 Facebook Messenger Setup Guide:</h4>
+            <div class="border border-blue-200 rounded-lg bg-blue-50 p-4">
+              <h4 class="mb-2 text-blue-900 font-medium">
+                📘 Facebook Messenger Setup Guide:
+              </h4>
               <ol class="text-sm text-blue-800 space-y-1">
                 <li>1. Create a Facebook App at developers.facebook.com</li>
                 <li>2. Add Messenger product to your app</li>
@@ -735,26 +766,28 @@ onMounted(fetchData);
             </div>
           </template>
 
-          <div class="flex items-center space-x-2 pt-2">
+          <div class="flex items-center pt-2 space-x-2">
             <Switch id="is_active" v-model:checked="form.is_active" />
             <Label for="is_active">{{ t('store_notifications.form.enabled_label') }}</Label>
           </div>
         </div>
         <DialogFooter class="flex justify-between">
           <Button
-            @click="handleTestNotification"
             :disabled="!isEditing || isSaving || isTesting"
             variant="secondary"
+            @click="handleTestNotification"
           >
             <Loader2Icon v-if="isTesting" class="mr-2 h-4 w-4 animate-spin" />
             <SendIcon v-else class="mr-2 h-4 w-4" />
             {{ t('store_notifications.dialog.test_button') }}
           </Button>
           <div class="flex gap-2">
-            <Button variant="outline" @click="isDialogOpen = false">{{
-              t('store_notifications.dialog.cancel_button')
-            }}</Button>
-            <Button @click="handleSubmit" :disabled="isSaving">
+            <Button variant="outline" @click="isDialogOpen = false">
+              {{
+                t('store_notifications.dialog.cancel_button')
+              }}
+            </Button>
+            <Button :disabled="isSaving" @click="handleSubmit">
               <Loader2Icon v-if="isSaving" class="mr-2 h-4 w-4 animate-spin" />
               {{
                 isSaving

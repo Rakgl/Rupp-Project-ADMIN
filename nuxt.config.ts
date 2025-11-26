@@ -60,11 +60,9 @@ export default defineNuxtConfig({
     },
   },
 
-  // THE CORRECT (FIXED) CODE
   vite: process.env.PROXY_API_URL
-      ? {
+    ? {
         server: {
-          // 1. ADD THIS LINE
           compression: false,
 
           proxy: {
@@ -72,26 +70,24 @@ export default defineNuxtConfig({
               target: process.env.PROXY_API_URL,
               changeOrigin: true,
               secure: false,
-
-              // 2. ADD THIS BLOCK
               headers: {
                 'Accept-Encoding': 'identity',
               },
 
               configure: (proxy, _options) => {
-                console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL);
+                console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL)
                 proxy.on('proxyReq', (proxyReq, req, _res) => {
-                  console.log('📤 Proxying:', req.method, req.url);
-                });
+                  console.log('📤 Proxying:', req.method, req.url)
+                })
                 proxy.on('proxyRes', (proxyRes, req, _res) => {
-                  console.log('📥 Response:', proxyRes.statusCode, req.url);
-                });
+                  console.log('📥 Response:', proxyRes.statusCode, req.url)
+                })
               },
             },
           },
         },
       }
-      : {},
+    : {},
 
   css: [
     '~/assets/css/fonts.css',
@@ -147,4 +143,4 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-12-14',
-});
+})

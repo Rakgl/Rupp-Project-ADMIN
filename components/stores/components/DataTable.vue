@@ -2,18 +2,14 @@
 import type {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   PaginationState,
+  SortingState,
   Updater,
-} from '@tanstack/vue-table';
-import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
-import { ref } from 'vue';
-import { useI18n } from 'vue-i18n'; // Import useLocaleCustom
-
-import { valueUpdater } from '@/lib/utils';
-import DataTablePagination from './DataTablePagination.vue';
-import DataTableToolbar from './DataTableToolbar.vue';
+  VisibilityState,
+} from '@tanstack/vue-table'
+import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table'
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n' // Import useLocaleCustom
 
 // Import the necessary table components from your UI library
 import {
@@ -23,60 +19,64 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/table'
+import { valueUpdater } from '@/lib/utils'
+import DataTablePagination from './DataTablePagination.vue'
+
+import DataTableToolbar from './DataTableToolbar.vue'
 
 interface DataTableProps {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  pageCount: number;
-  pagination: PaginationState;
-  sorting?: SortingState;
-  columnFilters?: ColumnFiltersState;
-  onPaginationChange: (updater: Updater<PaginationState>) => void;
-  onSortingChange?: (updater: Updater<SortingState>) => void;
-  onColumnFiltersChange?: (updater: Updater<ColumnFiltersState>) => void;
-  meta?: any;
-  manualPagination?: boolean;
-  manualSorting?: boolean;
-  manualFiltering?: boolean;
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
+  pageCount: number
+  pagination: PaginationState
+  sorting?: SortingState
+  columnFilters?: ColumnFiltersState
+  onPaginationChange: (updater: Updater<PaginationState>) => void
+  onSortingChange?: (updater: Updater<SortingState>) => void
+  onColumnFiltersChange?: (updater: Updater<ColumnFiltersState>) => void
+  meta?: any
+  manualPagination?: boolean
+  manualSorting?: boolean
+  manualFiltering?: boolean
 }
-const props = defineProps<DataTableProps>();
+const props = defineProps<DataTableProps>()
 
 // Initialize the translation function
-const { t } = useI18n();
+const { t } = useI18n()
 
 // Local states for features not (yet) server-controlled or always client-side
-const columnVisibility = ref<VisibilityState>({});
-const rowSelection = ref({}); // Keep if you use row selection
+const columnVisibility = ref<VisibilityState>({})
+const rowSelection = ref({}) // Keep if you use row selection
 
 const table = useVueTable({
   get data() {
-    return props.data;
+    return props.data
   },
   get columns() {
-    return props.columns;
+    return props.columns
   },
   state: {
     // Controlled states from props
     get pagination() {
-      return props.pagination;
+      return props.pagination
     },
     get sorting() {
-      return props.sorting;
+      return props.sorting
     },
     get columnFilters() {
-      return props.columnFilters;
+      return props.columnFilters
     },
     // Local states
     get columnVisibility() {
-      return columnVisibility.value;
+      return columnVisibility.value
     },
     get rowSelection() {
-      return rowSelection.value;
+      return rowSelection.value
     },
   },
   get pageCount() {
-    return props.pageCount;
+    return props.pageCount
   },
   manualPagination: props.manualPagination ?? true,
   manualSorting: props.manualSorting ?? true,
@@ -85,11 +85,11 @@ const table = useVueTable({
   onPaginationChange: props.onPaginationChange,
   onSortingChange: props.onSortingChange,
   onColumnFiltersChange: props.onColumnFiltersChange,
-  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
-  onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
+  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
+  onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
   getCoreRowModel: getCoreRowModel(),
   meta: props.meta,
-});
+})
 </script>
 
 <template>

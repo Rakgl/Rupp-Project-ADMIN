@@ -1,19 +1,10 @@
 <script setup lang="ts" generic="TData extends Record<string, any>">
-import type { Row, Table } from '@tanstack/vue-table';
-import { ref, computed } from 'vue';
-import { useToast } from '@/components/ui/toast/use-toast';
-import type { PaymentMethod } from '@/data/schemas/paymentMethod';
+import type { Row, Table } from '@tanstack/vue-table'
+import type { PaymentMethod } from '@/data/schemas/paymentMethod'
+import { Loader2Icon, MoreHorizontalIcon } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
 
-// --- Reusable Components & UI Elements ---
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import ImageUploader from '@/components/ImageUploader.vue'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,58 +14,67 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/components/ui/alert-dialog'
+// --- Reusable Components & UI Elements ---
+import { Button } from '@/components/ui/button'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Loader2Icon, MoreHorizontalIcon } from 'lucide-vue-next';
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
 
-import ImageUploader from '@/components/ImageUploader.vue';
-
-const { $i18n } = useNuxtApp();
+import { useToast } from '@/components/ui/toast/use-toast'
 // @ts-ignore
-import { useApi } from '@/composables/useApi';
+import { useApi } from '@/composables/useApi'
+
+const props = defineProps<DataTableRowActionsProps>()
+
+const { $i18n } = useNuxtApp()
 
 interface DataTableRowActionsProps {
-  row: Row<PaymentMethod>;
-  table: Table<TData>;
+  row: Row<PaymentMethod>
+  table: Table<TData>
 }
-const props = defineProps<DataTableRowActionsProps>();
+const api = useApi()
+const { toast } = useToast()
 
-const api = useApi();
-const { toast } = useToast();
-
-const isSubmitting = ref(false);
-const isEditDialogOpen = ref(false);
-const isDeleteDialogOpen = ref(false);
-const editError = ref<string | null>(null);
-const isFetchingDetails = ref(false);
+const isSubmitting = ref(false)
+const isEditDialogOpen = ref(false)
+const isDeleteDialogOpen = ref(false)
+const editError = ref<string | null>(null)
+const isFetchingDetails = ref(false)
 
 // This ref holds the data for the payment method being edited.
 // The 'type' property is updated to the new enum values.
 const editablePaymentMethod = ref<{
-  id: string;
-  name: string;
-  description: string;
-  type: 'online' | 'cash' | 'card_on_delivery';
-  status: 'ACTIVE' | 'INACTIVE';
-  image: string | null;
-  image_file: File | null;
-  delete_image: boolean;
+  id: string
+  name: string
+  description: string
+  type: 'online' | 'cash' | 'card_on_delivery'
+  status: 'ACTIVE' | 'INACTIVE'
+  image: string | null
+  image_file: File | null
+  delete_image: boolean
 }>({
   id: '',
   name: '',
@@ -84,36 +84,37 @@ const editablePaymentMethod = ref<{
   image: null,
   image_file: null,
   delete_image: false,
-});
+})
 
 // Computed property to manage the existing image for the uploader component.
 const existingImageForUploader = computed(() => {
   return editablePaymentMethod.value.image && !editablePaymentMethod.value.delete_image
     ? [{ id: 'current', image: editablePaymentMethod.value.image }]
-    : [];
-});
+    : []
+})
 
 // Computed property to handle the new image file for the uploader.
 const newImageFileAsArray = computed({
   get: () =>
     editablePaymentMethod.value.image_file ? [editablePaymentMethod.value.image_file] : [],
   set: (files: File[]) => {
-    const newFile = files[0] || null;
-    editablePaymentMethod.value.image_file = newFile;
-    if (newFile) editablePaymentMethod.value.image = null;
+    const newFile = files[0] || null
+    editablePaymentMethod.value.image_file = newFile
+    if (newFile)
+      editablePaymentMethod.value.image = null
   },
-});
+})
 
 // Fetches the full details of a payment method when the edit dialog is opened.
 async function openEditDialog() {
-  isEditDialogOpen.value = true;
-  isFetchingDetails.value = true;
-  editError.value = null;
+  isEditDialogOpen.value = true
+  isFetchingDetails.value = true
+  editError.value = null
 
   try {
-    const response: any = await api(`/payment-methods/${props.row.original.id}`);
+    const response: any = await api(`/payment-methods/${props.row.original.id}`)
     if (response.success) {
-      const original = response.data;
+      const original = response.data
       editablePaymentMethod.value = {
         id: original.id,
         name: original.name || '',
@@ -123,92 +124,101 @@ async function openEditDialog() {
         image: original.image || null,
         image_file: null,
         delete_image: false,
-      };
-    } else {
-      editError.value = response.message || 'Failed to fetch payment method details.';
-      toast({ title: 'Error', description: editError.value, variant: 'destructive' });
+      }
     }
-  } catch (err: any) {
-    editError.value = err.data?.message || 'An unexpected server error occurred.';
-    toast({ title: 'Error', description: editError.value, variant: 'destructive' });
-  } finally {
-    isFetchingDetails.value = false;
+    else {
+      editError.value = response.message || 'Failed to fetch payment method details.'
+      toast({ title: 'Error', description: editError.value, variant: 'destructive' })
+    }
+  }
+  catch (err: any) {
+    editError.value = err.data?.message || 'An unexpected server error occurred.'
+    toast({ title: 'Error', description: editError.value, variant: 'destructive' })
+  }
+  finally {
+    isFetchingDetails.value = false
   }
 }
 
 // Handles the submission of the updated payment method data.
 async function handleUpdatePaymentMethod() {
   if (!editablePaymentMethod.value.name) {
-    editError.value = 'Name is required.';
-    return;
+    editError.value = 'Name is required.'
+    return
   }
-  isSubmitting.value = true;
-  editError.value = null;
+  isSubmitting.value = true
+  editError.value = null
 
-  const formData = new FormData();
-  formData.append('_method', 'PUT');
-  formData.append('name', editablePaymentMethod.value.name);
-  formData.append('description', editablePaymentMethod.value.description || '');
-  formData.append('type', editablePaymentMethod.value.type);
-  formData.append('status', editablePaymentMethod.value.status);
+  const formData = new FormData()
+  formData.append('_method', 'PUT')
+  formData.append('name', editablePaymentMethod.value.name)
+  formData.append('description', editablePaymentMethod.value.description || '')
+  formData.append('type', editablePaymentMethod.value.type)
+  formData.append('status', editablePaymentMethod.value.status)
 
   if (editablePaymentMethod.value.image_file) {
-    formData.append('image', editablePaymentMethod.value.image_file);
+    formData.append('image', editablePaymentMethod.value.image_file)
   }
   if (editablePaymentMethod.value.delete_image) {
-    formData.append('delete_image', '1');
+    formData.append('delete_image', '1')
   }
 
   try {
     const response: any = await api(`/payment-methods/${editablePaymentMethod.value.id}`, {
       method: 'POST', // Using POST with _method spoofing for FormData
       body: formData,
-    });
+    })
     if (response.success) {
-      toast({ title: 'Success', description: 'Payment Method updated successfully.' });
-      isEditDialogOpen.value = false;
-      props.table.options.meta?.onDataChanged?.(); // Triggers a data refresh in the parent
-    } else {
-      editError.value = response.message || 'Update failed.';
-      if (response.errors) {
-        editError.value = Object.values(response.errors).flat().join(' ');
-      }
-      toast({ title: 'Error', description: editError.value, variant: 'destructive' });
+      toast({ title: 'Success', description: 'Payment Method updated successfully.' })
+      isEditDialogOpen.value = false
+      props.table.options.meta?.onDataChanged?.() // Triggers a data refresh in the parent
     }
-  } catch (err: any) {
-    editError.value = err.data?.message || 'An unexpected server error occurred.';
-    toast({ title: 'Error', description: editError.value, variant: 'destructive' });
-  } finally {
-    isSubmitting.value = false;
+    else {
+      editError.value = response.message || 'Update failed.'
+      if (response.errors) {
+        editError.value = Object.values(response.errors).flat().join(' ')
+      }
+      toast({ title: 'Error', description: editError.value, variant: 'destructive' })
+    }
+  }
+  catch (err: any) {
+    editError.value = err.data?.message || 'An unexpected server error occurred.'
+    toast({ title: 'Error', description: editError.value, variant: 'destructive' })
+  }
+  finally {
+    isSubmitting.value = false
   }
 }
 
 // Handles the deletion of a payment method.
 async function handleDeletePaymentMethod() {
-  isSubmitting.value = true;
+  isSubmitting.value = true
   try {
     const response: any = await api(`/payment-methods/${props.row.original.id}`, {
       method: 'DELETE',
-    });
+    })
     if (response.success) {
-      toast({ title: 'Success', description: 'Payment Method deleted.' });
-      isDeleteDialogOpen.value = false;
-      props.table.options.meta?.onDataChanged?.();
-    } else {
+      toast({ title: 'Success', description: 'Payment Method deleted.' })
+      isDeleteDialogOpen.value = false
+      props.table.options.meta?.onDataChanged?.()
+    }
+    else {
       toast({
         title: 'Error',
         description: response.message || 'Failed to delete.',
         variant: 'destructive',
-      });
+      })
     }
-  } catch (err: any) {
+  }
+  catch (err: any) {
     toast({
       title: 'Error',
       description: err.data?.message || 'An error occurred.',
       variant: 'destructive',
-    });
-  } finally {
-    isSubmitting.value = false;
+    })
+  }
+  finally {
+    isSubmitting.value = false
   }
 }
 </script>
@@ -251,9 +261,7 @@ async function handleDeletePaymentMethod() {
           <!-- Loading state -->
           <div v-if="isFetchingDetails" class="min-h-[300px] flex items-center justify-center">
             <Loader2Icon class="mr-2 h-8 w-8 animate-spin text-muted-foreground" />
-            <span class="text-muted-foreground"
-            ><LanguageText t-key="common.loadingDetails"
-            /></span>
+            <span class="text-muted-foreground"><LanguageText t-key="common.loadingDetails" /></span>
           </div>
 
           <!-- Error display -->
@@ -281,9 +289,15 @@ async function handleDeletePaymentMethod() {
                   <SelectValue :placeholder="$i18n.t('paymentMethods.form.selectType')" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="online">Online</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="card_on_delivery">Card on Delivery</SelectItem>
+                  <SelectItem value="online">
+                    Online
+                  </SelectItem>
+                  <SelectItem value="cash">
+                    Cash
+                  </SelectItem>
+                  <SelectItem value="card_on_delivery">
+                    Card on Delivery
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -315,9 +329,7 @@ async function handleDeletePaymentMethod() {
               />
             </div>
             <div class="space-y-1.5">
-              <Label for="edit-description"
-              ><LanguageText t-key="paymentMethods.form.description"
-              /></Label>
+              <Label for="edit-description"><LanguageText t-key="paymentMethods.form.description" /></Label>
               <Textarea
                 id="edit-description"
                 v-model="editablePaymentMethod.description"

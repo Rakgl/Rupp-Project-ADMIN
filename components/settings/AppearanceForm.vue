@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils';
-import { toTypedSchema } from '@vee-validate/zod';
-import { useForm } from 'vee-validate';
-import { h } from 'vue';
-import * as z from 'zod';
-import { useI18n } from 'vue-i18n';
-import { buttonVariants } from '~/components/ui/button';
-import { toast } from '~/components/ui/toast';
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
+import { h } from 'vue'
+import { useI18n } from 'vue-i18n'
+import * as z from 'zod'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '~/components/ui/button'
+import { toast } from '~/components/ui/toast'
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 const appearanceFormSchema = toTypedSchema(
   z.object({
@@ -19,8 +19,8 @@ const appearanceFormSchema = toTypedSchema(
       invalid_type_error: t('appearance.validation.fontInvalid'),
       required_error: t('appearance.validation.fontRequired'),
     }),
-  })
-);
+  }),
+)
 
 const { handleSubmit } = useForm({
   validationSchema: appearanceFormSchema,
@@ -28,9 +28,9 @@ const { handleSubmit } = useForm({
     theme: 'light',
     font: 'inter',
   },
-});
+})
 
-const color = useColorMode();
+const color = useColorMode()
 
 const onSubmit = handleSubmit((values) => {
   toast({
@@ -38,15 +38,16 @@ const onSubmit = handleSubmit((values) => {
     description: h(
       'pre',
       { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' },
-      h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))
+      h('code', { class: 'text-white' }, JSON.stringify(values, null, 2)),
     ),
-  });
+  })
   if (values.theme === 'dark') {
-    color.preference = 'dark';
-  } else {
-    color.preference = 'light';
+    color.preference = 'dark'
   }
-});
+  else {
+    color.preference = 'light'
+  }
+})
 </script>
 
 <template>

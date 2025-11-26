@@ -63,14 +63,14 @@ export const serviceCardColumns: ColumnDef<ServiceCard>[] = [
     cell: ({ row }) => {
       const { t } = useI18n()
       const config = useRuntimeConfig() // Get runtime config
-      const apiURL = config.public.apiURL || '' // Get base URL (e.g., 'http://api.test')
+      const apiBase = config.public.apiBase || '' // Get base URL (e.g., 'http://api.test')
 
       const imageUrl = row.original.image_url
       const altText = (row.original.title as any)?.en || t('serviceCards.columns.image_alt_fallback', 'Image')
 
       if (imageUrl) {
         // Construct full URL (e.g., 'http://api.test/images/card-image-1.png')
-        const fullImageUrl = `${apiURL}${imageUrl}`
+        const fullImageUrl = `${apiBase}${imageUrl}`
 
         return h('img', {
           src: fullImageUrl,

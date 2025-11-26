@@ -1,12 +1,12 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import type { Component } from 'vue';
-import type { BaseChartProps } from '.';
-import { cn } from '@/lib/utils';
-import { Donut } from '@unovis/ts';
-import { VisDonut, VisSingleContainer } from '@unovis/vue';
-import { useMounted } from '@vueuse/core';
-import { computed, ref } from 'vue';
-import { ChartSingleTooltip, defaultColors } from '../chart';
+import type { Component } from 'vue'
+import type { BaseChartProps } from '.'
+import { Donut } from '@unovis/ts'
+import { VisDonut, VisSingleContainer } from '@unovis/vue'
+import { useMounted } from '@vueuse/core'
+import { computed, ref } from 'vue'
+import { cn } from '@/lib/utils'
+import { ChartSingleTooltip, defaultColors } from '../chart'
 
 const props = withDefaults(
   defineProps<
@@ -17,24 +17,24 @@ const props = withDefaults(
       /**
        * Sets the name of the key containing the quantitative chart values.
        */
-      category: KeyOfT;
+      category: KeyOfT
       /**
        * Change the type of the chart
        * @default "donut"
        */
-      type?: 'donut' | 'pie';
+      type?: 'donut' | 'pie'
       /**
        * Function to sort the segment
        */
-      sortFunction?: (a: any, b: any) => number | undefined;
+      sortFunction?: (a: any, b: any) => number | undefined
       /**
        * Controls the formatting for the label.
        */
-      valueFormatter?: (tick: number, i?: number, ticks?: number[]) => string;
+      valueFormatter?: (tick: number, i?: number, ticks?: number[]) => string
       /**
        * Render custom tooltip component.
        */
-      customTooltip?: Component;
+      customTooltip?: Component
     }
   >(),
   {
@@ -45,35 +45,35 @@ const props = withDefaults(
     filterOpacity: 0.2,
     showTooltip: true,
     showLegend: true,
-  }
-);
+  },
+)
 
-type KeyOfT = Extract<keyof T, string>;
-type Data = (typeof props.data)[number];
+type KeyOfT = Extract<keyof T, string>
+type Data = (typeof props.data)[number]
 
-const category = computed(() => props.category as KeyOfT);
-const index = computed(() => props.index as KeyOfT);
+const category = computed(() => props.category as KeyOfT)
+const index = computed(() => props.index as KeyOfT)
 
-const isMounted = useMounted();
-const activeSegmentKey = ref<string>();
+const isMounted = useMounted()
+const activeSegmentKey = ref<string>()
 const colors = computed(() =>
   props.colors?.length
     ? props.colors
-    : defaultColors(props.data.filter((d) => d[props.category]).filter(Boolean).length)
-);
+    : defaultColors(props.data.filter(d => d[props.category]).filter(Boolean).length),
+)
 const legendItems = computed(() =>
   props.data.map((item, i) => ({
     name: item[props.index],
     color: colors.value[i],
     inactive: false,
-  }))
-);
+  })),
+)
 
 const totalValue = computed(() =>
   props.data.reduce((prev, curr) => {
-    return prev + curr[props.category];
-  }, 0)
-);
+    return prev + curr[props.category]
+  }, 0),
+)
 </script>
 
 <template>
@@ -104,7 +104,8 @@ const totalValue = computed(() =>
               if (d?.data?.[index] === activeSegmentKey) {
                 activeSegmentKey = undefined;
                 elements.forEach((el) => (el.style.opacity = '1'));
-              } else {
+              }
+              else {
                 activeSegmentKey = d?.data?.[index];
                 elements.forEach((el) => (el.style.opacity = `${filterOpacity}`));
                 elements[i].style.opacity = '1';

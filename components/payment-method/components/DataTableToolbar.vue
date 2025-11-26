@@ -1,13 +1,14 @@
 <script setup lang="ts" generic="TData extends Record<string, any>">
-import type { Table } from '@tanstack/vue-table';
-import { ListFilter, Loader2Icon, PlusCircleIcon, XIcon } from 'lucide-vue-next';
+import type { Table } from '@tanstack/vue-table'
+import type { PaymentMethod } from '@/data/schemas/paymentMethod'
 
-import { computed, ref, watch } from 'vue';
-import ImageUploader from '@/components/ImageUploader.vue';
-import LanguageText from '@/components/LanguageText.vue';
-import { Badge } from '@/components/ui/badge';
+import { ListFilter, Loader2Icon, PlusCircleIcon, XIcon } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
+import ImageUploader from '@/components/ImageUploader.vue'
+import LanguageText from '@/components/LanguageText.vue'
+import { Badge } from '@/components/ui/badge'
 // --- Reusable Components & UI Elements ---
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -16,122 +17,121 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from '@/components/ui/select'
 
-import { useToast } from '@/components/ui/toast/use-toast';
-import type { PaymentMethod } from '@/data/schemas/paymentMethod';
+import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/components/ui/toast/use-toast'
 // @ts-ignore
-import { useApi } from '@/composables/useApi';
+import { useApi } from '@/composables/useApi'
 
 interface DataTableToolbarProps {
-  table: Table<PaymentMethod>;
+  table: Table<PaymentMethod>
 }
-const props = defineProps<DataTableToolbarProps>();
+const props = defineProps<DataTableToolbarProps>()
 
-const api = useApi();
-const { toast } = useToast();
-const { $i18n } = useNuxtApp();
+const api = useApi()
+const { toast } = useToast()
+const { $i18n } = useNuxtApp()
 
-const isCreateDialogOpen = ref(false);
-const isSubmitting = ref(false);
-const createError = ref<string | null>(null);
-const isFilterPopoverOpen = ref(false);
+const isCreateDialogOpen = ref(false)
+const isSubmitting = ref(false)
+const createError = ref<string | null>(null)
+const isFilterPopoverOpen = ref(false)
 
 // --- Filter State Management ---
-const tempStatusFilter = ref<string | null>(null);
-const tempTypeFilter = ref<string | null>(null);
+const tempStatusFilter = ref<string | null>(null)
+const tempTypeFilter = ref<string | null>(null)
 
 // --- Debounced Search Input for Name Filter ---
-const nameFilterValue = ref((props.table.getColumn('name')?.getFilterValue() as string) ?? '');
-let debounceTimer: number | undefined;
+const nameFilterValue = ref((props.table.getColumn('name')?.getFilterValue() as string) ?? '')
+let debounceTimer: number | undefined
 
 watch(nameFilterValue, (newValue) => {
-  clearTimeout(debounceTimer);
+  clearTimeout(debounceTimer)
   debounceTimer = window.setTimeout(() => {
-    props.table.getColumn('name')?.setFilterValue(newValue);
-  }, 300);
-});
+    props.table.getColumn('name')?.setFilterValue(newValue)
+  }, 300)
+})
 
 // This watch ensures that if the filter is cleared externally (e.g., by reset), the input field updates.
 watch(
   () => props.table.getColumn('name')?.getFilterValue(),
   (newValue) => {
-    const currentTableValue = (newValue as string) ?? '';
+    const currentTableValue = (newValue as string) ?? ''
     if (nameFilterValue.value !== currentTableValue) {
-      nameFilterValue.value = currentTableValue;
+      nameFilterValue.value = currentTableValue
     }
-  }
-);
+  },
+)
 
-const isFiltered = computed(() => props.table.getState().columnFilters.length > 0);
+const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
 
 // Syncs the temporary filter state with the actual table state when the filter popover is opened.
 watch(isFilterPopoverOpen, (isOpen) => {
   if (isOpen) {
-    tempStatusFilter.value = (props.table.getColumn('status')?.getFilterValue() as string) ?? null;
-    tempTypeFilter.value = (props.table.getColumn('type')?.getFilterValue() as string) ?? null;
+    tempStatusFilter.value = (props.table.getColumn('status')?.getFilterValue() as string) ?? null
+    tempTypeFilter.value = (props.table.getColumn('type')?.getFilterValue() as string) ?? null
   }
-});
+})
 
 // Applies the selected filters from the popover to the table state.
 function applyFilters() {
   props.table.setColumnFilters((oldFilters) => {
     const otherFilters = oldFilters.filter(
-      (filter) => filter.id !== 'status' && filter.id !== 'type'
-    );
+      filter => filter.id !== 'status' && filter.id !== 'type',
+    )
 
-    const newFilters = [...otherFilters];
+    const newFilters = [...otherFilters]
     if (tempStatusFilter.value && tempStatusFilter.value !== 'any') {
-      newFilters.push({ id: 'status', value: tempStatusFilter.value });
+      newFilters.push({ id: 'status', value: tempStatusFilter.value })
     }
     if (tempTypeFilter.value && tempTypeFilter.value !== 'any') {
-      newFilters.push({ id: 'type', value: tempTypeFilter.value });
+      newFilters.push({ id: 'type', value: tempTypeFilter.value })
     }
-    return newFilters;
-  });
-  isFilterPopoverOpen.value = false;
+    return newFilters
+  })
+  isFilterPopoverOpen.value = false
 }
 
 // Resets all column filters.
 function resetFilters() {
-  props.table.resetColumnFilters();
-  tempStatusFilter.value = null;
-  tempTypeFilter.value = null;
+  props.table.resetColumnFilters()
+  tempStatusFilter.value = null
+  tempTypeFilter.value = null
 }
 
 // --- Create Dialog Logic ---
 // The 'type' property is updated to the new enum values.
 const newPaymentMethod = ref<{
-  name: string;
-  description: string;
-  type: 'online' | 'cash' | 'card_on_delivery';
-  image_file: File | null;
-  status: 'ACTIVE' | 'INACTIVE';
+  name: string
+  description: string
+  type: 'online' | 'cash' | 'card_on_delivery'
+  image_file: File | null
+  status: 'ACTIVE' | 'INACTIVE'
 }>({
   name: '',
   description: '',
   type: 'online',
   image_file: null,
   status: 'ACTIVE',
-});
+})
 
 const imageFileAsArray = computed({
   get: () => (newPaymentMethod.value.image_file ? [newPaymentMethod.value.image_file] : []),
   set: (files: File[]) => {
-    newPaymentMethod.value.image_file = files[0] || null;
+    newPaymentMethod.value.image_file = files[0] || null
   },
-});
+})
 
 // Resets the create form to its initial state.
 function resetForm() {
@@ -141,56 +141,60 @@ function resetForm() {
     type: 'online',
     image_file: null,
     status: 'ACTIVE',
-  };
-  createError.value = null;
+  }
+  createError.value = null
 }
 
 // Handles the creation of a new payment method.
 async function handleCreatePaymentMethod() {
   if (!newPaymentMethod.value.name) {
-    createError.value = $i18n.t('paymentMethods.validation.nameRequired');
-    return;
+    createError.value = $i18n.t('paymentMethods.validation.nameRequired')
+    return
   }
-  isSubmitting.value = true;
-  createError.value = null;
+  isSubmitting.value = true
+  createError.value = null
 
-  const formData = new FormData();
-  formData.append('name', newPaymentMethod.value.name);
-  formData.append('description', newPaymentMethod.value.description || '');
-  formData.append('type', newPaymentMethod.value.type);
-  formData.append('status', newPaymentMethod.value.status);
+  const formData = new FormData()
+  formData.append('name', newPaymentMethod.value.name)
+  formData.append('description', newPaymentMethod.value.description || '')
+  formData.append('type', newPaymentMethod.value.type)
+  formData.append('status', newPaymentMethod.value.status)
 
   if (newPaymentMethod.value.image_file) {
-    formData.append('image', newPaymentMethod.value.image_file);
+    formData.append('image', newPaymentMethod.value.image_file)
   }
 
   try {
-    const response: any = await api('/payment-methods', { method: 'POST', body: formData });
+    const response: any = await api('/payment-methods', { method: 'POST', body: formData })
     if (response.success) {
       toast({
         title: $i18n.t('common.success'),
         description: $i18n.t('paymentMethods.messages.created'),
-      });
-      isCreateDialogOpen.value = false;
-      props.table.options.meta?.onDataChanged?.();
-    } else {
-      createError.value = response.message || $i18n.t('paymentMethods.messages.createFailed');
-      if (response.errors) createError.value = Object.values(response.errors).flat().join(' ');
+      })
+      isCreateDialogOpen.value = false
+      props.table.options.meta?.onDataChanged?.()
+    }
+    else {
+      createError.value = response.message || $i18n.t('paymentMethods.messages.createFailed')
+      if (response.errors)
+        createError.value = Object.values(response.errors).flat().join(' ')
       toast({
         title: $i18n.t('common.error'),
         description: createError.value,
         variant: 'destructive',
-      });
+      })
     }
-  } catch (err: any) {
-    createError.value = err.data?.message || $i18n.t('common.unexpectedError');
+  }
+  catch (err: any) {
+    createError.value = err.data?.message || $i18n.t('common.unexpectedError')
     toast({
       title: $i18n.t('common.error'),
       description: createError.value,
       variant: 'destructive',
-    });
-  } finally {
-    isSubmitting.value = false;
+    })
+  }
+  finally {
+    isSubmitting.value = false
   }
 }
 </script>
@@ -258,9 +262,15 @@ async function handleCreatePaymentMethod() {
                     <SelectItem value="any">
                       {{ $i18n.t('paymentMethods.search.any') }}
                     </SelectItem>
-                    <SelectItem value="online">Online</SelectItem>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card_on_delivery">Card on Delivery</SelectItem>
+                    <SelectItem value="online">
+                      Online
+                    </SelectItem>
+                    <SelectItem value="cash">
+                      Cash
+                    </SelectItem>
+                    <SelectItem value="card_on_delivery">
+                      Card on Delivery
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -292,9 +302,9 @@ async function handleCreatePaymentMethod() {
         <DialogContent class="h-[80vh] w-[95vw] flex flex-col p-0 sm:max-w-lg">
           <DialogHeader class="flex-shrink-0 border-b p-6 pb-4">
             <DialogTitle><LanguageText t-key="paymentMethods.create.title" /></DialogTitle>
-            <DialogDescription
-            ><LanguageText t-key="paymentMethods.create.description"
-            /></DialogDescription>
+            <DialogDescription>
+              <LanguageText t-key="paymentMethods.create.description" />
+            </DialogDescription>
           </DialogHeader>
 
           <div class="custom-scrollbar flex-grow overflow-y-auto p-6">
@@ -320,9 +330,15 @@ async function handleCreatePaymentMethod() {
                     <SelectValue :placeholder="$i18n.t('paymentMethods.form.selectType')" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="online">Online</SelectItem>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card_on_delivery">Card on Delivery</SelectItem>
+                    <SelectItem value="online">
+                      Online
+                    </SelectItem>
+                    <SelectItem value="cash">
+                      Cash
+                    </SelectItem>
+                    <SelectItem value="card_on_delivery">
+                      Card on Delivery
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -347,9 +363,7 @@ async function handleCreatePaymentMethod() {
                 <ImageUploader v-model="imageFileAsArray" :max-size-mb="2" :max-files="1" />
               </div>
               <div class="grid w-full items-center gap-1.5">
-                <Label for="description"
-                ><LanguageText t-key="paymentMethods.form.description"
-                /></Label>
+                <Label for="description"><LanguageText t-key="paymentMethods.form.description" /></Label>
                 <Textarea
                   id="description"
                   v-model="newPaymentMethod.description"

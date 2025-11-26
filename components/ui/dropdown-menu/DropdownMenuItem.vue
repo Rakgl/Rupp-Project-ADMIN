@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { DropdownMenuItemProps } from 'radix-vue';
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
-import { DropdownMenuItem, useForwardProps } from 'radix-vue';
-import { computed } from 'vue';
+import type { DropdownMenuItemProps } from 'radix-vue'
+import type { HTMLAttributes } from 'vue'
+import { DropdownMenuItem, useForwardProps } from 'radix-vue'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<
-  DropdownMenuItemProps & { class?: HTMLAttributes['class']; inset?: boolean }
->();
+  DropdownMenuItemProps & { class?: HTMLAttributes['class'], inset?: boolean }
+>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
@@ -25,7 +25,7 @@ const forwardedProps = useForwardProps(delegatedProps);
       cn(
         'relative flex cursor-pointer select-none gap-2 items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         inset && 'pl-8',
-        props.class
+        props.class,
       )
     "
   >

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
-  reverse?: boolean;
-}>();
+  reverse?: boolean
+}>()
 </script>
 
 <template>

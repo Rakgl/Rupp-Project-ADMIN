@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ConfigProvider } from 'radix-vue'
-import { Sonner } from '@/components/ui/sonner'
+import { ConfigProvider } from 'radix-vue';
+import { Sonner } from '@/components/ui/sonner';
 
-const colorMode = useColorMode()
+const colorMode = useColorMode();
+const { locale } = useI18n();
 
-const color = computed(() => colorMode.value === 'dark' ? '#09090b' : '#ffffff')
+const color = computed(() => (colorMode.value === 'dark' ? '#09090b' : '#ffffff'));
 
-const { theme, radius } = useCustomize()
+const { theme, radius } = useCustomize();
 
 useHead({
   meta: [
@@ -14,20 +15,20 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { key: 'theme-color', name: 'theme-color', content: color },
   ],
-  link: [
-    { rel: 'icon', href: '/favicon.ico' },
-  ],
+  link: [{ rel: 'icon', href: '/favicon.ico' }],
   htmlAttrs: {
-    lang: 'en',
+    lang: computed(() => locale.value),
+    class: computed(() => `lang-${locale.value}`),
   },
   bodyAttrs: {
     class: computed(() => `theme-${theme.value}`),
     style: computed(() => `--radius: ${radius.value}rem;`),
   },
-})
+});
 
-const title = 'Nuxt Shadcn UI - Dashboard Template'
-const description = 'This dashboard, built with Nuxt, Shadcn UI, and UnoCSS. It includes a dark mode toggle and is optimized for performance and data efficiency.'
+const title = 'Car service dashboard';
+const description =
+  'This dashboard, built with Nuxt, Shadcn UI, and UnoCSS. It includes a dark mode toggle and is optimized for performance and data efficiency.';
 
 useSeoMeta({
   title,
@@ -40,19 +41,19 @@ useSeoMeta({
   twitterDescription: description,
   twitterImage: 'https://nuxt-shadcn-dashboard.vercel.app/social-card.png',
   twitterCard: 'summary_large_image',
-})
+});
 
-const router = useRouter()
+const router = useRouter();
 
 defineShortcuts({
   'G-H': () => router.push('/'),
   'G-E': () => router.push('/email'),
-})
+});
 
-const useIdFunction = () => useId()
+const useIdFunction = () => useId();
 
-const textDirection = useTextDirection({ initialValue: 'ltr' })
-const dir = computed(() => textDirection.value === 'rtl' ? 'rtl' : 'ltr')
+const textDirection = useTextDirection({ initialValue: 'ltr' });
+const dir = computed(() => (textDirection.value === 'rtl' ? 'rtl' : 'ltr'));
 </script>
 
 <template>
@@ -68,3 +69,12 @@ const dir = computed(() => textDirection.value === 'rtl' ? 'rtl' : 'ltr')
     <Sonner class="pointer-events-auto" />
   </ConfigProvider>
 </template>
+
+<style>
+body {
+  @apply text-sm;
+  font-family: var(--current-font);
+  line-height: var(--current-line-height);
+  letter-spacing: var(--current-letter-spacing);
+}
+</style>

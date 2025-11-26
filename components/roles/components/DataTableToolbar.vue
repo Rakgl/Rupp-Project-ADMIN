@@ -1,10 +1,10 @@
 <script setup lang="ts" generic="TData">
-import type { Table } from '@tanstack/vue-table';
-import { BadgePlus, Sparkles, X } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import type { Table } from '@tanstack/vue-table'
+import { BadgePlus, Sparkles, X } from 'lucide-vue-next'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -13,72 +13,73 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Toaster } from '@/components/ui/toast';
-import { useToast } from '@/components/ui/toast/use-toast';
-import { useApi } from '@/composables/useApi';
-import { roleStatuses } from '../data/data';
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Toaster } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/toast/use-toast'
+import { useApi } from '@/composables/useApi'
+import { roleStatuses } from '../data/data'
 
-import DataTableFacetedFilter from './DataTableFacetedFilter.vue';
+import DataTableFacetedFilter from './DataTableFacetedFilter.vue'
 
 interface DataTableToolbarProps {
-  table: Table<TData>;
+  table: Table<TData>
 }
 
-const props = defineProps<DataTableToolbarProps>();
-const { t } = useI18n();
-const { toast } = useToast();
-const api = useApi();
-const isFiltered = computed(() => props.table.getState().columnFilters.length > 0);
+const props = defineProps<DataTableToolbarProps>()
+const { t } = useI18n()
+const { toast } = useToast()
+const api = useApi()
+const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
 
 // Debounced search input logic
 const localSearchValue = ref<string>(
-  (props.table.getColumn('name')?.getFilterValue() as string) ?? ''
-);
-let debounceTimer: number | undefined;
+  (props.table.getColumn('name')?.getFilterValue() as string) ?? '',
+)
+let debounceTimer: number | undefined
 
 watch(localSearchValue, (newValue) => {
   if (debounceTimer) {
-    clearTimeout(debounceTimer);
+    clearTimeout(debounceTimer)
   }
   debounceTimer = window.setTimeout(() => {
-    props.table.getColumn('name')?.setFilterValue(newValue);
-  }, 300);
-});
+    props.table.getColumn('name')?.setFilterValue(newValue)
+  }, 300)
+})
 
 watch(
   () => props.table.getColumn('name')?.getFilterValue(),
   (filterValue) => {
     if (typeof filterValue === 'string' && localSearchValue.value !== filterValue) {
-      localSearchValue.value = filterValue;
-    } else if (filterValue === undefined && localSearchValue.value !== '') {
-      localSearchValue.value = '';
+      localSearchValue.value = filterValue
     }
-  }
-);
+    else if (filterValue === undefined && localSearchValue.value !== '') {
+      localSearchValue.value = ''
+    }
+  },
+)
 
 // --- Manual "New Role" Dialog State ---
-const isNewRoleDialogOpen = ref(false);
+const isNewRoleDialogOpen = ref(false)
 const newRoleData = ref({
   name: '',
   status: 'ACTIVE',
   description: '',
-});
+})
 
 watch(isNewRoleDialogOpen, (isOpen) => {
   if (isOpen) {
-    newRoleData.value = { name: '', status: 'ACTIVE', description: '' };
+    newRoleData.value = { name: '', status: 'ACTIVE', description: '' }
   }
-});
+})
 
 async function handleCreateRole() {
   // Validation for single role creation
@@ -87,8 +88,8 @@ async function handleCreateRole() {
       title: t('roles.toast.validation.title'),
       description: t('roles.toast.validation.nameRequired'),
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
   // ... other validations
 
@@ -96,78 +97,82 @@ async function handleCreateRole() {
     const response = await api('/roles', {
       method: 'POST',
       body: newRoleData.value,
-    });
+    })
 
     if (!(response as any).success) {
-      throw new Error((response as any).message || `Failed to create role.`);
+      throw new Error((response as any).message || `Failed to create role.`)
     }
 
-    isNewRoleDialogOpen.value = false;
+    isNewRoleDialogOpen.value = false
     toast({
       title: t('roles.toast.create.success.title'),
       description: t('roles.toast.create.success.description', {
         roleName: newRoleData.value.name,
       }),
-    });
-    props.table.options.meta?.onDataChanged?.();
-  } catch (error: any) {
+    })
+    props.table.options.meta?.onDataChanged?.()
+  }
+  catch (error: any) {
     toast({
       title: t('roles.toast.create.error.title'),
       description: error.message || t('roles.toast.create.error.description'),
       variant: 'destructive',
-    });
+    })
   }
 }
 
 // --- AI Suggestion & Bulk Create Dialog State ---
 interface SuggestedRole {
-  name: string;
-  description: string;
+  name: string
+  description: string
 }
-const isSuggestionDialogOpen = ref(false);
-const suggestionContext = ref('');
-const isLoadingSuggestions = ref(false);
-const isBulkCreating = ref(false);
-const suggestionError = ref<string | null>(null);
-const suggestedRoles = ref<SuggestedRole[]>([]);
-const selectedSuggestedRoles = ref<SuggestedRole[]>([]);
+const isSuggestionDialogOpen = ref(false)
+const suggestionContext = ref('')
+const isLoadingSuggestions = ref(false)
+const isBulkCreating = ref(false)
+const suggestionError = ref<string | null>(null)
+const suggestedRoles = ref<SuggestedRole[]>([])
+const selectedSuggestedRoles = ref<SuggestedRole[]>([])
 
 watch(isSuggestionDialogOpen, (isOpen) => {
   if (isOpen) {
     // Reset AI suggestion state when dialog opens
-    suggestionContext.value = '';
-    suggestedRoles.value = [];
-    selectedSuggestedRoles.value = [];
-    suggestionError.value = null;
+    suggestionContext.value = ''
+    suggestedRoles.value = []
+    selectedSuggestedRoles.value = []
+    suggestionError.value = null
   }
-});
+})
 
 async function handleSuggestRoles() {
   if (!suggestionContext.value.trim()) {
-    suggestionError.value = t('roles.dialog.ai.validation.contextRequired');
-    return;
+    suggestionError.value = t('roles.dialog.ai.validation.contextRequired')
+    return
   }
 
-  isLoadingSuggestions.value = true;
-  suggestionError.value = null;
-  suggestedRoles.value = [];
-  selectedSuggestedRoles.value = [];
+  isLoadingSuggestions.value = true
+  suggestionError.value = null
+  suggestedRoles.value = []
+  selectedSuggestedRoles.value = []
 
   try {
-    const response = await api<{ success: boolean; data: SuggestedRole[]; error?: string }>(
+    const response = await api<{ success: boolean, data: SuggestedRole[], error?: string }>(
       '/roles/suggest',
-      { method: 'POST', body: { context: suggestionContext.value } }
-    );
+      { method: 'POST', body: { context: suggestionContext.value } },
+    )
 
     if (response.success) {
-      suggestedRoles.value = response.data;
-    } else {
-      throw new Error(response.error || t('roles.dialog.ai.error.fetchFailed'));
+      suggestedRoles.value = response.data
     }
-  } catch (error: any) {
-    suggestionError.value = error.message || t('roles.dialog.ai.error.unexpected');
-  } finally {
-    isLoadingSuggestions.value = false;
+    else {
+      throw new Error(response.error || t('roles.dialog.ai.error.fetchFailed'))
+    }
+  }
+  catch (error: any) {
+    suggestionError.value = error.message || t('roles.dialog.ai.error.unexpected')
+  }
+  finally {
+    isLoadingSuggestions.value = false
   }
 }
 
@@ -177,12 +182,12 @@ async function handleCreateMultipleRoles() {
       title: t('roles.toast.validation.title'),
       description: t('roles.toast.validation.selectionRequired'),
       variant: 'destructive',
-    });
-    return;
+    })
+    return
   }
 
-  isBulkCreating.value = true;
-  const creationPromises = selectedSuggestedRoles.value.map((role) =>
+  isBulkCreating.value = true
+  const creationPromises = selectedSuggestedRoles.value.map(role =>
     api('/roles', {
       method: 'POST',
       body: {
@@ -190,15 +195,15 @@ async function handleCreateMultipleRoles() {
         description: role.description,
         status: 'ACTIVE',
       },
-    })
-  );
+    }),
+  )
 
   try {
-    const results = await Promise.allSettled(creationPromises);
+    const results = await Promise.allSettled(creationPromises)
     const successfulCreations = results.filter(
-      (r) => r.status === 'fulfilled' && (r.value as any).success
-    ).length;
-    const failedCreations = results.length - successfulCreations;
+      r => r.status === 'fulfilled' && (r.value as any).success,
+    ).length
+    const failedCreations = results.length - successfulCreations
 
     toast({
       title: t('roles.toast.bulkCreate.title'),
@@ -206,20 +211,22 @@ async function handleCreateMultipleRoles() {
         count: successfulCreations,
         failed: failedCreations,
       }),
-    });
+    })
 
     if (successfulCreations > 0) {
-      isSuggestionDialogOpen.value = false;
-      props.table.options.meta?.onDataChanged?.();
+      isSuggestionDialogOpen.value = false
+      props.table.options.meta?.onDataChanged?.()
     }
-  } catch (error: any) {
+  }
+  catch (error: any) {
     toast({
       title: t('roles.toast.create.error.title'),
       description: error.message || t('roles.toast.create.error.description'),
       variant: 'destructive',
-    });
-  } finally {
-    isBulkCreating.value = false;
+    })
+  }
+  finally {
+    isBulkCreating.value = false
   }
 }
 </script>
@@ -274,7 +281,7 @@ async function handleCreateMultipleRoles() {
                 class="mt-1 text-sm text-muted-foreground"
               />
             </DialogHeader>
-            <div class="px-6 pb-4 border-b">
+            <div class="border-b px-6 pb-4">
               <div class="flex items-center gap-2">
                 <Input
                   id="ai-suggestion-context"
@@ -306,11 +313,13 @@ async function handleCreateMultipleRoles() {
                 {{ t('roles.dialog.ai.loading') }}...
               </div>
               <div v-else-if="suggestedRoles.length > 0" class="space-y-2">
-                <p class="text-sm text-muted-foreground mb-2">{{ t('roles.dialog.ai.results') }}</p>
+                <p class="mb-2 text-sm text-muted-foreground">
+                  {{ t('roles.dialog.ai.results') }}
+                </p>
                 <label
                   v-for="role in suggestedRoles"
                   :key="role.name"
-                  class="flex items-start gap-3 rounded-md border p-3 cursor-pointer hover:bg-accent hover:text-accent-foreground has-[:checked]:bg-accent"
+                  class="flex cursor-pointer items-start gap-3 border rounded-md p-3 has-[:checked]:bg-accent hover:bg-accent hover:text-accent-foreground"
                 >
                   <Checkbox
                     :id="`role-${role.name}`"
@@ -320,9 +329,10 @@ async function handleCreateMultipleRoles() {
                       (checked) => {
                         if (checked) {
                           selectedSuggestedRoles.push(role);
-                        } else {
+                        }
+                        else {
                           selectedSuggestedRoles = selectedSuggestedRoles.filter(
-                            (r) => r.name !== role.name
+                            (r) => r.name !== role.name,
                           );
                         }
                       }
@@ -339,7 +349,7 @@ async function handleCreateMultipleRoles() {
               </div>
             </div>
             <DialogFooter
-              class="flex flex-col-reverse p-6 border-t sm:flex-row sm:justify-end sm:space-x-2"
+              class="flex flex-col-reverse border-t p-6 sm:flex-row sm:justify-end sm:space-x-2"
             >
               <Button type="button" variant="outline" @click="isSuggestionDialogOpen = false">
                 {{ t('roles.dialog.buttons.cancel') }}
@@ -415,8 +425,8 @@ async function handleCreateMultipleRoles() {
                 <label for="new-role-description" class="block text-sm text-foreground font-medium">
                   {{ t('roles.dialog.form.description.label') }}
                   <span class="text-xs text-muted-foreground">{{
-                      t('roles.dialog.form.description.optional')
-                    }}</span>
+                    t('roles.dialog.form.description.optional')
+                  }}</span>
                 </label>
                 <Textarea
                   id="new-role-description"

@@ -33,7 +33,7 @@ const isCollapsed = computed(() => state.value === 'collapsed')
 const hasChildren = computed(() => props.item.children && props.item.children.length > 0)
 
 // Handle mouse enter for hover menu (only for items with children)
-const handleMouseEnter = () => {
+function handleMouseEnter() {
   if (isCollapsed.value && hasChildren.value) {
     if (hoverTimeout.value) {
       clearTimeout(hoverTimeout.value)
@@ -43,7 +43,7 @@ const handleMouseEnter = () => {
 }
 
 // Handle mouse leave for hover menu
-const handleMouseLeave = () => {
+function handleMouseLeave() {
   if (isCollapsed.value && hasChildren.value) {
     hoverTimeout.value = setTimeout(() => {
       showHoverMenu.value = false
@@ -52,13 +52,13 @@ const handleMouseLeave = () => {
 }
 
 // Handle dropdown mouse events to keep it open
-const handleDropdownMouseEnter = () => {
+function handleDropdownMouseEnter() {
   if (hoverTimeout.value) {
     clearTimeout(hoverTimeout.value)
   }
 }
 
-const handleDropdownMouseLeave = () => {
+function handleDropdownMouseLeave() {
   if (isCollapsed.value) {
     hoverTimeout.value = setTimeout(() => {
       showHoverMenu.value = false
@@ -75,12 +75,13 @@ watch(() => state.value, (newState) => {
 
 // Calculate dropdown position
 const dropdownPosition = computed(() => {
-  if (!triggerRef.value) return { left: '60px', top: '0px' }
+  if (!triggerRef.value)
+    return { left: '60px', top: '0px' }
 
   const rect = triggerRef.value.getBoundingClientRect()
   return {
     left: '60px', // Adjust based on your sidebar width
-    top: `${rect.top}px`
+    top: `${rect.top}px`,
   }
 })
 </script>
@@ -138,7 +139,7 @@ const dropdownPosition = computed(() => {
       <div
         v-if="hasChildren"
         ref="triggerRef"
-        class="relative w-full transition-all duration-150 hover:bg-sidebar-accent/50 rounded-md"
+        class="relative w-full rounded-md transition-all duration-150 hover:bg-sidebar-accent/50"
         @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave"
       >
@@ -165,13 +166,13 @@ const dropdownPosition = computed(() => {
           >
             <div
               v-if="showHoverMenu"
-              class="fixed z-50 min-w-48 bg-popover border rounded-md shadow-lg backdrop-blur-sm"
+              class="fixed z-50 min-w-48 border rounded-md bg-popover shadow-lg backdrop-blur-sm"
               :style="dropdownPosition"
               @mouseenter="handleDropdownMouseEnter"
               @mouseleave="handleDropdownMouseLeave"
             >
               <div class="p-1">
-                <div class="px-2 py-1.5 text-sm font-medium text-muted-foreground border-b mb-1">
+                <div class="mb-1 border-b px-2 py-1.5 text-sm text-muted-foreground font-medium">
                   {{ t(item.title) }}
                 </div>
                 <div class="space-y-1">
@@ -179,7 +180,7 @@ const dropdownPosition = computed(() => {
                     v-for="subItem in item.children"
                     :key="subItem.title"
                     :to="localePath(subItem.link)"
-                    class="flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors duration-150"
+                    class="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors duration-150 hover:bg-accent hover:text-accent-foreground"
                     @click="setOpenMobile(false)"
                   >
                     <span class="truncate">{{ t(subItem.title) }}</span>

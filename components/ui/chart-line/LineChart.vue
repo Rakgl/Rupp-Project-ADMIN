@@ -1,13 +1,13 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import type { BulletLegendItemInterface } from '@unovis/ts';
-import type { Component } from 'vue';
-import type { BaseChartProps } from '.';
-import { cn } from '@/lib/utils';
-import { Axis, CurveType, Line } from '@unovis/ts';
-import { VisAxis, VisLine, VisXYContainer } from '@unovis/vue';
-import { useMounted } from '@vueuse/core';
-import { computed, ref } from 'vue';
-import { ChartCrosshair, ChartLegend, defaultColors } from '../chart';
+import type { BulletLegendItemInterface } from '@unovis/ts'
+import type { Component } from 'vue'
+import type { BaseChartProps } from '.'
+import { Axis, CurveType, Line } from '@unovis/ts'
+import { VisAxis, VisLine, VisXYContainer } from '@unovis/vue'
+import { useMounted } from '@vueuse/core'
+import { computed, ref } from 'vue'
+import { cn } from '@/lib/utils'
+import { ChartCrosshair, ChartLegend, defaultColors } from '../chart'
 
 const props = withDefaults(
   defineProps<
@@ -15,11 +15,11 @@ const props = withDefaults(
       /**
        * Render custom tooltip component.
        */
-      customTooltip?: Component;
+      customTooltip?: Component
       /**
        * Type of curve
        */
-      curveType?: CurveType;
+      curveType?: CurveType
     }
   >(),
   {
@@ -31,33 +31,33 @@ const props = withDefaults(
     showTooltip: true,
     showLegend: true,
     showGridLine: true,
-  }
-);
+  },
+)
 
 const emits = defineEmits<{
-  legendItemClick: [d: BulletLegendItemInterface, i: number];
-}>();
+  legendItemClick: [d: BulletLegendItemInterface, i: number]
+}>()
 
-type KeyOfT = Extract<keyof T, string>;
-type Data = (typeof props.data)[number];
+type KeyOfT = Extract<keyof T, string>
+type Data = (typeof props.data)[number]
 
-const index = computed(() => props.index as KeyOfT);
+const index = computed(() => props.index as KeyOfT)
 const colors = computed(() =>
-  props.colors?.length ? props.colors : defaultColors(props.categories.length)
-);
+  props.colors?.length ? props.colors : defaultColors(props.categories.length),
+)
 
 const legendItems = ref<BulletLegendItemInterface[]>(
   props.categories.map((category, i) => ({
     name: category,
     color: colors.value[i],
     inactive: false,
-  }))
-);
+  })),
+)
 
-const isMounted = useMounted();
+const isMounted = useMounted()
 
 function handleLegendItemClick(d: BulletLegendItemInterface, i: number) {
-  emits('legendItemClick', d, i);
+  emits('legendItemClick', d, i)
 }
 </script>
 

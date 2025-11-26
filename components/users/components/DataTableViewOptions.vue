@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import type { Table } from '@tanstack/vue-table';
-import type { Task } from '../data/schema';
-import { computed } from 'vue';
+import type { Table } from '@tanstack/vue-table'
+import type { Task } from '../data/schema'
+import { computed } from 'vue'
 
 interface DataTableViewOptionsProps {
-  table: Table<Task>;
+  table: Table<Task>
 }
 
-const props = defineProps<DataTableViewOptionsProps>();
+const props = defineProps<DataTableViewOptionsProps>()
 
 const columns = computed(() =>
   props.table
     .getAllColumns()
-    .filter((column) => typeof column.accessorFn !== 'undefined' && column.getCanHide())
-);
+    .filter(column => typeof column.accessorFn !== 'undefined' && column.getCanHide()),
+)
 </script>
 
 <template>
