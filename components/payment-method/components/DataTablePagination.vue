@@ -37,7 +37,7 @@ defineProps<DataTablePaginationProps>()
           </SelectContent>
         </Select>
       </div>
-      <div class="w-[100px] flex items-center justify-center text-sm font-medium gap-2">
+      <div class="w-[100px] flex items-center justify-center gap-2 text-sm font-medium">
         <LanguageText t-key="common.page" /> {{ table.getState().pagination.pageIndex + 1 }} <LanguageText t-key="common.of" />
         {{ table.getPageCount() }}
       </div>

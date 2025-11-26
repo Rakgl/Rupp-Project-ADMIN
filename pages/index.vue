@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import NumberFlow from '@number-flow/vue';
-import { Activity, Calendar, DollarSign, Users } from 'lucide-vue-next';
+import NumberFlow from '@number-flow/vue'
+import { Activity, Calendar, DollarSign, Users } from 'lucide-vue-next'
 
 const dataCard = ref({
   totalRevenue: 0,
@@ -11,7 +11,7 @@ const dataCard = ref({
   usersDesc: 0,
   activeNow: 0,
   activeNowDesc: 0,
-});
+})
 
 const dataRecentConsultations = [
   {
@@ -39,7 +39,7 @@ const dataRecentConsultations = [
     patient: 'David Brown - Cardiology',
     amount: 150,
   },
-];
+]
 
 onMounted(() => {
   dataCard.value = {
@@ -51,14 +51,16 @@ onMounted(() => {
     usersDesc: 15.7 / 100,
     activeNow: 24,
     activeNowDesc: 6,
-  };
-});
+  }
+})
 </script>
 
 <template>
   <div class="w-full flex flex-col gap-4">
-    <div class="flex flex-wrap items-center justify-between gap-2 mt-3">
-      <h2 class="text-2xl font-bold tracking-tight">Admin Dashboard</h2>
+    <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+      <h2 class="text-2xl font-bold tracking-tight">
+        Admin Dashboard
+      </h2>
       <div class="flex items-center space-x-2">
         <BaseDateRangePicker />
         <Button>Export Report</Button>
@@ -68,7 +70,9 @@ onMounted(() => {
       <div class="grid gap-4 lg:grid-cols-4 md:grid-cols-2 md:gap-8">
         <Card>
           <CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle class="text-sm font-medium"> Total Revenue </CardTitle>
+            <CardTitle class="text-sm font-medium">
+              Total Revenue
+            </CardTitle>
             <DollarSign class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -94,7 +98,9 @@ onMounted(() => {
         </Card>
         <Card>
           <CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle class="text-sm font-medium"> Total Technicians </CardTitle>
+            <CardTitle class="text-sm font-medium">
+              Total Technicians
+            </CardTitle>
             <Calendar class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -113,7 +119,9 @@ onMounted(() => {
         </Card>
         <Card>
           <CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle class="text-sm font-medium"> Active User </CardTitle>
+            <CardTitle class="text-sm font-medium">
+              Active User
+            </CardTitle>
             <Users class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -132,7 +140,9 @@ onMounted(() => {
         </Card>
         <Card>
           <CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle class="text-sm font-medium"> Live Consultations </CardTitle>
+            <CardTitle class="text-sm font-medium">
+              Live Consultations
+            </CardTitle>
             <Activity class="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -165,13 +175,15 @@ onMounted(() => {
               class="flex items-center gap-4"
             >
               <Avatar class="hidden h-9 w-9 sm:flex">
-                <AvatarFallback>{{
+                <AvatarFallback>
+                  {{
                     consultation.name
                       .split(' ')
                       .slice(1)
                       .map((n) => n[0])
                       .join('')
-                  }}</AvatarFallback>
+                  }}
+                </AvatarFallback>
               </Avatar>
               <div class="grid gap-1">
                 <p class="text-sm font-medium leading-none">

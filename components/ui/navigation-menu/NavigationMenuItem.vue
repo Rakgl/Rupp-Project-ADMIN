@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { NavigationMenuItemProps } from 'radix-vue';
-import { NavigationMenuItem } from 'radix-vue';
+import type { NavigationMenuItemProps } from 'radix-vue'
+import { NavigationMenuItem } from 'radix-vue'
 
-const props = defineProps<NavigationMenuItemProps>();
+const props = defineProps<NavigationMenuItemProps>()
 </script>
 
 <template>

@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import type { NavigationMenuTriggerProps } from 'radix-vue';
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
-import { NavigationMenuTrigger, useForwardProps } from 'radix-vue';
-import { computed } from 'vue';
-import { navigationMenuTriggerStyle } from '.';
+import type { NavigationMenuTriggerProps } from 'radix-vue'
+import type { HTMLAttributes } from 'vue'
+import { NavigationMenuTrigger, useForwardProps } from 'radix-vue'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { navigationMenuTriggerStyle } from '.'
 
-const props = defineProps<NavigationMenuTriggerProps & { class?: HTMLAttributes['class'] }>();
+const props = defineProps<NavigationMenuTriggerProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>

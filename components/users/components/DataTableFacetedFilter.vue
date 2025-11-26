@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import type { Column } from '@tanstack/vue-table';
-import type { Component } from 'vue';
-import type { Task } from '../data/schema';
-import { cn } from '@/lib/utils';
-import { computed } from 'vue';
+import type { Column } from '@tanstack/vue-table'
+import type { Component } from 'vue'
+import type { Task } from '../data/schema'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 interface DataTableFacetedFilter {
-  column?: Column<Task, any>;
-  title?: string;
+  column?: Column<Task, any>
+  title?: string
   options: {
-    label: string;
-    value: string;
-    icon?: Component;
-  }[];
+    label: string
+    value: string
+    icon?: Component
+  }[]
 }
 
-const props = defineProps<DataTableFacetedFilter>();
+const props = defineProps<DataTableFacetedFilter>()
 
-const facets = computed(() => props.column?.getFacetedUniqueValues());
-const selectedValues = computed(() => new Set(props.column?.getFilterValue() as string[]));
+const facets = computed(() => props.column?.getFacetedUniqueValues())
+const selectedValues = computed(() => new Set(props.column?.getFilterValue() as string[]))
 </script>
 
 <template>
@@ -76,7 +76,8 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
                   const isSelected = selectedValues.has(option.value);
                   if (isSelected) {
                     selectedValues.delete(option.value);
-                  } else {
+                  }
+                  else {
                     selectedValues.add(option.value);
                   }
                   const filterValues = Array.from(selectedValues);
@@ -90,7 +91,7 @@ const selectedValues = computed(() => new Set(props.column?.getFilterValue() as 
                     'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                     selectedValues.has(option.value)
                       ? 'bg-primary text-primary-foreground'
-                      : 'opacity-50 [&_svg]:invisible'
+                      : 'opacity-50 [&_svg]:invisible',
                   )
                 "
               >

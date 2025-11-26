@@ -4,110 +4,115 @@ import type {
   PaginationState,
   SortingState,
   Updater,
-} from '@tanstack/vue-table';
+} from '@tanstack/vue-table'
 
-import type { Role } from '@/components/users/data/schema'; // Adjust path
-import { onMounted, ref } from 'vue';
-import { roleColumns } from '@/components/users/components/columns'; // Adjust path
+import type { Role } from '@/components/users/data/schema' // Adjust path
+import { onMounted, ref } from 'vue'
+import { roleColumns } from '@/components/users/components/columns' // Adjust path
 
-import DataTable from '@/components/users/components/DataTable.vue'; // Adjust path as needed
-import { valueUpdater } from '@/lib/utils'; // Your existing utility
+import DataTable from '@/components/users/components/DataTable.vue' // Adjust path as needed
+import { valueUpdater } from '@/lib/utils' // Your existing utility
 
 // Assuming useApi composable or similar for API calls
 // import { useApi } from '@/composables/useApi'; // Example
 
-const rolesData = ref<Role[]>([]);
-const isLoading = ref(true);
+const rolesData = ref<Role[]>([])
+const isLoading = ref(true)
 
 // --- Table States for Server-Side Control ---
 const pagination = ref<PaginationState>({
   pageIndex: 0, // TanStack Table is 0-indexed for page
   pageSize: 10, // Default page size
-});
+})
 
-const sorting = ref<SortingState>([]);
+const sorting = ref<SortingState>([])
 
-const columnFilters = ref<ColumnFiltersState>([]);
+const columnFilters = ref<ColumnFiltersState>([])
 
-const pageCount = ref(0);
-const totalRows = ref(0);
+const pageCount = ref(0)
+const totalRows = ref(0)
 
 // --- API Fetching Logic ---
 async function fetchData() {
-  isLoading.value = true;
+  isLoading.value = true
   const params: Record<string, any> = {
     page: pagination.value.pageIndex + 1,
     per_page: pagination.value.pageSize,
-  };
+  }
 
   if (sorting.value.length > 0) {
-    const sortItem = sorting.value[0];
-    params.sort_by = sortItem.id;
-    params.sort_dir = sortItem.desc ? 'desc' : 'asc';
-  } else {
-    params.sort_by = 'created_at';
-    params.sort_dir = 'desc';
+    const sortItem = sorting.value[0]
+    params.sort_by = sortItem.id
+    params.sort_dir = sortItem.desc ? 'desc' : 'asc'
+  }
+  else {
+    params.sort_by = 'created_at'
+    params.sort_dir = 'desc'
   }
 
   columnFilters.value.forEach((filter) => {
     if (filter.id === 'name') {
-      params.search = filter.value;
-    } else if (filter.id === 'status') {
+      params.search = filter.value
+    }
+    else if (filter.id === 'status') {
       if (Array.isArray(filter.value) && filter.value.length > 0) {
-        params.status = filter.value.join(',');
-      } else if (typeof filter.value === 'string') {
-        params.status = filter.value;
+        params.status = filter.value.join(',')
+      }
+      else if (typeof filter.value === 'string') {
+        params.status = filter.value
       }
     }
-  });
+  })
 
-  const api = useApi();
+  const api = useApi()
   try {
-    const response = await api('/users', { params }); // Your actual API call
-    rolesData.value = response.data;
-    pageCount.value = response.meta.last_page;
-    totalRows.value = response.meta.total;
-  } catch (error) {
-    console.error('Failed to fetch roles:', error);
-    rolesData.value = [];
-    pageCount.value = 0;
-    totalRows.value = 0;
-  } finally {
-    isLoading.value = false;
+    const response = await api('/users', { params }) // Your actual API call
+    rolesData.value = response.data
+    pageCount.value = response.meta.last_page
+    totalRows.value = response.meta.total
   }
-  isLoading.value = false; // Ensure isLoading is set to false after mock
+  catch (error) {
+    console.error('Failed to fetch roles:', error)
+    rolesData.value = []
+    pageCount.value = 0
+    totalRows.value = 0
+  }
+  finally {
+    isLoading.value = false
+  }
+  isLoading.value = false // Ensure isLoading is set to false after mock
 }
 
 // --- Handlers for DataTable emitted events ---
 function handlePaginationChange(updaterOrValue: Updater<PaginationState>) {
-  const oldPageSize = pagination.value.pageSize;
+  const oldPageSize = pagination.value.pageSize
 
-  valueUpdater(updaterOrValue, pagination);
+  valueUpdater(updaterOrValue, pagination)
 
-  const newPageSize = pagination.value.pageSize;
+  const newPageSize = pagination.value.pageSize
 
   if (oldPageSize !== newPageSize) {
-    pagination.value.pageIndex = 0;
+    pagination.value.pageIndex = 0
   }
-  fetchData();
+  fetchData()
 }
 
 function handleSortingChange(updaterOrValue: Updater<SortingState>) {
-  valueUpdater(updaterOrValue, sorting);
-  pagination.value.pageIndex = 0;
-  fetchData();
+  valueUpdater(updaterOrValue, sorting)
+  pagination.value.pageIndex = 0
+  fetchData()
 }
 
 function handleColumnFiltersChange(updaterOrValue: Updater<ColumnFiltersState>) {
-  valueUpdater(updaterOrValue, columnFilters);
-  pagination.value.pageIndex = 0;
-  fetchData();
+  valueUpdater(updaterOrValue, columnFilters)
+  pagination.value.pageIndex = 0
+  fetchData()
 }
 
-onMounted(fetchData);
+onMounted(fetchData)
 
 function onDataChanged() {
-  fetchData();
+  fetchData()
 }
 </script>
 

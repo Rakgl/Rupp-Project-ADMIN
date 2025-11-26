@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import type { RangeCalendarCellTriggerProps } from 'radix-vue';
-import type { HTMLAttributes } from 'vue';
-import { cn } from '@/lib/utils';
-import { RangeCalendarCellTrigger, useForwardProps } from 'radix-vue';
-import { computed } from 'vue';
-import { buttonVariants } from '../button';
+import type { RangeCalendarCellTriggerProps } from 'radix-vue'
+import type { HTMLAttributes } from 'vue'
+import { RangeCalendarCellTrigger, useForwardProps } from 'radix-vue'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '../button'
 
-const props = defineProps<RangeCalendarCellTriggerProps & { class?: HTMLAttributes['class'] }>();
+const props = defineProps<RangeCalendarCellTriggerProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
@@ -34,7 +34,7 @@ const forwardedProps = useForwardProps(delegatedProps);
         'data-[disabled]:text-muted-foreground data-[disabled]:opacity-50',
         // Unavailable
         'data-[unavailable]:text-destructive-foreground data-[unavailable]:line-through',
-        props.class
+        props.class,
       )
     "
     v-bind="forwardedProps"

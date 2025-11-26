@@ -1,21 +1,20 @@
-import type { ColumnDef, Table } from '@tanstack/vue-table'; // ✨ ADDED Table type
-import { h } from 'vue';
-import { useI18n } from 'vue-i18n';
-import type { Role } from '../data/schema';
-import { Checkbox } from '@/components/ui/checkbox';
-import DataTableColumnHeader from './DataTableColumnHeader.vue';
-import RoleRowActions from './DataTableRowActions.vue';
-import { Badge } from '@/components/ui/badge';
+import type { ColumnDef } from '@tanstack/vue-table' // ✨ ADDED Table type
+import type { Role } from '../data/schema'
+import { h } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { Badge } from '@/components/ui/badge'
+import DataTableColumnHeader from './DataTableColumnHeader.vue'
+import RoleRowActions from './DataTableRowActions.vue'
 
 interface CustomTableMeta {
-  onDataChanged?: () => void;
+  onDataChanged?: () => void
 }
 
 // --- Configuration for Status Column ---
 interface StatusDisplayConfig {
-  label: string;
-  badgeClass: string;
-  dotClass: string;
+  label: string
+  badgeClass: string
+  dotClass: string
 }
 
 const statusConfigurations: Record<string, StatusDisplayConfig> = {
@@ -37,19 +36,19 @@ const statusConfigurations: Record<string, StatusDisplayConfig> = {
       'bg-gray-100 text-gray-600 dark:bg-gray-600/20 dark:text-gray-400 border border-gray-200 dark:border-gray-500/30',
     dotClass: 'bg-gray-400',
   },
-};
+}
 
 export const roleColumns: ColumnDef<Role>[] = [
   {
     id: 'index',
     header: ({ column }) => {
-      const { t } = useI18n();
-      return h(DataTableColumnHeader, { column, title: t('roles.columns.index') });
+      const { t } = useI18n()
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.index') })
     },
     cell: ({ row, table }) => {
-      const { pageIndex, pageSize } = table.getState().pagination;
-      const globalIndex = pageIndex * pageSize + row.index + 1;
-      return h('div', { class: 'font-medium' }, globalIndex);
+      const { pageIndex, pageSize } = table.getState().pagination
+      const globalIndex = pageIndex * pageSize + row.index + 1
+      return h('div', { class: 'font-medium' }, globalIndex)
     },
     enableSorting: false,
     enableHiding: false,
@@ -57,8 +56,8 @@ export const roleColumns: ColumnDef<Role>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => {
-      const { t } = useI18n();
-      return h(DataTableColumnHeader, { column, title: t('roles.columns.name') });
+      const { t } = useI18n()
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.name') })
     },
     cell: ({ row }) => h('div', { class: 'font-medium' }, row.getValue('name')),
     enableSorting: true,
@@ -66,37 +65,34 @@ export const roleColumns: ColumnDef<Role>[] = [
   {
     accessorKey: 'description',
     header: ({ column }) => {
-      const { t } = useI18n();
-      return h(DataTableColumnHeader, { column, title: t('roles.columns.description') });
+      const { t } = useI18n()
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.description') })
     },
     cell: ({ row }) => {
-      const { t } = useI18n();
-      return h('div', {}, row.getValue('description') || t('roles.table.noDescription'));
+      const { t } = useI18n()
+      return h('div', {}, row.getValue('description') || t('roles.table.noDescription'))
     },
     enableSorting: false,
   },
   {
     accessorKey: 'status',
     header: ({ column }) => {
-      const { t } = useI18n();
-      return h(DataTableColumnHeader, { column, title: t('roles.columns.status') });
+      const { t } = useI18n()
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.status') })
     },
     cell: ({ row }) => {
-      const { t } = useI18n();
-      const statusValue = row.getValue('status') as string;
-      const configKey = statusValue?.toUpperCase();
-      const config = statusConfigurations[configKey] || statusConfigurations.DEFAULT;
+      const { t } = useI18n()
+      const statusValue = row.getValue('status') as string
+      const configKey = statusValue?.toUpperCase()
+      const config = statusConfigurations[configKey] || statusConfigurations.DEFAULT
 
       return h(
         Badge,
         {
           class: `px-2.5 py-1 text-xs rounded-md font-medium inline-flex items-center ${config.badgeClass}`,
         },
-        () => [
-          h('span', { class: `w-2 h-2 mr-1.5 rounded-full ${config.dotClass}` }),
-          t(config.label),
-        ]
-      );
+        () => [h('span', { class: `w-2 h-2 mr-1.5 rounded-full ${config.dotClass}` }), t(config.label)],
+      )
     },
     minSize: 120,
     meta: { cellClass: 'text-center' },
@@ -104,17 +100,15 @@ export const roleColumns: ColumnDef<Role>[] = [
   {
     id: 'actions',
     header: ({ column }) => {
-      const { t } = useI18n();
-      return h(DataTableColumnHeader, { column, title: t('roles.columns.actions') });
+      const { t } = useI18n()
+      return h(DataTableColumnHeader, { column, title: t('roles.columns.actions') })
     },
     cell: ({ row, table }) => {
-      // ✨ table is available in cell context
-      // Access onDataChanged from table.options.meta
-      const meta = table.options.meta as CustomTableMeta; // Cast to your custom meta type
+      const meta = table.options.meta as CustomTableMeta
       return h(RoleRowActions, {
         row,
-        onDataChanged: meta?.onDataChanged, // ✨ Pass it to RoleRowActions
-      });
+        onDataChanged: meta?.onDataChanged,
+      })
     },
     enableSorting: false,
     enableHiding: false,
@@ -122,4 +116,4 @@ export const roleColumns: ColumnDef<Role>[] = [
       cellClass: 'text-right',
     },
   },
-];
+]

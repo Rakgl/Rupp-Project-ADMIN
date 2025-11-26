@@ -3,19 +3,19 @@
 definePageMeta({
   title: 'Sidebar Font Demo',
   description: 'Demonstration of language-based fonts in sidebar navigation',
-});
+})
 
-const { locale } = useI18n();
-const { getSampleNavItems, currentSidebarFontClass, currentSidebarFontFamily } = useSidebarFont();
-const { getFontClass, getFontFamily } = useLanguageFont();
+const { locale } = useI18n()
+const { getSampleNavItems, currentSidebarFontClass, currentSidebarFontFamily } = useSidebarFont()
+const { getFontClass, getFontFamily } = useLanguageFont()
 
 // Sample navigation items
-const sampleNavItems = getSampleNavItems();
+const sampleNavItems = getSampleNavItems()
 
 // Current font information
-const currentLanguage = computed(() => locale.value);
-const currentFontClass = computed(() => getFontClass(locale.value));
-const currentFontFamily = computed(() => getFontFamily(locale.value));
+const currentLanguage = computed(() => locale.value)
+const currentFontClass = computed(() => getFontClass(locale.value))
+const currentFontFamily = computed(() => getFontFamily(locale.value))
 
 // Font information
 const fontInfo = {
@@ -31,14 +31,14 @@ const fontInfo = {
     optimizedFor: 'Clean Khmer rendering, contemporary design, UI optimization',
     lineHeight: '1.5-1.7 (script optimized)',
   },
-};
+}
 
 function getLanguageName(code) {
   const names = {
     en: 'English',
     km: 'Khmer (ខ្មែរ)',
-  };
-  return names[code] || code;
+  }
+  return names[code] || code
 }
 </script>
 
@@ -47,8 +47,12 @@ function getLanguageName(code) {
     <div class="container mx-auto max-w-4xl">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="mb-2 text-3xl text-gray-900 font-bold">Sidebar Font System Demo</h1>
-        <p class="text-gray-600">Demonstration of language-based fonts in the sidebar navigation</p>
+        <h1 class="mb-2 text-3xl text-gray-900 font-bold">
+          Sidebar Font System Demo
+        </h1>
+        <p class="text-gray-600">
+          Demonstration of language-based fonts in the sidebar navigation
+        </p>
       </div>
 
       <!-- Language Controls -->
@@ -56,7 +60,9 @@ function getLanguageName(code) {
         <CardHeader>
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-semibold">Language Settings</h3>
+              <h3 class="text-lg font-semibold">
+                Language Settings
+              </h3>
               <p class="text-sm text-gray-600">
                 Switch languages to see font changes in the sidebar
               </p>
@@ -71,8 +77,12 @@ function getLanguageName(code) {
         <!-- Navigation Preview -->
         <Card class="border-0 shadow-sm ring-1 ring-gray-200">
           <CardHeader>
-            <h3 class="text-lg font-semibold">Navigation Preview</h3>
-            <p class="text-sm text-gray-600">Sample navigation items in different languages</p>
+            <h3 class="text-lg font-semibold">
+              Navigation Preview
+            </h3>
+            <p class="text-sm text-gray-600">
+              Sample navigation items in different languages
+            </p>
           </CardHeader>
           <CardContent>
             <div class="space-y-4">
@@ -105,14 +115,20 @@ function getLanguageName(code) {
         <!-- Font Information -->
         <Card class="border-0 shadow-sm ring-1 ring-gray-200">
           <CardHeader>
-            <h3 class="text-lg font-semibold">Font Information</h3>
-            <p class="text-sm text-gray-600">Current font settings and characteristics</p>
+            <h3 class="text-lg font-semibold">
+              Font Information
+            </h3>
+            <p class="text-sm text-gray-600">
+              Current font settings and characteristics
+            </p>
           </CardHeader>
           <CardContent>
             <div class="space-y-6">
               <!-- Current Font -->
               <div>
-                <h4 class="mb-3 text-gray-900 font-medium">Current Active Font</h4>
+                <h4 class="mb-3 text-gray-900 font-medium">
+                  Current Active Font
+                </h4>
                 <div class="rounded-lg bg-blue-50 p-4">
                   <div class="text-sm space-y-2">
                     <div><strong>Language:</strong> {{ currentLanguage }}</div>
@@ -130,7 +146,9 @@ function getLanguageName(code) {
 
               <!-- Font Characteristics -->
               <div>
-                <h4 class="mb-3 text-gray-900 font-medium">Font Characteristics</h4>
+                <h4 class="mb-3 text-gray-900 font-medium">
+                  Font Characteristics
+                </h4>
                 <div class="space-y-3">
                   <div v-for="(info, lang) in fontInfo" :key="lang" class="border rounded-lg p-3">
                     <div class="mb-2 flex items-center gap-2">
@@ -150,7 +168,9 @@ function getLanguageName(code) {
 
               <!-- Usage Example -->
               <div>
-                <h4 class="mb-3 text-gray-900 font-medium">Usage Example</h4>
+                <h4 class="mb-3 text-gray-900 font-medium">
+                  Usage Example
+                </h4>
                 <div class="rounded-lg bg-gray-900 p-4 text-sm text-gray-100 font-mono">
                   <div>&lt;LanguageText</div>
                   <div>&nbsp;&nbsp;:text="translation"</div>

@@ -46,16 +46,60 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-globe',
             link: '/settings/security',
           },
-          {
-            title: 'nav.items.account_recovery',
-            icon: 'i-lucide-shield-check',
-            link: '/account-recoveries',
-          },
+          // {
+          //   title: 'nav.items.account_recovery',
+          //   icon: 'i-lucide-shield-check',
+          //   link: '/account-recoveries',
+          // },
           {
             title: 'nav.items.payment_methods',
             icon: 'i-lucide-credit-card',
             link: '/payment-methods',
           },
+        ],
+      },
+    ],
+  },
+  // --- Home page ---
+  {
+    heading: 'nav.home_page',
+    items: [
+      {
+        title: 'nav.content_management',
+        icon: 'i-lucide-table-of-contents',
+        children: [
+          {
+            title: 'nav.content_blocks',
+            icon: 'i-lucide-circle',
+            link: '/content-blocks',
+          },
+          {
+            title: 'nav.service_cards',
+            icon: 'i-lucide-circle',
+            link: '/service-cards',
+          },
+        ],
+      },
+      {
+        title: 'nav.orders_sales',
+        icon: 'i-lucide-credit-card',
+        meta: { roles: ['admin'] },
+        children: [
+          {
+            title: 'nav.all_orders',
+            icon: 'i-lucide-circle',
+            link: '/orders',
+          },
+          {
+            title: 'nav.pending_orders',
+            icon: 'i-lucide-circle',
+            link: '/orders/pending',
+          },
+          // {
+          //   title: 'nav.sales_reports',
+          //   icon: 'i-lucide-circle',
+          //   link: '/reports/sales',
+          // },
         ],
       },
     ],

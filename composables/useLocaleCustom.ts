@@ -1,10 +1,10 @@
-// composables/useLocaleCustom.ts
-import { useI18n as useVueI18n } from 'vue-i18n';
 import {
+  useLocaleHead as useNuxtLocaleHead,
   useLocalePath as useNuxtLocalePath,
   useSwitchLocalePath as useNuxtSwitchLocalePath,
-  useLocaleHead as useNuxtLocaleHead,
-} from '#imports';
+} from '#imports'
+// composables/useLocaleCustom.ts
+import { useI18n as useVueI18n } from 'vue-i18n'
 
 /**
  * A custom composable that bundles i18n functionalities.
@@ -12,15 +12,15 @@ import {
  * throughout the app without needing multiple imports.
  */
 export function useLocaleCustom() {
-  const vueI18n = useVueI18n();
-  const localePath = useNuxtLocalePath();
-  const switchLocalePath = useNuxtSwitchLocalePath();
-  const localeHead = useNuxtLocaleHead();
+  const vueI18n = useVueI18n()
+  const localePath = useNuxtLocalePath()
+  const switchLocalePath = useNuxtSwitchLocalePath()
+  const localeHead = useNuxtLocaleHead()
 
   return {
     ...vueI18n, // Includes t, locale, setLocale, etc.
     localePath, // For creating localized internal links
     switchLocalePath, // For building language switcher links
     localeHead, // For SEO head properties
-  };
+  }
 }

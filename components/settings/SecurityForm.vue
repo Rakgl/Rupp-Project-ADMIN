@@ -1,159 +1,169 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n';
-import { ref, onMounted } from 'vue';
-import { useToast } from '@/components/ui/toast/use-toast';
-import { Copy, Loader2, ShieldCheck } from 'lucide-vue-next';
-const api = useApi();
-const { t } = useI18n();
-const { toast } = useToast();
+import { Copy, Loader2 } from 'lucide-vue-next'
+import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useToast } from '@/components/ui/toast/use-toast'
 
-const isLoading = ref(false);
-const is2FAEnabled = ref(false);
-const showSetup = ref(false);
-const showDisableConfirm = ref(false);
-const qrCode = ref('');
-const recoveryCodes = ref<string[]>([]);
-const confirmationCode = ref('');
-const disableCode = ref('');
-const isShowingRecoveryCodes = ref(false);
+const api = useApi()
+const { t } = useI18n()
+const { toast } = useToast()
+
+const isLoading = ref(false)
+const is2FAEnabled = ref(false)
+const showSetup = ref(false)
+const showDisableConfirm = ref(false)
+const qrCode = ref('')
+const recoveryCodes = ref<string[]>([])
+const confirmationCode = ref('')
+const disableCode = ref('')
+const isShowingRecoveryCodes = ref(false)
 
 onMounted(async () => {
-  await checkTwoFactorStatus();
-});
+  await checkTwoFactorStatus()
+})
 
-const checkTwoFactorStatus = async () => {
+async function checkTwoFactorStatus() {
   try {
-    const response = await api('/user/two-factor-authentication');
-    is2FAEnabled.value = response?.enabled || false;
-  } catch (error) {
-    console.error('Error checking 2FA status:', error);
-    is2FAEnabled.value = false;
+    const response = await api('/user/two-factor-authentication')
+    is2FAEnabled.value = response?.enabled || false
   }
-};
+  catch (error) {
+    console.error('Error checking 2FA status:', error)
+    is2FAEnabled.value = false
+  }
+}
 
-const enableTwoFactor = async () => {
+async function enableTwoFactor() {
   try {
-    isLoading.value = true;
+    isLoading.value = true
     await api('/user/two-factor-authentication', {
       method: 'POST',
-    });
+    })
 
     // Get QR code
-    const qrResponse = await api('/user/two-factor-qr-code');
-    qrCode.value = qrResponse.svg;
+    const qrResponse = await api('/user/two-factor-qr-code')
+    qrCode.value = qrResponse.svg
 
     // Get recovery codes
-    const codesResponse = await api('/user/two-factor-recovery-codes');
-    recoveryCodes.value = codesResponse;
+    const codesResponse = await api('/user/two-factor-recovery-codes')
+    recoveryCodes.value = codesResponse
 
-    showSetup.value = true;
-  } catch (error) {
-    console.error('Error enabling 2FA:', error);
+    showSetup.value = true
+  }
+  catch (error) {
+    console.error('Error enabling 2FA:', error)
     toast({
       title: t('settings.security.error'),
       description: t('settings.security.enable_error'),
       variant: 'destructive',
-    });
-  } finally {
-    isLoading.value = false;
+    })
   }
-};
+  finally {
+    isLoading.value = false
+  }
+}
 
-const confirmTwoFactor = async () => {
+async function confirmTwoFactor() {
   try {
-    isLoading.value = true;
+    isLoading.value = true
     await api('/user/confirmed-two-factor-authentication', {
       method: 'POST',
       body: {
         code: confirmationCode.value,
       },
-    });
+    })
 
-    is2FAEnabled.value = true;
-    showSetup.value = false;
-    confirmationCode.value = '';
+    is2FAEnabled.value = true
+    showSetup.value = false
+    confirmationCode.value = ''
 
     toast({
       title: t('settings.security.success'),
       description: t('settings.security.enabled_success'),
-    });
-  } catch (error) {
-    console.error('Error confirming 2FA:', error);
+    })
+  }
+  catch (error) {
+    console.error('Error confirming 2FA:', error)
     toast({
       title: t('settings.security.error'),
       description: t('settings.security.confirmation_error'),
       variant: 'destructive',
-    });
-  } finally {
-    isLoading.value = false;
+    })
   }
-};
+  finally {
+    isLoading.value = false
+  }
+}
 
-const confirmAndDisableTwoFactor = async () => {
+async function confirmAndDisableTwoFactor() {
   try {
-    isLoading.value = true;
+    isLoading.value = true
     await api('/user/two-factor-authentication', {
       method: 'DELETE',
       body: {
         code: disableCode.value,
       },
-    });
+    })
 
-    is2FAEnabled.value = false;
-    showDisableConfirm.value = false;
-    disableCode.value = '';
-    qrCode.value = '';
-    recoveryCodes.value = [];
+    is2FAEnabled.value = false
+    showDisableConfirm.value = false
+    disableCode.value = ''
+    qrCode.value = ''
+    recoveryCodes.value = []
 
     toast({
       title: t('settings.security.success'),
       description: t('settings.security.disabled_success'),
-    });
-  } catch (error) {
-    console.error('Error disabling 2FA:', error);
+    })
+  }
+  catch (error) {
+    console.error('Error disabling 2FA:', error)
     toast({
       title: t('settings.security.error'),
       description: error.data?.message || t('settings.security.disable_error'),
       variant: 'destructive',
-    });
-  } finally {
-    isLoading.value = false;
+    })
   }
-};
+  finally {
+    isLoading.value = false
+  }
+}
 
-const regenerateRecoveryCodes = async () => {
+async function regenerateRecoveryCodes() {
   try {
-    isLoading.value = true;
+    isLoading.value = true
     const response = await api('/user/two-factor-recovery-codes', {
       method: 'POST',
-    });
-    recoveryCodes.value = response;
+    })
+    recoveryCodes.value = response
 
-    isShowingRecoveryCodes.value = true;
+    isShowingRecoveryCodes.value = true
 
     toast({
       title: t('settings.security.success'),
       description: t('settings.security.codes_regenerated'),
-    });
-  } catch (error) {
-    console.error('Error regenerating recovery codes:', error);
+    })
+  }
+  catch (error) {
+    console.error('Error regenerating recovery codes:', error)
     toast({
       title: t('settings.security.error'),
       description: t('settings.security.regenerate_error'),
       variant: 'destructive',
-    });
-  } finally {
-    isLoading.value = false;
+    })
   }
-};
+  finally {
+    isLoading.value = false
+  }
+}
 
-const copyRecoveryCodes = () => {
-  navigator.clipboard.writeText(recoveryCodes.value.join('\n'));
+function copyRecoveryCodes() {
+  navigator.clipboard.writeText(recoveryCodes.value.join('\n'))
   toast({
     title: t('settings.security.success'),
     description: t('settings.security.codes_copied'),
-  });
-};
+  })
+}
 </script>
 
 <template>
@@ -161,7 +171,9 @@ const copyRecoveryCodes = () => {
     <!-- Two Factor Authentication Status -->
     <div class="flex items-center justify-between">
       <div class="space-y-0.5">
-        <div class="text-base font-medium">{{ t('settings.security.two_factor_auth') }}</div>
+        <div class="text-base font-medium">
+          {{ t('settings.security.two_factor_auth') }}
+        </div>
         <div class="text-sm text-muted-foreground">
           {{ t('settings.security.two_factor_description') }}
         </div>
@@ -170,18 +182,18 @@ const copyRecoveryCodes = () => {
         <Badge :variant="is2FAEnabled ? 'default' : 'secondary'">
           {{ is2FAEnabled ? t('settings.security.enabled') : t('settings.security.disabled') }}
         </Badge>
-        <Button v-if="!is2FAEnabled" @click="enableTwoFactor" :disabled="isLoading" size="sm">
-          <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+        <Button v-if="!is2FAEnabled" :disabled="isLoading" size="sm" @click="enableTwoFactor">
+          <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
           {{ t('settings.security.enable') }}
         </Button>
         <Button
           v-else
-          @click="showDisableConfirm = true"
           :disabled="isLoading"
           variant="destructive"
           size="sm"
+          @click="showDisableConfirm = true"
         >
-          <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+          <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
           {{ t('settings.security.disable') }}
         </Button>
       </div>
@@ -189,7 +201,7 @@ const copyRecoveryCodes = () => {
 
     <!-- Setup Dialog -->
     <Dialog v-model:open="showSetup">
-      <DialogContent class="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{{ t('settings.security.setup_title') }}</DialogTitle>
           <DialogDescription>
@@ -197,14 +209,14 @@ const copyRecoveryCodes = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div class="space-y-4 p-4">
+        <div class="p-4 space-y-4">
           <!-- QR Code -->
           <div class="flex flex-col items-center space-y-2">
             <div v-if="qrCode" class="qr-code-container">
-              <div v-html="qrCode"></div>
+              <div v-html="qrCode" />
             </div>
           </div>
-          <div class="text-sm text-center text-muted-foreground">
+          <div class="text-center text-sm text-muted-foreground">
             {{ t('settings.security.qr_instruction') }}
           </div>
 
@@ -212,12 +224,12 @@ const copyRecoveryCodes = () => {
           <div v-if="recoveryCodes.length > 0" class="space-y-2">
             <div class="flex items-center justify-between">
               <Label class="text-sm font-medium">{{ t('settings.security.recovery_codes') }}</Label>
-              <Button @click="copyRecoveryCodes" variant="outline" size="sm">
-                <Copy class="w-4 h-4 mr-2" />
+              <Button variant="outline" size="sm" @click="copyRecoveryCodes">
+                <Copy class="mr-2 h-4 w-4" />
                 {{ t('settings.security.copy') }}
               </Button>
             </div>
-            <div class="bg-muted p-3 rounded-lg">
+            <div class="rounded-lg bg-muted p-3">
               <div class="grid grid-cols-2 gap-2 text-sm font-mono">
                 <div v-for="code in recoveryCodes" :key="code" class="text-center">
                   {{ code }}
@@ -247,14 +259,14 @@ const copyRecoveryCodes = () => {
         </div>
 
         <DialogFooter>
-          <Button @click="showSetup = false" variant="outline">
+          <Button variant="outline" @click="showSetup = false">
             {{ t('common.cancel') }}
           </Button>
           <Button
-            @click="confirmTwoFactor"
             :disabled="!confirmationCode || confirmationCode.length !== 6 || isLoading"
+            @click="confirmTwoFactor"
           >
-            <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
             {{ t('settings.security.confirm') }}
           </Button>
         </DialogFooter>
@@ -270,7 +282,7 @@ const copyRecoveryCodes = () => {
             {{ t('settings.security.disable_confirmation') }}
           </DialogDescription>
         </DialogHeader>
-        <div class="space-y-4 py-4">
+        <div class="py-4 space-y-4">
           <div class="space-y-2">
             <Label for="disable-code">{{ t('settings.security.authentication_code') }}</Label>
             <Input
@@ -287,15 +299,15 @@ const copyRecoveryCodes = () => {
           </div>
         </div>
         <DialogFooter>
-          <Button @click="showDisableConfirm = false" variant="outline">
+          <Button variant="outline" @click="showDisableConfirm = false">
             {{ t('common.cancel') }}
           </Button>
           <Button
-            @click="confirmAndDisableTwoFactor"
             :disabled="!disableCode || disableCode.length !== 6 || isLoading"
             variant="destructive"
+            @click="confirmAndDisableTwoFactor"
           >
-            <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
             {{ t('settings.security.disable') }}
           </Button>
         </DialogFooter>
@@ -311,16 +323,16 @@ const copyRecoveryCodes = () => {
             {{ t('settings.security.recovery_codes_warning') }}
           </DialogDescription>
         </DialogHeader>
-        <div class="space-y-4 py-4">
-          <div class="bg-muted p-4 rounded-lg">
+        <div class="py-4 space-y-4">
+          <div class="rounded-lg bg-muted p-4">
             <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm font-mono">
               <div v-for="code in recoveryCodes" :key="code" class="text-center">
                 {{ code }}
               </div>
             </div>
           </div>
-          <Button @click="copyRecoveryCodes" variant="outline" class="w-full">
-            <Copy class="w-4 h-4 mr-2" />
+          <Button variant="outline" class="w-full" @click="copyRecoveryCodes">
+            <Copy class="mr-2 h-4 w-4" />
             {{ t('settings.security.copy') }}
           </Button>
         </div>
@@ -337,13 +349,15 @@ const copyRecoveryCodes = () => {
       <Separator />
       <div class="flex items-center justify-between">
         <div class="space-y-0.5">
-          <div class="text-base font-medium">{{ t('settings.security.recovery_codes') }}</div>
+          <div class="text-base font-medium">
+            {{ t('settings.security.recovery_codes') }}
+          </div>
           <div class="text-sm text-muted-foreground">
             {{ t('settings.security.recovery_codes_description') }}
           </div>
         </div>
-        <Button @click="regenerateRecoveryCodes" :disabled="isLoading" variant="outline" size="sm">
-          <Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+        <Button :disabled="isLoading" variant="outline" size="sm" @click="regenerateRecoveryCodes">
+          <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
           {{ t('settings.security.regenerate') }}
         </Button>
       </div>
