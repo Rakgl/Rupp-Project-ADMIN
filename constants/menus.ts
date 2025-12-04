@@ -78,6 +78,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/service-cards',
           },
+          {
+            title: 'nav.news',
+            icon: 'i-lucide-circle',
+            link: '/news',
+          },
         ],
       },
       {
@@ -118,24 +123,19 @@ export const navMenu: NavMenu[] = [
         icon: 'i-lucide-shopping-basket',
         children: [
           {
-            title: 'nav.product_list',
-            icon: 'i-lucide-circle',
-            link: '/products',
-          },
-          {
             title: 'nav.store_inventories',
             icon: 'i-lucide-circle',
             link: '/store-products',
           },
           {
-            title: 'nav.manage_categories',
-            icon: 'i-lucide-circle',
-            link: '/categories',
-          },
-          {
             title: 'nav.manage_brands',
             icon: 'i-lucide-circle',
             link: '/brands',
+          },
+          {
+            title: 'nav.models',
+            icon: 'i-lucide-circle',
+            link: '/models',
           },
         ],
       },
