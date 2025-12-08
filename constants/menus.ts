@@ -137,6 +137,16 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/models',
           },
+          {
+            title: 'nav.body_types',
+            icon: 'i-lucide-circle',
+            link: '/body-types',
+          },
+          {
+            title: 'nav.cars',
+            icon: 'i-lucide-circle',
+            link: '/cars',
+          },
         ],
       },
       {

@@ -13,18 +13,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Toaster } from '@/components/ui/toast'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { useApi } from '@/composables/useApi'
+import { newsStatuses } from '../data/data' // Keep if you still want the filter, otherwise remove
+import DataTableFacetedFilter from './DataTableFacetedFilter.vue'
 
 interface DataTableToolbarProps {
   table: Table<TData>
@@ -38,7 +33,7 @@ const api = useApi()
 
 // --- SEARCH LOGIC ---
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
-const searchColumnKey = 'name' 
+const searchColumnKey = 'name' // Assumes your column accessor is just 'name'
 
 const localSearchValue = ref<string>(
   (props.table.getColumn(searchColumnKey)?.getFilterValue() as string) ?? '',
@@ -65,37 +60,10 @@ watch(
   },
 )
 
-// --- BRAND FETCHING LOGIC ---
-interface BrandOption {
-  id: string
-  name: string
-}
-const brands = ref<BrandOption[]>([])
-const isLoadingBrands = ref(false)
-
-async function fetchBrands() {
-  if (brands.value.length > 0) return // Don't refetch if we already have them
-  
-  isLoadingBrands.value = true
-  try {
-    const response = await api<any>('/brands/all')
-    brands.value = response.data || response
-  } catch (error) {
-    console.error("Failed to fetch brands", error)
-    toast({
-      title: t('common.error'),
-      description: 'Failed to load brands list.',
-      variant: 'destructive'
-    })
-  } finally {
-    isLoadingBrands.value = false
-  }
-}
-
 // --- CREATE DATA STRUCTURE ---
 interface CreateItemData {
   name: string
-  brand_id: string
+  image: File | null
 }
 
 const isCreateDialogOpen = ref(false)
@@ -104,30 +72,42 @@ const createError = ref<string | null>(null)
 
 const newData = ref<CreateItemData>({
   name: '',
-  brand_id: '',
+  image: null,
 })
+
+function onFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    newData.value.image = target.files[0]
+  }
+  else {
+    newData.value.image = null
+  }
+}
 
 watch(isCreateDialogOpen, (isOpen) => {
   if (isOpen) {
     createError.value = null
+    // Reset form
     newData.value = {
       name: '',
-      brand_id: '',
+      image: null,
     }
-    fetchBrands()
   }
 })
 
 const isSaveDisabled = computed(() => {
   if (isLoadingCreate.value) return true
+  // Name is required
   if (!newData.value.name.trim()) return true
-  if (!newData.value.brand_id) return true
+  // Image is required
+  if (!newData.value.image) return true
   return false
 })
 
 async function handleCreate() {
   if (isSaveDisabled.value) {
-    createError.value = 'Name and Brand are required.'
+    createError.value = 'Name and Image are required.'
     return
   }
 
@@ -138,11 +118,14 @@ async function handleCreate() {
 
   // 1. Append simple name
   formData.append('name', newData.value.name)
-  // 2. Append Brand ID
-  formData.append('brand_id', newData.value.brand_id)
+
+  // 2. Append image
+  if (newData.value.image) {
+    formData.append('image', newData.value.image)
+  }
 
   try {
-    await api<any>('/models', {
+    const response = await api<{ success: boolean, data?: any, message?: string }>('/body-types', {
       method: 'POST',
       body: formData,
     })
@@ -178,6 +161,27 @@ async function handleCreate() {
           v-model="localSearchValue"
           class="h-9 w-full lg:w-[280px] sm:w-[180px]"
         />
+
+        <!-- Status Filter (Optional - Remove if you don't need filtering by status) -->
+        <DataTableFacetedFilter
+          v-if="table.getColumn('status')"
+          :column="table.getColumn('status')"
+          :title="t('status')"
+          :options="newsStatuses"
+        />
+
+        <!-- Reset Filter Button -->
+        <div class="flex items-center gap-2">
+          <Button
+            v-if="isFiltered"
+            variant="ghost"
+            class="h-9 px-3 text-sm"
+            @click="() => table.resetColumnFilters()"
+          >
+            {{ t('common.reset') }}
+            <XIcon class="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <!-- Create Dialog -->
@@ -206,7 +210,8 @@ async function handleCreate() {
             </div>
 
             <div class="overflow-y-auto p-6 space-y-6">
-              <!-- 2. NAME FIELD -->
+              
+              <!-- 1. NAME FIELD -->
               <div>
                 <Label for="createName" class="mb-1 block text-sm font-medium">
                   {{ t('common.name', 'Name') }} <span class="text-destructive">*</span>
@@ -215,30 +220,27 @@ async function handleCreate() {
                   id="createName"
                   v-model="newData.name"
                   :disabled="isLoadingCreate"
-                  placeholder="Enter model name..."
+                  placeholder="Enter name..."
                 />
               </div>
-              
-              <!-- 1. BRAND SELECT (Moved first usually helps UX flow) -->
+
+              <!-- 2. IMAGE FIELD -->
               <div>
-                <Label class="mb-1 block text-sm font-medium">
-                  Brand <span class="text-destructive">*</span>
+                <Label for="createImage" class="mb-1 block text-sm font-medium">
+                  {{ t('image', 'Image') }} <span class="text-destructive">*</span>
                 </Label>
-                <Select v-model="newData.brand_id" :disabled="isLoadingCreate || isLoadingBrands">
-                  <SelectTrigger>
-                    <SelectValue :placeholder="isLoadingBrands ? 'Loading brands...' : 'Select a Brand'" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem 
-                      v-for="brand in brands" 
-                      :key="brand.id" 
-                      :value="brand.id"
-                    >
-                      {{ brand.name }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="createImage"
+                  type="file"
+                  :disabled="isLoadingCreate"
+                  accept="image/png, image/jpeg, image/webp"
+                  @change="onFileChange"
+                />
+                <p class="mt-1 text-xs text-muted-foreground">
+                  Required.
+                </p>
               </div>
+
             </div>
 
             <DialogFooter

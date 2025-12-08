@@ -207,7 +207,7 @@ function onFileChange(event: Event) {
     </DropdownMenu>
 
     <Dialog v-model:open="isEditDialogOpen">
-      <DialogContent class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
+      <DialogContent class="max-h-[85vh] w-[30%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle class="text-xl font-semibold">
             {{ t('news.editDialog.title') }}
@@ -248,11 +248,9 @@ function onFileChange(event: Event) {
           </div>
 
           <div class="border-t pt-4 space-y-4">
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div>
-                <Label for="name" class="mb-1 block text-sm font-medium">Name <span class="text-destructive">*</span></Label>
-                <Input id="name" v-model="itemToEdit.name" :disabled="isLoading" />
-              </div>
+            <div>
+              <Label for="name" class="mb-1 block text-sm font-medium">Name <span class="text-destructive">*</span></Label>
+              <Input id="name" v-model="itemToEdit.name" :disabled="isLoading" />
             </div>
           </div>
         </div>

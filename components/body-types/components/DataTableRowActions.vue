@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Row } from '@tanstack/vue-table'
-import type { Model } from '../data/schema'
+import type { BodyType } from '../data/schema'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { useApi } from '@/composables/useApi'
 import {
@@ -41,11 +42,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { newsStatuses } from '../data/data' 
 
 interface RowActionsProps {
-  row: Row<Model>
+  row: Row<BodyType>
   onDataChanged?: () => void
-  type: 'models'
+  type: 'body-types'
 }
 
 const props = defineProps<RowActionsProps>()
@@ -60,31 +62,10 @@ const isDeleteDialogOpen = ref(false)
 const isLoading = ref(false)
 const editError = ref<string | null>(null)
 
-const itemToEdit = ref<Model | null>(null)
+const itemToEdit = ref<BodyType | null>(null)
+const newImageFile = ref<File | null>(null)
 
-// --- BRAND FETCHING LOGIC ---
-interface BrandOption {
-  id: string
-  name: string
-}
-const brands = ref<BrandOption[]>([])
-const isLoadingBrands = ref(false)
-
-async function fetchBrands() {
-  if (brands.value.length > 0) return // Optional: Cache if already loaded
-  
-  isLoadingBrands.value = true
-  try {
-    const response = await apiInstance<any>('/brands/all')
-    brands.value = response.data || response
-  } catch (error) {
-    console.error("Failed to fetch brands", error)
-  } finally {
-    isLoadingBrands.value = false
-  }
-}
-
-const getApiEndpoint = (id: number | string) => `/models/${id}`
+const getApiEndpoint = (id: number | string) => `/body-types/${id}`
 
 async function openEditDialog() {
   isEditDialogOpen.value = true
@@ -92,18 +73,18 @@ async function openEditDialog() {
   editError.value = null
   itemToEdit.value = null
 
-  fetchBrands()
-
   try {
-    const response = await apiInstance<{ data: Model }>(
+    console.log('Fetching brand ID:', item.value.id);
+    const response = await apiInstance<{ data: BodyType }>(
       getApiEndpoint(item.value.id),
       { method: 'GET' },
     )
-    
     itemToEdit.value = response.data || response
+
+    console.log('Loaded Item:', itemToEdit.value);
   }
   catch (error: any) {
-    editError.value = 'Failed to load details.'
+    editError.value = 'Failed to load news details.'
   }
   finally {
     isLoading.value = false
@@ -111,12 +92,11 @@ async function openEditDialog() {
 }
 
 const isSaveDisabled = computed(() => {
-  if (isLoading.value || !itemToEdit.value) return true
+  if (isLoading.value || !itemToEdit.value)
+    return true
   // Validate Name
-  if (!itemToEdit.value.name.trim()) return true
-  // Validate Brand
-  if (!itemToEdit.value.brand_id) return true
-  
+  if (!itemToEdit.value.name.trim())
+    return true
   return false
 })
 
@@ -132,9 +112,12 @@ async function handleSaveChanges() {
   const formData = new FormData()
 
   formData.append('_method', 'PUT')
+
   formData.append('name', itemToEdit.value.name)
-  // Append Brand ID
-  formData.append('brand_id', itemToEdit.value.brand_id)
+
+  if (newImageFile.value) {
+    formData.append('image', newImageFile.value)
+  }
 
   try {
     await apiInstance<{ success: boolean, message?: string }>(
@@ -143,7 +126,7 @@ async function handleSaveChanges() {
     )
 
     isEditDialogOpen.value = false
-    toast({ title: t('common.success'), description: `Updated successfully.` })
+    toast({ title: 'News Updated', description: `News updated successfully.` })
     props.onDataChanged?.()
   }
   catch (error: any) {
@@ -164,8 +147,8 @@ async function confirmDeleteItem() {
   try {
     await apiInstance(getApiEndpoint(item.value.id), { method: 'DELETE' })
     toast({
-      title: t('common.success'),
-      description: `Item has been deleted.`,
+      title: 'News Deleted',
+      description: `News has been deleted.`,
     })
     isDeleteDialogOpen.value = false
     props.onDataChanged?.()
@@ -173,12 +156,30 @@ async function confirmDeleteItem() {
   catch (error: any) {
     toast({
       title: 'Deletion Failed',
-      description: error.data?.message || 'Could not delete the item.',
+      description: error.data?.message || 'Could not delete the news.',
       variant: 'destructive',
     })
   }
   finally {
     isLoading.value = false
+  }
+}
+
+watch(isEditDialogOpen, (isOpen) => {
+  if (!isOpen) {
+    itemToEdit.value = null
+    editError.value = null
+    newImageFile.value = null
+  }
+})
+
+function onFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    newImageFile.value = target.files[0]
+  }
+  else {
+    newImageFile.value = null
   }
 }
 </script>
@@ -209,8 +210,11 @@ async function confirmDeleteItem() {
       <DialogContent class="max-h-[85vh] w-[30%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle class="text-xl font-semibold">
-            {{ t('news.editDialog.title', 'Edit Model') }}
+            {{ t('news.editDialog.title') }}
           </DialogTitle>
+          <DialogDescription class="mt-1 text-sm text-muted-foreground">
+            {{ t('news.editDialog.description') }}
+          </DialogDescription>
         </DialogHeader>
 
         <div v-if="isLoading && !itemToEdit" class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
@@ -223,35 +227,30 @@ async function confirmDeleteItem() {
 
         <div v-if="itemToEdit" class="overflow-y-auto p-6 space-y-6">
           <div>
-            <div class="grid grid-cols-1 gap-6">
-              
-              <!-- BRAND SELECT -->
-              <div>
-                <Label class="mb-1 block text-sm font-medium">
-                  Brand <span class="text-destructive">*</span>
-                </Label>
-                <Select v-model="itemToEdit.brand_id" :disabled="isLoading || isLoadingBrands">
-                  <SelectTrigger>
-                    <SelectValue :placeholder="isLoadingBrands ? 'Loading...' : 'Select a Brand'" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem 
-                      v-for="brand in brands" 
-                      :key="brand.id" 
-                      :value="brand.id"
-                    >
-                      {{ brand.name }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <Label for="editImage" class="mb-1 block text-sm font-medium">Image</Label>
+            <div v-if="itemToEdit.image_url && !newImageFile" class="mb-2">
+              <img 
+                :src="itemToEdit.image_url.startsWith('http') ? itemToEdit.image_url : `${useRuntimeConfig().public.apiBase.replace(/\/api\/?$/, '')}/${itemToEdit.image_url}`" 
+                alt="Current Image" 
+                class="max-h-32 border rounded-md"
+              >
+            </div>
+            <Input
+              id="editImage"
+              type="file"
+              :disabled="isLoading"
+              accept="image/png, image/jpeg, image/webp"
+              @change="onFileChange"
+            />
+            <p class="mt-1 text-xs text-muted-foreground">
+              Upload a new file to replace the current image.
+            </p>
+          </div>
 
-              <!-- NAME INPUT -->
-              <div>
-                <Label for="name" class="mb-1 block text-sm font-medium">Name <span class="text-destructive">*</span></Label>
-                <Input id="name" v-model="itemToEdit.name" :disabled="isLoading" />
-              </div>
-              
+          <div class="border-t pt-4 space-y-4">
+            <div>
+              <Label for="name" class="mb-1 block text-sm font-medium">Name <span class="text-destructive">*</span></Label>
+              <Input id="name" v-model="itemToEdit.name" :disabled="isLoading" />
             </div>
           </div>
         </div>
@@ -271,13 +270,12 @@ async function confirmDeleteItem() {
       </DialogContent>
     </Dialog>
 
-    <!-- Delete Alert Dialog remains same -->
     <AlertDialog v-model:open="isDeleteDialogOpen">
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{{ t('common.areYouSure') }}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this item.
+            This action cannot be undone. This will permanently delete this news.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter class="flex-col-reverse gap-2 sm:flex-row sm:justify-end">
