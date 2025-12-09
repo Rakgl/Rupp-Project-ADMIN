@@ -119,7 +119,7 @@ export const navMenu: NavMenu[] = [
         link: '/stores',
       },
       {
-        title: 'nav.product_inventory',
+        title: 'nav.car_inventory',
         icon: 'i-lucide-shopping-basket',
         children: [
           {
@@ -146,6 +146,27 @@ export const navMenu: NavMenu[] = [
             title: 'nav.cars',
             icon: 'i-lucide-circle',
             link: '/cars',
+          },
+          {
+            title: 'nav.user_listings',
+            icon: 'i-lucide-circle',
+            link: '/user-listings',
+          },
+        ],
+      },
+      {
+        title: 'nav.accessory_inventory',
+        icon: 'i-lucide-shopping-basket',
+        children: [
+          {
+            title: 'nav.accessory',
+            icon: 'i-lucide-circle',
+            link: '/store-products',
+          },
+          {
+            title: 'nav.accessory',
+            icon: 'i-lucide-circle',
+            link: '/store-products',
           },
         ],
       },

@@ -209,7 +209,7 @@ async function confirmDeleteItem() {
       <DialogContent class="max-h-[85vh] w-[30%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle class="text-xl font-semibold">
-            {{ t('news.editDialog.title', 'Edit Model') }}
+            {{ t('common.edit', 'Edit Model') }}
           </DialogTitle>
         </DialogHeader>
 

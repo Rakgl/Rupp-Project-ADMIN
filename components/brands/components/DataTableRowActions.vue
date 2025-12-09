@@ -32,17 +32,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/toast/use-toast'
 import { useApi } from '@/composables/useApi'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { newsStatuses } from '../data/data' 
 
 interface RowActionsProps {
   row: Row<Brands>
@@ -84,7 +75,7 @@ async function openEditDialog() {
     console.log('Loaded Item:', itemToEdit.value);
   }
   catch (error: any) {
-    editError.value = 'Failed to load news details.'
+    editError.value = 'Failed to load brand details.'
   }
   finally {
     isLoading.value = false
@@ -126,7 +117,7 @@ async function handleSaveChanges() {
     )
 
     isEditDialogOpen.value = false
-    toast({ title: 'News Updated', description: `News updated successfully.` })
+    toast({ title: 'Brand Updated', description: `Brand updated successfully.` })
     props.onDataChanged?.()
   }
   catch (error: any) {
@@ -147,8 +138,8 @@ async function confirmDeleteItem() {
   try {
     await apiInstance(getApiEndpoint(item.value.id), { method: 'DELETE' })
     toast({
-      title: 'News Deleted',
-      description: `News has been deleted.`,
+      title: 'Brand Deleted',
+      description: `Brand has been deleted.`,
     })
     isDeleteDialogOpen.value = false
     props.onDataChanged?.()
@@ -156,7 +147,7 @@ async function confirmDeleteItem() {
   catch (error: any) {
     toast({
       title: 'Deletion Failed',
-      description: error.data?.message || 'Could not delete the news.',
+      description: error.data?.message || 'Could not delete the Brand.',
       variant: 'destructive',
     })
   }
@@ -210,11 +201,8 @@ function onFileChange(event: Event) {
       <DialogContent class="max-h-[85vh] w-[30%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle class="text-xl font-semibold">
-            {{ t('news.editDialog.title') }}
+            {{ t('common.edit') }}
           </DialogTitle>
-          <DialogDescription class="mt-1 text-sm text-muted-foreground">
-            {{ t('news.editDialog.description') }}
-          </DialogDescription>
         </DialogHeader>
 
         <div v-if="isLoading && !itemToEdit" class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
@@ -275,7 +263,7 @@ function onFileChange(event: Event) {
         <AlertDialogHeader>
           <AlertDialogTitle>{{ t('common.areYouSure') }}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this news.
+            This action cannot be undone. This will permanently delete this brand.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter class="flex-col-reverse gap-2 sm:flex-row sm:justify-end">

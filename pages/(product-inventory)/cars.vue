@@ -110,8 +110,8 @@ const onDataChanged = () => fetchData()
   <div class="w-full flex flex-col items-stretch gap-4">
     <div class="flex flex-wrap items-end justify-between gap-2">
       <div>
-        <h2 v-t="'news.title'" class="text-2xl font-bold tracking-tight" />
-        <p v-t="'news.description'" class="text-muted-foreground" />
+        <h2 v-t="'cars.title'" class="text-2xl font-bold tracking-tight" />
+        <p v-t="'cars.description'" class="text-muted-foreground" />
       </div>
     </div>
 

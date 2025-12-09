@@ -27,6 +27,7 @@ import {
     DropdownMenuTrigger,
     DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
+import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -159,11 +160,32 @@ const removeExistingImage = (imageId: string) => {
     currentImages.value = currentImages.value.filter(img => img.id !== imageId)
 }
 
+function getFilenameFromUrl(url: string): string {
+    if (!url) return 'image';
+    try {
+        const path = new URL(url).pathname;
+        const filename = path.substring(path.lastIndexOf('/') + 1);
+        return decodeURIComponent(filename) || 'image';
+    } catch (e) {
+        const parts = url.split('/');
+        return parts[parts.length - 1] || 'image';
+    }
+}
+
 const onNewFilesChange = (e: Event) => {
     const target = e.target as HTMLInputElement
     if (target.files) {
-        newImageFiles.value = Array.from(target.files)
+        const newFiles = Array.from(target.files)
+        for (const file of newFiles) {
+            if (!newImageFiles.value.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified))
+                newImageFiles.value.push(file)
+        }
     }
+    target.value = ''
+}
+
+const removeNewImage = (index: number) => {
+    newImageFiles.value.splice(index, 1)
 }
 
 const handleSave = async () => {
@@ -260,7 +282,7 @@ const confirmDelete = async () => {
                     <!-- Row 1 -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="space-y-2">
-                            <Label>Brand *</Label>
+                            <Label>Brand <span class="text-destructive">*</span></Label>
                             <Select :model-value="editData.brand_id" @update:model-value="onBrandChange">
                                 <SelectTrigger><SelectValue placeholder="Select Brand" /></SelectTrigger>
                                 <SelectContent>
@@ -269,7 +291,7 @@ const confirmDelete = async () => {
                             </Select>
                         </div>
                         <div class="space-y-2">
-                            <Label>Model *</Label>
+                            <Label>Model <span class="text-destructive">*</span></Label>
                             <Select v-model="editData.model_id" :disabled="!editData.brand_id">
                                 <SelectTrigger><SelectValue placeholder="Select Model" /></SelectTrigger>
                                 <SelectContent>
@@ -291,11 +313,11 @@ const confirmDelete = async () => {
                     <!-- Row 2 -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                          <div class="space-y-2">
-                            <Label>Year *</Label>
+                            <Label>Year <span class="text-destructive">*</span></Label>
                             <Input v-model="editData.year" type="number" class="h-9"/>
                         </div>
                          <div class="space-y-2">
-                            <Label>Condition *</Label>
+                            <Label>Condition <span class="text-destructive">*</span></Label>
                              <Select v-model="editData.condition">
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -313,7 +335,7 @@ const confirmDelete = async () => {
                             </Select>
                         </div>
                          <div class="space-y-2">
-                            <Label>Stock *</Label>
+                            <Label>Stock <span class="text-destructive">*</span></Label>
                             <Input v-model="editData.stock_quantity" type="number" class="h-9"/>
                         </div>
                     </div>
@@ -333,7 +355,7 @@ const confirmDelete = async () => {
                     <!-- Row 4 -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="space-y-2">
-                            <Label>Transmission *</Label>
+                            <Label>Transmission <span class="text-destructive">*</span></Label>
                             <Select v-model="editData.transmission">
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -342,7 +364,7 @@ const confirmDelete = async () => {
                             </Select>
                         </div>
                         <div class="space-y-2">
-                            <Label>Fuel Type *</Label>
+                            <Label>Fuel Type <span class="text-destructive">*</span></Label>
                             <Select v-model="editData.fuel_type">
                                 <SelectTrigger><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -382,8 +404,17 @@ const confirmDelete = async () => {
                     </div>
 
                      <div class="space-y-2">
-                        <Label>Add New Images</Label>
-                        <Input type="file" multiple accept="image/*" @change="onNewFilesChange" />
+                        <Label>Add New Images <span class="text-destructive">*</span></Label>
+                        <Input type="file" multiple accept="image/*" @change="onNewFilesChange" class="h-9" />
+                        <div v-if="newImageFiles.length > 0" class="flex flex-wrap gap-2 pt-2">
+                            <Badge v-for="(file, index) in newImageFiles" :key="`${file.name}-${file.lastModified}`" variant="secondary" class="flex items-center gap-1.5 pl-2 pr-1 font-normal">
+                                <span class="text-sm">{{ file.name }}</span>
+                                <button type="button" class="p-0.5 rounded-full hover:bg-background/50" @click="removeNewImage(index)">
+                                    <XIcon class="w-3 h-3" />
+                                    <span class="sr-only">Remove {{ file.name }}</span>
+                                </button>
+                            </Badge>
+                        </div>
                     </div>
                 </div>
 

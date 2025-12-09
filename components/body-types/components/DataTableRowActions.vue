@@ -210,11 +210,8 @@ function onFileChange(event: Event) {
       <DialogContent class="max-h-[85vh] w-[30%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle class="text-xl font-semibold">
-            {{ t('news.editDialog.title') }}
+            {{ t('common.edit') }}
           </DialogTitle>
-          <DialogDescription class="mt-1 text-sm text-muted-foreground">
-            {{ t('news.editDialog.description') }}
-          </DialogDescription>
         </DialogHeader>
 
         <div v-if="isLoading && !itemToEdit" class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
