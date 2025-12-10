@@ -33,7 +33,7 @@ const { toast } = useToast()
 const { t } = useI18n()
 const api = useApi()
 
-const locales = ['en', 'km', 'zh']
+const locales = ['en', 'km']
 const defaultLocale = 'en'
 
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
@@ -268,7 +268,7 @@ async function handleCreateCard() {
                   </Label>
                   <Input
                     :id="`title-${loc}`"
-                    v.model="newCardData.title[loc]"
+                    v-model="newCardData.title[loc]"
                     :disabled="isLoadingCreateCard"
                   />
                 </div>
@@ -279,7 +279,7 @@ async function handleCreateCard() {
                   </Label>
                   <Textarea
                     :id="`desc-${loc}`"
-                    v.model="newCardData.description[loc]"
+                    v-model="newCardData.description[loc]"
                     :disabled="isLoadingCreateCard"
                     rows="3"
                   />
@@ -291,7 +291,7 @@ async function handleCreateCard() {
                   </Label>
                   <Input
                     :id="`button-text-${loc}`"
-                    v.model="newCardData.button_text[loc]"
+                    v-model="newCardData.button_text[loc]"
                     :disabled="isLoadingCreateCard"
                   />
                 </div>

@@ -80,7 +80,6 @@ async function openEditDialog() {
       { method: 'GET' },
     )
     itemToEdit.value = response.data
-    console.log('Fetched content block for editing:', response.data)
   }
   catch (error: any) {
     editError.value = `Failed to load content block details: ${error.data?.message || error.message}`
@@ -112,7 +111,7 @@ async function handleSaveChanges() {
   formData.append('_method', 'PUT')
   formData.append('status', itemToEdit.value.status)
 
-  const locales = ['en', 'km', 'zh']
+  const locales = ['en', 'km']
   for (const loc of locales) {
     formData.append(`title[${loc}]`, itemToEdit.value.title[loc] || '')
     formData.append(`description[${loc}]`, itemToEdit.value.description[loc] || '')
@@ -313,10 +312,7 @@ function onFileChange(event: Event) {
                 <Label for="title-km" class="mb-1 block text-sm font-medium">Title (Khmer)</Label>
                 <Input id="title-km" v-model="itemToEdit.title.km" :disabled="isLoading" />
               </div>
-              <div>
-                <Label for="title-zh" class="mb-1 block text-sm font-medium">Title (Chinese)</Label>
-                <Input id="title-zh" v-model="itemToEdit.title.zh" :disabled="isLoading" />
-              </div>
+
 
               <div class="md:col-span-3">
                 <Label for="desc-en" class="mb-1 block text-sm font-medium">Description (English)</Label>
@@ -326,10 +322,7 @@ function onFileChange(event: Event) {
                 <Label for="desc-km" class="mb-1 block text-sm font-medium">Description (Khmer)</Label>
                 <Textarea id="desc-km" v-model="itemToEdit.description.km" :disabled="isLoading" rows="4" />
               </div>
-              <div class="md:col-span-3">
-                <Label for="desc-zh" class="mb-1 block text-sm font-medium">Description (Chinese)</Label>
-                <Textarea id="desc-zh" v-model="itemToEdit.description.zh" :disabled="isLoading" rows="4" />
-              </div>
+
 
               <div>
                 <Label for="btn-en" class="mb-1 block text-sm font-medium">Button Text (English)</Label>
@@ -339,10 +332,7 @@ function onFileChange(event: Event) {
                 <Label for="btn-km" class="mb-1 block text-sm font-medium">Button Text (Khmer)</Label>
                 <Input id="btn-km" v-model="itemToEdit.booking_btn.km" :disabled="isLoading" />
               </div>
-              <div>
-                <Label for="btn-zh" class="mb-1 block text-sm font-medium">Button Text (Chinese)</Label>
-                <Input id="btn-zh" v-model="itemToEdit.booking_btn.zh" :disabled="isLoading" />
-              </div>
+
             </div>
           </div>
         </div>

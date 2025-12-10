@@ -61,7 +61,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
           if (userLanguage) {
             // Validate that the language is supported
-            const supportedLocales = ['en', 'km', 'zh'] // From nuxt.config.ts
+            const supportedLocales = ['en', 'km'] // From nuxt.config.ts
             const targetLocale = supportedLocales.includes(userLanguage) ? userLanguage : 'en'
 
             // Only change locale if it's different from current
