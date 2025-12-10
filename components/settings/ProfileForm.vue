@@ -45,11 +45,9 @@ const defaultFormValues = {
   language: 'en',
 }
 
-// MODIFICATION: Added Chinese ('zh') to the language options.
 const languageOptions = computed(() => [
   { value: 'en', label: t('languages.en') },
   { value: 'km', label: t('languages.km') },
-  { value: 'zh', label: t('languages.zh') }, // Added this line
 ])
 
 const predefinedFallbackColors = ref([

@@ -83,6 +83,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/news',
           },
+          {
+            title: 'nav.aboutUs',
+            icon: 'i-lucide-circle',
+            link: '/about-us',
+          },
         ],
       },
       {

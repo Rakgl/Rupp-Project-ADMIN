@@ -138,7 +138,6 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en', name: 'English' },
       { code: 'km', name: 'Khmer' },
-      { code: 'zh', name: 'Chinese' },
     ],
   },
 

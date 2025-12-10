@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TData">
 import type { Table } from '@tanstack/vue-table'
-import { BadgePlus, XIcon } from 'lucide-vue-next'
+import { BadgePlus, XIcon, FileImage, Globe } from 'lucide-vue-next'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -38,7 +38,7 @@ const { toast } = useToast()
 const { t } = useI18n()
 const api = useApi()
 
-const locales = ['en', 'km', 'zh']
+const locales = ['en', 'km']
 const defaultLocale = 'en'
 
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
@@ -183,140 +183,137 @@ async function handleCreateBlock() {
               <BadgePlus class="mr-2 h-4 w-4" /> {{ t('contentBlocks.toolbar.new') }}
             </Button>
           </DialogTrigger>
-          <DialogContent
-            class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl"
-          >
-            <DialogHeader>
-              <DialogTitle
-                class="text-xl font-semibold"
-                v-t="'contentBlocks.dialog.create.title'"
-              />
-              <DialogDescription
-                class="mt-1 text-sm text-muted-foreground"
-                v-t="'contentBlocks.dialog.create.description'"
-              />
+          <DialogContent class="max-h-[90vh] w-[95%] flex flex-col rounded-lg shadow-xl sm:max-w-4xl">
+            <DialogHeader class="px-6 pt-6">
+              <DialogTitle class="text-xl font-semibold flex items-center gap-2">
+                {{ t('contentBlocks.dialog.create.title') }}
+              </DialogTitle>
+              <DialogDescription class="mt-1 text-sm text-muted-foreground">
+                {{ t('contentBlocks.dialog.create.description') }}
+              </DialogDescription>
             </DialogHeader>
 
             <div
               v-if="createBlockError"
-              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
+              class="mx-6 mt-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
             >
               <strong>{{ t('common.error') }}</strong> {{ createBlockError }}
             </div>
 
-            <div class="overflow-y-auto p-6 space-y-6">
-              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label for="createStatus" class="mb-1 block text-sm font-medium">Status</Label>
-                  <Select v-model="newBlockData.status" :disabled="isLoadingCreateBlock">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ACTIVE">
-                        ACTIVE
-                      </SelectItem>
-                      <SelectItem value="INACTIVE">
-                        INACTIVE
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            <div class="flex-1 overflow-y-auto p-6">
+              <div class="grid gap-6">
 
-              <div>
-                <Label for="createImage" class="mb-1 block text-sm font-medium">{{ t('contentBlocks.dialog.create.form.image.label') }}
-                </Label>
-                <Input
-                  id="createImage"
-                  type="file"
-                  :disabled="isLoadingCreateBlock"
-                  accept="image/png, image/jpeg, image/webp"
-                  @change="onFileChange"
-                />
-              </div>
+                <div class="grid gap-6 md:grid-cols-2">
+                  <div class="space-y-2">
+                    <Label for="createStatus" class="text-sm font-medium">Status</Label>
+                    <Select v-model="newBlockData.status" :disabled="isLoadingCreateBlock">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                        <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div class="border-t pt-4 space-y-4">
-                <h4 class="text-md mb-3 font-semibold">
-                  Multilingual Fields
-                </h4>
-
-                <div v-for="loc in locales" :key="loc">
-                  <Label :for="`title-${loc}`" class="mb-1 block text-sm font-medium">
-                    {{ t('contentBlocks.dialog.create.form.title.label', { lang: loc.toUpperCase() }) }}
-                    <span v-if="loc === defaultLocale" class="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    :id="`title-${loc}`"
-                    v-model="newBlockData.title[loc]"
-                    :disabled="isLoadingCreateBlock"
-                  />
+                  <div class="space-y-2">
+                    <Label for="createImage" class="text-sm font-medium flex items-center gap-2">
+                      <FileImage class="h-4 w-4" />
+                      {{ t('contentBlocks.dialog.create.form.image.label') }}
+                    </Label>
+                    <Input
+                      id="createImage"
+                      type="file"
+                      class="cursor-pointer"
+                      :disabled="isLoadingCreateBlock"
+                      accept="image/png, image/jpeg, image/webp"
+                      @change="onFileChange"
+                    />
+                  </div>
                 </div>
 
-                <div v-for="loc in locales" :key="loc">
-                  <Label :for="`desc-${loc}`" class="mb-1 block text-sm font-medium">
-                    {{ t('contentBlocks.dialog.create.form.description.label', { lang: loc.toUpperCase() }) }}
-                  </Label>
-                  <Textarea
-                    :id="`desc-${loc}`"
-                    v-model="newBlockData.description[loc]"
-                    :disabled="isLoadingCreateBlock"
-                    rows="3"
-                  />
+                <div class="relative">
+                  <div class="absolute inset-0 flex items-center">
+                    <span class="w-full border-t" />
+                  </div>
+                  <div class="relative flex justify-center text-xs uppercase">
+                    <span class="bg-background px-2 text-muted-foreground flex items-center gap-1">
+                      <Globe class="h-3 w-3" /> Multilingual Content
+                    </span>
+                  </div>
                 </div>
 
-                <div v-for="loc in locales" :key="loc">
-                  <Label :for="`booking-btn-${loc}`" class="mb-1 block text-sm font-medium">
-                    {{ t('contentBlocks.dialog.create.form.bookingBtn.label', { lang: loc.toUpperCase() }) }}
-                  </Label>
-                  <Input
-                    :id="`booking-btn-${loc}`"
-                    v-model="newBlockData.booking_btn[loc]"
-                    :disabled="isLoadingCreateBlock"
-                  />
+                <div class="grid gap-6 md:grid-cols-2">
+                  <div v-for="loc in locales" :key="`title-${loc}`" class="space-y-2">
+                    <Label :for="`title-${loc}`" class="text-sm font-medium">
+                      {{ t('contentBlocks.dialog.create.form.title.label', { lang: loc.toUpperCase() }) }}
+                      <span v-if="loc === defaultLocale" class="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      :id="`title-${loc}`"
+                      v-model="newBlockData.title[loc]"
+                      :placeholder="`Enter ${loc.toUpperCase()} title...`"
+                      :disabled="isLoadingCreateBlock"
+                    />
+                  </div>
                 </div>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                  <div v-for="loc in locales" :key="`btn-${loc}`" class="space-y-2">
+                    <Label :for="`booking-btn-${loc}`" class="text-sm font-medium">
+                      {{ t('contentBlocks.dialog.create.form.bookingBtn.label', { lang: loc.toUpperCase() }) }}
+                    </Label>
+                    <Input
+                      :id="`booking-btn-${loc}`"
+                      v-model="newBlockData.booking_btn[loc]"
+                      :disabled="isLoadingCreateBlock"
+                    />
+                  </div>
+                </div>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                  <div v-for="loc in locales" :key="`desc-${loc}`" class="space-y-2">
+                    <Label :for="`desc-${loc}`" class="text-sm font-medium">
+                      {{ t('contentBlocks.dialog.create.form.description.label', { lang: loc.toUpperCase() }) }}
+                    </Label>
+                    <Textarea
+                      :id="`desc-${loc}`"
+                      v-model="newBlockData.description[loc]"
+                      :disabled="isLoadingCreateBlock"
+                      class="resize-none min-h-[100px]"
+                      rows="4"
+                    />
+                  </div>
+                </div>
+
               </div>
             </div>
 
-            <DialogFooter
-              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
-            >
-              <Button
-                type="button"
-                variant="outline"
-                :disabled="isLoadingCreateBlock"
-                @click="isCreateBlockDialogOpen = false"
-              >
-                {{ t('common.cancel') }}
-              </Button>
-              <Button type="button" :disabled="isCreateBlockSaveDisabled" @click="handleCreateBlock">
-                <svg
-                  v-if="isLoadingCreateBlock"
-                  class="mr-3 h-5 w-5 animate-spin -ml-1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            <DialogFooter class="border-t px-6 py-4">
+              <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 w-full">
+                <Button
+                  type="button"
+                  variant="outline"
+                  :disabled="isLoadingCreateBlock"
+                  @click="isCreateBlockDialogOpen = false"
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  />
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                {{
-                  isLoadingCreateBlock
-                    ? t('common.creating')
-                    : t('contentBlocks.toolbar.new')
-                }}
-              </Button>
+                  {{ t('common.cancel') }}
+                </Button>
+                <Button type="button" :disabled="isCreateBlockSaveDisabled" @click="handleCreateBlock">
+                  <svg
+                    v-if="isLoadingCreateBlock"
+                    class="mr-2 h-4 w-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  {{ isLoadingCreateBlock ? t('common.creating') : t('contentBlocks.toolbar.new') }}
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>
