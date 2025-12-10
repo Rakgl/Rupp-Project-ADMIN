@@ -78,6 +78,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/service-cards',
           },
+          {
+            title: 'nav.news',
+            icon: 'i-lucide-circle',
+            link: '/news',
+          },
         ],
       },
       {
@@ -114,28 +119,59 @@ export const navMenu: NavMenu[] = [
         link: '/stores',
       },
       {
-        title: 'nav.product_inventory',
+        title: 'nav.car_inventory',
         icon: 'i-lucide-shopping-basket',
         children: [
-          {
-            title: 'nav.product_list',
-            icon: 'i-lucide-circle',
-            link: '/products',
-          },
           {
             title: 'nav.store_inventories',
             icon: 'i-lucide-circle',
             link: '/store-products',
           },
           {
-            title: 'nav.manage_categories',
-            icon: 'i-lucide-circle',
-            link: '/categories',
-          },
-          {
             title: 'nav.manage_brands',
             icon: 'i-lucide-circle',
             link: '/brands',
+          },
+          {
+            title: 'nav.models',
+            icon: 'i-lucide-circle',
+            link: '/models',
+          },
+          {
+            title: 'nav.body_types',
+            icon: 'i-lucide-circle',
+            link: '/body-types',
+          },
+          {
+            title: 'nav.cars',
+            icon: 'i-lucide-circle',
+            link: '/cars',
+          },
+          {
+            title: 'nav.user_listings',
+            icon: 'i-lucide-circle',
+            link: '/user-listings',
+          },
+          {
+            title: 'nav.reviews',
+            icon: 'i-lucide-circle',
+            link: '/reviews',
+          },
+        ],
+      },
+      {
+        title: 'nav.accessory_inventory',
+        icon: 'i-lucide-shopping-basket',
+        children: [
+          {
+            title: 'nav.accessory',
+            icon: 'i-lucide-circle',
+            link: '/store-products',
+          },
+          {
+            title: 'nav.accessory',
+            icon: 'i-lucide-circle',
+            link: '/store-products',
           },
         ],
       },
