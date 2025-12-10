@@ -152,6 +152,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/user-listings',
           },
+          {
+            title: 'nav.reviews',
+            icon: 'i-lucide-circle',
+            link: '/reviews',
+          },
         ],
       },
       {
