@@ -125,13 +125,8 @@ export const navMenu: NavMenu[] = [
       },
       {
         title: 'nav.car_inventory',
-        icon: 'i-lucide-shopping-basket',
+        icon: 'i-lucide-car',
         children: [
-          {
-            title: 'nav.store_inventories',
-            icon: 'i-lucide-circle',
-            link: '/store-products',
-          },
           {
             title: 'nav.manage_brands',
             icon: 'i-lucide-circle',
@@ -161,6 +156,11 @@ export const navMenu: NavMenu[] = [
             title: 'nav.reviews',
             icon: 'i-lucide-circle',
             link: '/reviews',
+          },
+          {
+            title: 'nav.requested_buy',
+            icon: 'i-lucide-circle',
+            link: '/requested-buy',
           },
         ],
       },
