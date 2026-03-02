@@ -11,6 +11,30 @@ import presetAnimations from 'unocss-preset-animations';
 import { builtinColors, presetShadcn } from 'unocss-preset-shadcn';
 
 export default defineConfig({
+  safelist: [
+    // Active Status
+    'bg-green-100', 'text-green-700', 'border-green-200', 'bg-green-500',
+    'dark:bg-green-700/20', 'dark:text-green-400', 'dark:border-green-600/30',
+    'dark:bg-green-400',
+    // Inactive Status
+    'bg-red-100', 'text-red-700', 'border-red-200', 'bg-red-500',
+    'dark:bg-red-700/20', 'dark:text-red-400', 'dark:border-red-600/30',
+    'dark:bg-red-400',
+    // Default Status
+    'bg-gray-100', 'text-gray-600', 'border-gray-200', 'bg-gray-400',
+    'dark:bg-gray-600/20', 'dark:text-gray-400', 'dark:border-gray-500/30',
+    // Backgrounds & Text (Badge)
+    'bg-green-100', 'text-green-700', 'border-green-200',
+    'bg-red-100', 'text-red-700', 'border-red-200',
+    'bg-gray-100', 'text-gray-600', 'border-gray-200',
+    // Dot Classes (The circle)
+    'w-1.5', 'h-1.5', 'mr-1.5', 'rounded-full',
+    'bg-green-500', 'bg-red-500', 'bg-gray-400',
+    // Dark Mode Versions
+    'dark:bg-green-700/20', 'dark:text-green-400', 'dark:border-green-600/30', 'dark:bg-green-400',
+    'dark:bg-red-700/20', 'dark:text-red-400', 'dark:border-red-600/30', 'dark:bg-red-400',
+    'dark:bg-gray-600/20', 'dark:text-gray-400', 'dark:border-gray-500/30'
+  ],
   variants: [
     {
       // nth-[]:class
