@@ -60,60 +60,6 @@ export const navMenu: NavMenu[] = [
       },
     ],
   },
-  // --- Home page ---
-  {
-    heading: 'nav.home_page',
-    items: [
-      {
-        title: 'nav.content_management',
-        icon: 'i-lucide-table-of-contents',
-        children: [
-          {
-            title: 'nav.content_blocks',
-            icon: 'i-lucide-circle',
-            link: '/content-blocks',
-          },
-          {
-            title: 'nav.service_cards',
-            icon: 'i-lucide-circle',
-            link: '/service-cards',
-          },
-          {
-            title: 'nav.news',
-            icon: 'i-lucide-circle',
-            link: '/news',
-          },
-          {
-            title: 'nav.aboutUs',
-            icon: 'i-lucide-circle',
-            link: '/about-us',
-          },
-        ],
-      },
-      {
-        title: 'nav.orders_sales',
-        icon: 'i-lucide-credit-card',
-        meta: { roles: ['admin'] },
-        children: [
-          {
-            title: 'nav.all_orders',
-            icon: 'i-lucide-circle',
-            link: '/orders',
-          },
-          {
-            title: 'nav.pending_orders',
-            icon: 'i-lucide-circle',
-            link: '/orders/pending',
-          },
-          // {
-          //   title: 'nav.sales_reports',
-          //   icon: 'i-lucide-circle',
-          //   link: '/reports/sales',
-          // },
-        ],
-      },
-    ],
-  },
   // --- Product & Sales ---
   {
     heading: 'nav.product_sales',
@@ -122,47 +68,6 @@ export const navMenu: NavMenu[] = [
         title: 'nav.store',
         icon: 'i-lucide-store',
         link: '/stores',
-      },
-      {
-        title: 'nav.car_inventory',
-        icon: 'i-lucide-shopping-basket',
-        children: [
-          {
-            title: 'nav.store_inventories',
-            icon: 'i-lucide-circle',
-            link: '/store-products',
-          },
-          {
-            title: 'nav.manage_brands',
-            icon: 'i-lucide-circle',
-            link: '/brands',
-          },
-          {
-            title: 'nav.models',
-            icon: 'i-lucide-circle',
-            link: '/models',
-          },
-          {
-            title: 'nav.body_types',
-            icon: 'i-lucide-circle',
-            link: '/body-types',
-          },
-          {
-            title: 'nav.cars',
-            icon: 'i-lucide-circle',
-            link: '/cars',
-          },
-          {
-            title: 'nav.user_listings',
-            icon: 'i-lucide-circle',
-            link: '/user-listings',
-          },
-          {
-            title: 'nav.reviews',
-            icon: 'i-lucide-circle',
-            link: '/reviews',
-          },
-        ],
       },
       {
         title: 'nav.accessory_inventory',
