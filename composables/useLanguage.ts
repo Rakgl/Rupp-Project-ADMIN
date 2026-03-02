@@ -66,7 +66,7 @@ export const useLanguage = () => {
    */
   const setLanguage = async (language: string, saveToProfile = true) => {
     try {
-      const supportedLocales = ['en', 'km']
+      const supportedLocales = ['en', 'kh']
 
       if (!supportedLocales.includes(language)) {
         console.warn(`[Language] Unsupported language: ${language}, defaulting to 'en'`)
@@ -97,7 +97,7 @@ export const useLanguage = () => {
   const getAvailableLanguages = () => {
     return [
       { code: 'en', name: 'English', nativeName: 'English' },
-      { code: 'km', name: 'Khmer', nativeName: 'ខ្មែរ' },
+      { code: 'kh', name: 'Khmer', nativeName: 'ខ្មែរ' },
     ]
   }
 

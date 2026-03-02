@@ -33,7 +33,7 @@ const { toast } = useToast()
 const { t } = useI18n()
 const api = useApi()
 
-const locales = ['en', 'km']
+const locales = ['en', 'kh']
 const defaultLocale = 'en'
 
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
@@ -187,26 +187,14 @@ async function handleCreateCard() {
   <div>
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          :placeholder="t('serviceCards.toolbar.filterByTitle', 'Filter by Title')"
-          v.model="localSearchValue"
-          class="h-9 w-full lg:w-[280px] sm:w-[180px]"
-        />
+        <Input :placeholder="t('serviceCards.toolbar.filterByTitle', 'Filter by Title')" v.model="localSearchValue"
+          class="h-9 w-full lg:w-[280px] sm:w-[180px]" />
 
-        <DataTableFacetedFilter
-          v-if="table.getColumn('status')"
-          :column="table.getColumn('status')"
-          :title="t('serviceCards.columns.status')"
-          :options="serviceCardStatuses"
-        />
+        <DataTableFacetedFilter v-if="table.getColumn('status')" :column="table.getColumn('status')"
+          :title="t('serviceCards.columns.status')" :options="serviceCardStatuses" />
 
         <div class="flex items-center gap-2">
-          <Button
-            v-if="isFiltered"
-            variant="ghost"
-            class="h-9 px-3 text-sm"
-            @click="() => table.resetColumnFilters()"
-          >
+          <Button v-if="isFiltered" variant="ghost" class="h-9 px-3 text-sm" @click="() => table.resetColumnFilters()">
             {{ t('common.reset') }}
             <XIcon class="ml-2 h-4 w-4" />
           </Button>
@@ -220,9 +208,7 @@ async function handleCreateCard() {
               <BadgePlus class="mr-2 h-4 w-4" /> {{ t('serviceCards.toolbar.new') }}
             </Button>
           </DialogTrigger>
-          <DialogContent
-            class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl"
-          >
+          <DialogContent class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl">
             <DialogHeader>
               <DialogTitle class="text-xl font-semibold">
                 {{ t('serviceCards.dialog.create.title') }}
@@ -232,25 +218,19 @@ async function handleCreateCard() {
               </DialogDescription>
             </DialogHeader>
 
-            <div
-              v-if="createCardError"
-              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-            >
+            <div v-if="createCardError"
+              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <strong>{{ t('common.error') }}</strong> {{ createCardError }}
             </div>
 
             <div class="overflow-y-auto p-6 space-y-6">
               <div>
-                <Label for="createImage" class="mb-1 block text-sm font-medium">{{ t('serviceCards.dialog.create.form.image.label') }}
+                <Label for="createImage" class="mb-1 block text-sm font-medium">{{
+                  t('serviceCards.dialog.create.form.image.label') }}
                   <span class="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="createImage"
-                  type="file"
-                  :disabled="isLoadingCreateCard"
-                  accept="image/png, image/jpeg, image/webp"
-                  @change="onFileChange"
-                />
+                <Input id="createImage" type="file" :disabled="isLoadingCreateCard"
+                  accept="image/png, image/jpeg, image/webp" @change="onFileChange" />
                 <p class="mt-1 text-xs text-muted-foreground">
                   Required.
                 </p>
@@ -266,53 +246,39 @@ async function handleCreateCard() {
                     Title ({{ loc.toUpperCase() }})
                     <span v-if="loc === defaultLocale" class="text-destructive">*</span>
                   </Label>
-                  <Input
-                    :id="`title-${loc}`"
-                    v-model="newCardData.title[loc]"
-                    :disabled="isLoadingCreateCard"
-                  />
+                  <Input :id="`title-${loc}`" v-model="newCardData.title[loc]" :disabled="isLoadingCreateCard" />
                 </div>
 
                 <div v-for="loc in locales" :key="loc">
                   <Label :for="`desc-${loc}`" class="mb-1 block text-sm font-medium">
                     Description ({{ loc.toUpperCase() }})
                   </Label>
-                  <Textarea
-                    :id="`desc-${loc}`"
-                    v-model="newCardData.description[loc]"
-                    :disabled="isLoadingCreateCard"
-                    rows="3"
-                  />
+                  <Textarea :id="`desc-${loc}`" v-model="newCardData.description[loc]" :disabled="isLoadingCreateCard"
+                    rows="3" />
                 </div>
 
                 <div v-for="loc in locales" :key="loc">
                   <Label :for="`button-text-${loc}`" class="mb-1 block text-sm font-medium">
                     Button Text ({{ loc.toUpperCase() }})
                   </Label>
-                  <Input
-                    :id="`button-text-${loc}`"
-                    v-model="newCardData.button_text[loc]"
-                    :disabled="isLoadingCreateCard"
-                  />
+                  <Input :id="`button-text-${loc}`" v-model="newCardData.button_text[loc]"
+                    :disabled="isLoadingCreateCard" />
                 </div>
               </div>
             </div>
 
             <DialogFooter
-              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
-            >
-              <Button
-                type="button"
-                variant="outline"
-                :disabled="isLoadingCreateCard"
-                @click="isCreateCardDialogOpen = false"
-              >
+              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+              <Button type="button" variant="outline" :disabled="isLoadingCreateCard"
+                @click="isCreateCardDialogOpen = false">
                 {{ t('common.cancel') }}
               </Button>
               <Button type="button" :disabled="isCreateCardSaveDisabled" @click="handleCreateCard">
-                <svg v-if="isLoadingCreateCard" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg v-if="isLoadingCreateCard" class="mr-3 h-5 w-5 animate-spin -ml-1"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 {{ isLoadingCreateCard ? t('common.creating') : t('serviceCards.toolbar.new') }}
               </Button>

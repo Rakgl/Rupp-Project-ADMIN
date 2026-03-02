@@ -38,7 +38,7 @@ const { toast } = useToast()
 const { t } = useI18n()
 const api = useApi()
 
-const locales = ['en', 'km']
+const locales = ['en', 'kh']
 const defaultLocale = 'en'
 
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
@@ -164,12 +164,7 @@ async function handleCreateBlock() {
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div class="flex items-center gap-2">
-          <Button
-            v-if="isFiltered"
-            variant="ghost"
-            class="h-9 px-3 text-sm"
-            @click="() => table.resetColumnFilters()"
-          >
+          <Button v-if="isFiltered" variant="ghost" class="h-9 px-3 text-sm" @click="() => table.resetColumnFilters()">
             {{ t('common.reset') }}
             <XIcon class="ml-2 h-4 w-4" />
           </Button>
@@ -193,10 +188,8 @@ async function handleCreateBlock() {
               </DialogDescription>
             </DialogHeader>
 
-            <div
-              v-if="createBlockError"
-              class="mx-6 mt-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-            >
+            <div v-if="createBlockError"
+              class="mx-6 mt-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <strong>{{ t('common.error') }}</strong> {{ createBlockError }}
             </div>
 
@@ -222,14 +215,8 @@ async function handleCreateBlock() {
                       <FileImage class="h-4 w-4" />
                       {{ t('contentBlocks.dialog.create.form.image.label') }}
                     </Label>
-                    <Input
-                      id="createImage"
-                      type="file"
-                      class="cursor-pointer"
-                      :disabled="isLoadingCreateBlock"
-                      accept="image/png, image/jpeg, image/webp"
-                      @change="onFileChange"
-                    />
+                    <Input id="createImage" type="file" class="cursor-pointer" :disabled="isLoadingCreateBlock"
+                      accept="image/png, image/jpeg, image/webp" @change="onFileChange" />
                   </div>
                 </div>
 
@@ -250,12 +237,8 @@ async function handleCreateBlock() {
                       {{ t('contentBlocks.dialog.create.form.title.label', { lang: loc.toUpperCase() }) }}
                       <span v-if="loc === defaultLocale" class="text-destructive">*</span>
                     </Label>
-                    <Input
-                      :id="`title-${loc}`"
-                      v-model="newBlockData.title[loc]"
-                      :placeholder="`Enter ${loc.toUpperCase()} title...`"
-                      :disabled="isLoadingCreateBlock"
-                    />
+                    <Input :id="`title-${loc}`" v-model="newBlockData.title[loc]"
+                      :placeholder="`Enter ${loc.toUpperCase()} title...`" :disabled="isLoadingCreateBlock" />
                   </div>
                 </div>
 
@@ -264,11 +247,8 @@ async function handleCreateBlock() {
                     <Label :for="`booking-btn-${loc}`" class="text-sm font-medium">
                       {{ t('contentBlocks.dialog.create.form.bookingBtn.label', { lang: loc.toUpperCase() }) }}
                     </Label>
-                    <Input
-                      :id="`booking-btn-${loc}`"
-                      v-model="newBlockData.booking_btn[loc]"
-                      :disabled="isLoadingCreateBlock"
-                    />
+                    <Input :id="`booking-btn-${loc}`" v-model="newBlockData.booking_btn[loc]"
+                      :disabled="isLoadingCreateBlock" />
                   </div>
                 </div>
 
@@ -277,13 +257,8 @@ async function handleCreateBlock() {
                     <Label :for="`desc-${loc}`" class="text-sm font-medium">
                       {{ t('contentBlocks.dialog.create.form.description.label', { lang: loc.toUpperCase() }) }}
                     </Label>
-                    <Textarea
-                      :id="`desc-${loc}`"
-                      v-model="newBlockData.description[loc]"
-                      :disabled="isLoadingCreateBlock"
-                      class="resize-none min-h-[100px]"
-                      rows="4"
-                    />
+                    <Textarea :id="`desc-${loc}`" v-model="newBlockData.description[loc]"
+                      :disabled="isLoadingCreateBlock" class="resize-none min-h-[100px]" rows="4" />
                   </div>
                 </div>
 
@@ -292,24 +267,16 @@ async function handleCreateBlock() {
 
             <DialogFooter class="border-t px-6 py-4">
               <div class="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 w-full">
-                <Button
-                  type="button"
-                  variant="outline"
-                  :disabled="isLoadingCreateBlock"
-                  @click="isCreateBlockDialogOpen = false"
-                >
+                <Button type="button" variant="outline" :disabled="isLoadingCreateBlock"
+                  @click="isCreateBlockDialogOpen = false">
                   {{ t('common.cancel') }}
                 </Button>
                 <Button type="button" :disabled="isCreateBlockSaveDisabled" @click="handleCreateBlock">
-                  <svg
-                    v-if="isLoadingCreateBlock"
-                    class="mr-2 h-4 w-4 animate-spin"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
+                  <svg v-if="isLoadingCreateBlock" class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <path class="opacity-75" fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                   {{ isLoadingCreateBlock ? t('common.creating') : t('contentBlocks.toolbar.new') }}
                 </Button>

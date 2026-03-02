@@ -38,7 +38,7 @@ const { toast } = useToast()
 const { t } = useI18n()
 const api = useApi()
 
-const locales = ['en', 'km']
+const locales = ['en', 'kh']
 const defaultLocale = 'en'
 
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
@@ -145,7 +145,7 @@ async function handleCreate() {
         title: t('aboutUs.dialog.create.success.title'),
         description: t('aboutUs.dialog.create.success.description'),
       })
-      props.table.options.meta?.onDataChanged?.()
+      props.onDataChanged?.()
     }
     else {
       createError.value = response.message || 'Failed to create About Us entry.'
@@ -170,12 +170,7 @@ async function handleCreate() {
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div class="flex items-center gap-2">
-          <Button
-            v-if="isFiltered"
-            variant="ghost"
-            class="h-9 px-3 text-sm"
-            @click="() => table.resetColumnFilters()"
-          >
+          <Button v-if="isFiltered" variant="ghost" class="h-9 px-3 text-sm" @click="() => table.resetColumnFilters()">
             {{ t('common.reset') }}
             <XIcon class="ml-2 h-4 w-4" />
           </Button>
@@ -189,9 +184,7 @@ async function handleCreate() {
               <BadgePlus class="mr-2 h-4 w-4" /> {{ t('aboutUs.toolbar.new') }}
             </Button>
           </DialogTrigger>
-          <DialogContent
-            class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl"
-          >
+          <DialogContent class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-3xl sm:max-w-xl">
             <DialogHeader>
               <DialogTitle class="text-xl font-semibold">
                 {{ t('aboutUs.dialog.create.title') }}
@@ -201,10 +194,8 @@ async function handleCreate() {
               </DialogDescription>
             </DialogHeader>
 
-            <div
-              v-if="createError"
-              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-            >
+            <div v-if="createError"
+              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <strong>{{ t('common.error') }}</strong> {{ createError }}
             </div>
 
@@ -226,13 +217,8 @@ async function handleCreate() {
 
               <div>
                 <Label for="createImage" class="mb-1 block text-sm font-medium">Image</Label>
-                <Input
-                  id="createImage"
-                  type="file"
-                  :disabled="isLoadingCreate"
-                  accept="image/png, image/jpeg, image/webp"
-                  @change="onFileChange"
-                />
+                <Input id="createImage" type="file" :disabled="isLoadingCreate"
+                  accept="image/png, image/jpeg, image/webp" @change="onFileChange" />
               </div>
 
               <div class="border-t pt-4 space-y-4">
@@ -243,13 +229,10 @@ async function handleCreate() {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div v-for="loc in locales" :key="`title-${loc}`">
                     <Label :for="`title-${loc}`" class="mb-1 block text-sm font-medium">
-                      Title ({{ loc.toUpperCase() }}) <span v-if="loc === defaultLocale" class="text-destructive">*</span>
+                      Title ({{ loc.toUpperCase() }}) <span v-if="loc === defaultLocale"
+                        class="text-destructive">*</span>
                     </Label>
-                    <Input
-                      :id="`title-${loc}`"
-                      v-model="newData.title[loc]"
-                      :disabled="isLoadingCreate"
-                    />
+                    <Input :id="`title-${loc}`" v-model="newData.title[loc]" :disabled="isLoadingCreate" />
                   </div>
                 </div>
 
@@ -258,12 +241,8 @@ async function handleCreate() {
                     <Label :for="`desc-${loc}`" class="mb-1 block text-sm font-medium">
                       Description ({{ loc.toUpperCase() }})
                     </Label>
-                    <Textarea
-                      :id="`desc-${loc}`"
-                      v-model="newData.description[loc]"
-                      :disabled="isLoadingCreate"
-                      rows="3"
-                    />
+                    <Textarea :id="`desc-${loc}`" v-model="newData.description[loc]" :disabled="isLoadingCreate"
+                      rows="3" />
                   </div>
                 </div>
 
@@ -273,13 +252,8 @@ async function handleCreate() {
                       List Items ({{ loc.toUpperCase() }})
                       <span class="text-xs text-muted-foreground block font-normal">One item per line</span>
                     </Label>
-                    <Textarea
-                      :id="`list-${loc}`"
-                      v-model="newData.list_text[loc]"
-                      :disabled="isLoadingCreate"
-                      placeholder="- Item 1&#10;- Item 2"
-                      rows="4"
-                    />
+                    <Textarea :id="`list-${loc}`" v-model="newData.list_text[loc]" :disabled="isLoadingCreate"
+                      placeholder="- Item 1&#10;- Item 2" rows="4" />
                   </div>
                 </div>
 
@@ -287,26 +261,16 @@ async function handleCreate() {
             </div>
 
             <DialogFooter
-              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
-            >
-              <Button
-                type="button"
-                variant="outline"
-                :disabled="isLoadingCreate"
-                @click="isCreateDialogOpen = false"
-              >
+              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+              <Button type="button" variant="outline" :disabled="isLoadingCreate" @click="isCreateDialogOpen = false">
                 {{ t('common.cancel') }}
               </Button>
               <Button type="button" :disabled="isCreateSaveDisabled" @click="handleCreate">
-                <svg
-                  v-if="isLoadingCreate"
-                  class="mr-3 h-5 w-5 animate-spin -ml-1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
+                <svg v-if="isLoadingCreate" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg"
+                  fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 {{ isLoadingCreate ? t('common.creating') : t('common.create') }}
               </Button>

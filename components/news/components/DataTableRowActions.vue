@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { newsStatuses } from '../data/data' 
+import { newsStatuses } from '../data/data'
 
 interface RowActionsProps {
   row: Row<News>
@@ -114,9 +114,9 @@ async function handleSaveChanges() {
   // Use _method PUT for multipart/form-data update in Laravel
   formData.append('_method', 'PUT')
 
-  formData.append('status', itemToEdit.value.status) 
+  formData.append('status', itemToEdit.value.status)
 
-  const locales = ['en', 'km']
+  const locales = ['en', 'kh']
   for (const loc of locales) {
     // Note: Use 'as keyof typeof...' if TS complains, or generic access
     const nameVal = (itemToEdit.value.name as any)[loc] || ''
@@ -201,7 +201,8 @@ function onFileChange(event: Event) {
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" class="h-8 w-8 flex p-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
+            <path fill="currentColor"
+              d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
           </svg>
           <span class="sr-only">{{ t('common.openMenu') }}</span>
         </Button>
@@ -228,11 +229,13 @@ function onFileChange(event: Event) {
           </DialogDescription>
         </DialogHeader>
 
-        <div v-if="isLoading && !itemToEdit" class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
+        <div v-if="isLoading && !itemToEdit"
+          class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
           {{ t('common.loading') }}
         </div>
 
-        <div v-else-if="editError && !itemToEdit" class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div v-else-if="editError && !itemToEdit"
+          class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <strong>{{ t('common.error') }}</strong>
         </div>
 
@@ -244,36 +247,26 @@ function onFileChange(event: Event) {
                 <SelectValue :placeholder="itemToEdit.status || 'Select status'" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem 
-                  v-for="status in newsStatuses" 
-                  :key="status.value" 
-                  :value="status.value"
-                >
+                <SelectItem v-for="status in newsStatuses" :key="status.value" :value="status.value">
                   {{ status.label }}
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div v-if="editError" class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div v-if="editError"
+            class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <strong>{{ t('common.error') }}</strong> {{ editError }}
           </div>
 
           <div>
             <Label for="editImage" class="mb-1 block text-sm font-medium">Image</Label>
             <div v-if="itemToEdit.image_url && !newImageFile" class="mb-2">
-              <img 
-                :src="itemToEdit.image_url.startsWith('http') ? itemToEdit.image_url : `${useRuntimeConfig().public.apiBase.replace(/\/api\/?$/, '')}/${itemToEdit.image_url}`" 
-                alt="Current Image" 
-                class="max-h-32 border rounded-md"
-              >
+              <img
+                :src="itemToEdit.image_url.startsWith('http') ? itemToEdit.image_url : `${useRuntimeConfig().public.apiBase.replace(/\/api\/?$/, '')}/${itemToEdit.image_url}`"
+                alt="Current Image" class="max-h-32 border rounded-md">
             </div>
-            <Input
-              id="editImage"
-              type="file"
-              :disabled="isLoading"
-              accept="image/png, image/jpeg, image/webp"
-              @change="onFileChange"
-            />
+            <Input id="editImage" type="file" :disabled="isLoading" accept="image/png, image/jpeg, image/webp"
+              @change="onFileChange" />
             <p class="mt-1 text-xs text-muted-foreground">
               Upload a new file to replace the current image.
             </p>
@@ -286,7 +279,8 @@ function onFileChange(event: Event) {
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <Label for="name-en" class="mb-1 block text-sm font-medium">Name (English) <span class="text-destructive">*</span></Label>
+                <Label for="name-en" class="mb-1 block text-sm font-medium">Name (English) <span
+                    class="text-destructive">*</span></Label>
                 <Input id="name-en" v-model="itemToEdit.name.en" :disabled="isLoading" />
               </div>
               <div>
@@ -306,18 +300,21 @@ function onFileChange(event: Event) {
           </div>
         </div>
 
-        <DialogFooter v-if="itemToEdit" class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+        <DialogFooter v-if="itemToEdit"
+          class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
           <Button type="button" variant="outline" :disabled="isLoading" @click="isEditDialogOpen = false">
             {{ t('common.cancel') }}
           </Button>
           <Button type="button" :disabled="isSaveDisabled" @click="handleSaveChanges">
-            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{ isLoading ? t('common.saving') : t('common.saveChanges') }}
           </Button>
-        </DialogFooter> 
+        </DialogFooter>
       </DialogContent>
     </Dialog>
 
@@ -333,10 +330,13 @@ function onFileChange(event: Event) {
           <AlertDialogCancel :disabled="isLoading">
             {{ t('common.cancel') }}
           </AlertDialogCancel>
-          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading" @click="confirmDeleteItem">
-            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading"
+            @click="confirmDeleteItem">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{ isLoading ? t('common.deleting') : t('common.yesDelete') }}
           </AlertDialogAction>

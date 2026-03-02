@@ -12,8 +12,8 @@ export const useLanguageFont = () => {
       font: 'font-sans',
       fallback: 'Parkinsans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     },
-    km: {
-      code: 'km',
+    kh: {
+      code: 'kh',
       font: 'font-khmer',
       fallback: 'Kantumruy Pro, "Khmer OS System", "Khmer OS", sans-serif',
     },
@@ -42,7 +42,7 @@ export const useLanguageFont = () => {
     if (!text) return 'en';
 
     // Khmer Unicode range (U+1780–U+17FF)
-    if (/[\u1780-\u17FF]/.test(text)) return 'km';
+    if (/[\u1780-\u17FF]/.test(text)) return 'kh';
 
     // Default to English for any other text
     return 'en';

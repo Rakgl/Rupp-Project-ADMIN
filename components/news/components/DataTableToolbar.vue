@@ -41,7 +41,7 @@ const { toast } = useToast()
 const { t } = useI18n()
 const api = useApi()
 
-const locales = ['en', 'km']
+const locales = ['en', 'kh']
 const defaultLocale = 'en'
 
 const isFiltered = computed(() => props.table.getState().columnFilters.length > 0)
@@ -193,26 +193,14 @@ async function handleCreateNews() {
   <div>
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          :placeholder="t('news.toolbar.filterByName', 'Filter by Name')"
-          v-model="localSearchValue"
-          class="h-9 w-full lg:w-[280px] sm:w-[180px]"
-        />
+        <Input :placeholder="t('news.toolbar.filterByName', 'Filter by Name')" v-model="localSearchValue"
+          class="h-9 w-full lg:w-[280px] sm:w-[180px]" />
 
-        <DataTableFacetedFilter
-          v-if="table.getColumn('status')"
-          :column="table.getColumn('status')"
-          :title="t('status')"
-          :options="newsStatuses"
-        />
+        <DataTableFacetedFilter v-if="table.getColumn('status')" :column="table.getColumn('status')"
+          :title="t('status')" :options="newsStatuses" />
 
         <div class="flex items-center gap-2">
-          <Button
-            v-if="isFiltered"
-            variant="ghost"
-            class="h-9 px-3 text-sm"
-            @click="() => table.resetColumnFilters()"
-          >
+          <Button v-if="isFiltered" variant="ghost" class="h-9 px-3 text-sm" @click="() => table.resetColumnFilters()">
             {{ t('common.reset') }}
             <XIcon class="ml-2 h-4 w-4" />
           </Button>
@@ -226,19 +214,15 @@ async function handleCreateNews() {
               <BadgePlus class="mr-2 h-4 w-4" /> {{ t('news.create.title') }}
             </Button>
           </DialogTrigger>
-          <DialogContent
-            class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl"
-          >
+          <DialogContent class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl">
             <DialogHeader>
               <DialogTitle class="text-xl font-semibold">
                 {{ t('news.create.title') }}
               </DialogTitle>
             </DialogHeader>
 
-            <div
-              v-if="createNewsError"
-              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-            >
+            <div v-if="createNewsError"
+              class="mx-6 mt-4 flex-shrink-0 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <strong>{{ t('common.error') }}</strong> {{ createNewsError }}
             </div>
 
@@ -250,11 +234,7 @@ async function handleCreateNews() {
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem 
-                      v-for="status in newsStatuses" 
-                      :key="status.value" 
-                      :value="status.value"
-                    >
+                    <SelectItem v-for="status in newsStatuses" :key="status.value" :value="status.value">
                       {{ status.label }}
                     </SelectItem>
                   </SelectContent>
@@ -264,13 +244,8 @@ async function handleCreateNews() {
                 <Label for="createImage" class="mb-1 block text-sm font-medium">{{ t('image') }}
                   <span class="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="createImage"
-                  type="file"
-                  :disabled="isLoadingCreateNews"
-                  accept="image/png, image/jpeg, image/webp"
-                  @change="onFileChange"
-                />
+                <Input id="createImage" type="file" :disabled="isLoadingCreateNews"
+                  accept="image/png, image/jpeg, image/webp" @change="onFileChange" />
                 <p class="mt-1 text-xs text-muted-foreground">
                   Required.
                 </p>
@@ -286,42 +261,31 @@ async function handleCreateNews() {
                     Name ({{ loc.toUpperCase() }})
                     <span v-if="loc === defaultLocale" class="text-destructive">*</span>
                   </Label>
-                  <Input
-                    :id="`name-${loc}`"
-                    v-model="newNewsData.name[loc]"
-                    :disabled="isLoadingCreateNews"
-                  />
+                  <Input :id="`name-${loc}`" v-model="newNewsData.name[loc]" :disabled="isLoadingCreateNews" />
                 </div>
 
                 <div v-for="loc in locales" :key="loc">
                   <Label :for="`desc-${loc}`" class="mb-1 block text-sm font-medium">
                     Description ({{ loc.toUpperCase() }})
                   </Label>
-                  <Textarea
-                    :id="`desc-${loc}`"
-                    v-model="newNewsData.description[loc]"
-                    :disabled="isLoadingCreateNews"
-                    rows="3"
-                  />
+                  <Textarea :id="`desc-${loc}`" v-model="newNewsData.description[loc]" :disabled="isLoadingCreateNews"
+                    rows="3" />
                 </div>
               </div>
             </div>
 
             <DialogFooter
-              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
-            >
-              <Button
-                type="button"
-                variant="outline"
-                :disabled="isLoadingCreateNews"
-                @click="isCreateNewsDialogOpen = false"
-              >
+              class="flex flex-shrink-0 flex-col-reverse gap-2 border-t rounded-b-lg px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+              <Button type="button" variant="outline" :disabled="isLoadingCreateNews"
+                @click="isCreateNewsDialogOpen = false">
                 {{ t('common.cancel') }}
               </Button>
               <Button type="button" :disabled="isCreateNewsSaveDisabled" @click="handleCreateNews">
-                <svg v-if="isLoadingCreateNews" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg v-if="isLoadingCreateNews" class="mr-3 h-5 w-5 animate-spin -ml-1"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 {{ isLoadingCreateNews ? t('common.creating') : t('news.create.title') }}
               </Button>

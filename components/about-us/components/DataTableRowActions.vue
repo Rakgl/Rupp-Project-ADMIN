@@ -88,7 +88,7 @@ async function openEditDialog() {
 
     // Transform arrays to newline strings for the form
     const transformedListText: { [key: string]: string } = {}
-    const locales = ['en', 'km']
+    const locales = ['en', 'kh']
     locales.forEach(loc => {
       const list = data.list_text?.[loc as keyof typeof data.list_text]
       transformedListText[loc] = Array.isArray(list) ? list.join('\n') : ''
@@ -129,7 +129,7 @@ async function handleSaveChanges() {
   formData.append('_method', 'PUT')
   formData.append('status', itemToEdit.value.status)
 
-  const locales = ['en', 'km']
+  const locales = ['en', 'kh']
   for (const loc of locales) {
     const langKey = loc as keyof typeof itemToEdit.value.title
     formData.append(`title[${loc}]`, itemToEdit.value.title?.[langKey] || '')
@@ -223,7 +223,8 @@ function onFileChange(event: Event) {
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" class="h-8 w-8 flex p-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
+            <path fill="currentColor"
+              d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
           </svg>
           <span class="sr-only">{{ t('common.openMenu') }}</span>
         </Button>
@@ -233,10 +234,7 @@ function onFileChange(event: Event) {
           {{ t('common.edit') }}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          class="text-destructive focus:text-destructive"
-          @click="isDeleteDialogOpen = true"
-        >
+        <DropdownMenuItem class="text-destructive focus:text-destructive" @click="isDeleteDialogOpen = true">
           <span>{{ t('common.delete') }}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -253,16 +251,19 @@ function onFileChange(event: Event) {
           </DialogDescription>
         </DialogHeader>
 
-        <div v-if="isLoading && !itemToEdit" class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
+        <div v-if="isLoading && !itemToEdit"
+          class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
           {{ t('common.loading') }}
         </div>
 
-        <div v-else-if="editError && !itemToEdit" class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div v-else-if="editError && !itemToEdit"
+          class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <strong>{{ t('common.error') }}</strong>
         </div>
 
         <div v-if="itemToEdit" class="overflow-y-auto p-6 space-y-6">
-          <div v-if="editError" class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div v-if="editError"
+            class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <strong>{{ t('common.error') }}</strong> {{ editError }}
           </div>
 
@@ -286,19 +287,10 @@ function onFileChange(event: Event) {
             <div v-if="itemToEdit.image_url && !shouldDeleteImage && !newImageFile" class="mb-2">
               <img :src="itemToEdit.image_url" alt="Current Image" class="max-h-32 border rounded-md">
             </div>
-            <Input
-              id="editImage"
-              type="file"
-              :disabled="isLoading || shouldDeleteImage"
-              accept="image/png, image/jpeg, image/webp"
-              @change="onFileChange"
-            />
+            <Input id="editImage" type="file" :disabled="isLoading || shouldDeleteImage"
+              accept="image/png, image/jpeg, image/webp" @change="onFileChange" />
             <div v-if="itemToEdit.image_url" class="mt-3 flex items-center space-x-2">
-              <Checkbox
-                id="deleteImage"
-                v-model:checked="shouldDeleteImage"
-                :disabled="isLoading || !!newImageFile"
-              />
+              <Checkbox id="deleteImage" v-model:checked="shouldDeleteImage" :disabled="isLoading || !!newImageFile" />
               <Label for="deleteImage" class="text-sm text-destructive font-medium">
                 Remove current image
               </Label>
@@ -310,7 +302,8 @@ function onFileChange(event: Event) {
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
               <div>
-                <Label for="title-en" class="mb-1 block text-sm font-medium">Title (EN) <span class="text-destructive">*</span></Label>
+                <Label for="title-en" class="mb-1 block text-sm font-medium">Title (EN) <span
+                    class="text-destructive">*</span></Label>
                 <Input id="title-en" v-model="itemToEdit.title.en" :disabled="isLoading" />
               </div>
               <div class="md:col-span-3">
@@ -318,21 +311,23 @@ function onFileChange(event: Event) {
                 <Textarea id="desc-en" v-model="itemToEdit.description.en" :disabled="isLoading" rows="4" />
               </div>
               <div class="md:col-span-3">
-                <Label for="list-en" class="mb-1 block text-sm font-medium">List Items (EN) <span class="font-normal text-muted-foreground">(One per line)</span></Label>
+                <Label for="list-en" class="mb-1 block text-sm font-medium">List Items (EN) <span
+                    class="font-normal text-muted-foreground">(One per line)</span></Label>
                 <Textarea id="list-en" v-model="itemToEdit.list_text.en" :disabled="isLoading" rows="4" />
               </div>
 
               <div>
-                <Label for="title-km" class="mb-1 block text-sm font-medium">Title (KM)</Label>
-                <Input id="title-km" v-model="itemToEdit.title.km" :disabled="isLoading" />
+                <Label for="title-kh" class="mb-1 block text-sm font-medium">Title (KM)</Label>
+                <Input id="title-kh" v-model="itemToEdit.title.kh" :disabled="isLoading" />
               </div>
               <div class="md:col-span-3">
-                <Label for="desc-km" class="mb-1 block text-sm font-medium">Description (KM)</Label>
-                <Textarea id="desc-km" v-model="itemToEdit.description.km" :disabled="isLoading" rows="4" />
+                <Label for="desc-kh" class="mb-1 block text-sm font-medium">Description (KM)</Label>
+                <Textarea id="desc-kh" v-model="itemToEdit.description.kh" :disabled="isLoading" rows="4" />
               </div>
               <div class="md:col-span-3">
-                <Label for="list-km" class="mb-1 block text-sm font-medium">List Items (KM) <span class="font-normal text-muted-foreground">(One per line)</span></Label>
-                <Textarea id="list-km" v-model="itemToEdit.list_text.km" :disabled="isLoading" rows="4" />
+                <Label for="list-kh" class="mb-1 block text-sm font-medium">List Items (KM) <span
+                    class="text-xs text-muted-foreground font-normal">(One per line)</span></Label>
+                <Textarea id="list-kh" v-model="itemToEdit.list_text.kh" :disabled="isLoading" rows="4" />
               </div>
 
 
@@ -341,14 +336,17 @@ function onFileChange(event: Event) {
           </div>
         </div>
 
-        <DialogFooter v-if="itemToEdit" class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+        <DialogFooter v-if="itemToEdit"
+          class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
           <Button type="button" variant="outline" :disabled="isLoading" @click="isEditDialogOpen = false">
             {{ t('common.cancel') }}
           </Button>
           <Button type="button" :disabled="isSaveDisabled" @click="handleSaveChanges">
-            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{ isLoading ? t('common.saving') : t('common.saveChanges') }}
           </Button>
@@ -366,7 +364,8 @@ function onFileChange(event: Event) {
         </AlertDialogHeader>
         <AlertDialogFooter class="flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <AlertDialogCancel :disabled="isLoading">{{ t('common.cancel') }}</AlertDialogCancel>
-          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading" @click="confirmDeleteItem">
+          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading"
+            @click="confirmDeleteItem">
             {{ isLoading ? t('common.deleting') : t('common.yesDelete') }}
           </AlertDialogAction>
         </AlertDialogFooter>

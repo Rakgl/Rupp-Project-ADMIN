@@ -26,7 +26,7 @@ useHead({
   },
 });
 
-const title = 'Car service dashboard';
+const title = 'Dashboard';
 const description =
   'This dashboard, built with Nuxt, Shadcn UI, and UnoCSS. It includes a dark mode toggle and is optimized for performance and data efficiency.';
 

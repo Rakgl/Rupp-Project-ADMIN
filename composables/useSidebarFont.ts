@@ -46,7 +46,7 @@ export const useSidebarFont = () => {
         { title: 'Medical Records', subtitle: 'Health Documentation' },
         { title: 'Reports', subtitle: 'Data & Statistics' },
       ],
-      km: [
+      kh: [
         { title: 'ផ្ទាំងគ្រប់គ្រង', subtitle: 'ទិដ្ឋភាព និងការវិភាគ' },
         { title: 'អ្នកជំងឺ', subtitle: 'ការគ្រប់គ្រងអ្នកជំងឺ' },
         { title: 'ការណាត់ជួប', subtitle: 'កាលវិភាគ និងតារាង' },

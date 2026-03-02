@@ -62,31 +62,31 @@ export default defineNuxtConfig({
 
   vite: process.env.PROXY_API_URL
     ? {
-        server: {
-          compression: false,
+      server: {
+        compression: false,
 
-          proxy: {
-            '/api/v1/admin': {
-              target: process.env.PROXY_API_URL,
-              changeOrigin: true,
-              secure: false,
-              headers: {
-                'Accept-Encoding': 'identity',
-              },
+        proxy: {
+          '/api/v1/admin': {
+            target: process.env.PROXY_API_URL,
+            changeOrigin: true,
+            secure: false,
+            headers: {
+              'Accept-Encoding': 'identity',
+            },
 
-              configure: (proxy, _options) => {
-                console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL)
-                proxy.on('proxyReq', (proxyReq, req, _res) => {
-                  console.log('📤 Proxying:', req.method, req.url)
-                })
-                proxy.on('proxyRes', (proxyRes, req, _res) => {
-                  console.log('📥 Response:', proxyRes.statusCode, req.url)
-                })
-              },
+            configure: (proxy, _options) => {
+              console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL)
+              proxy.on('proxyReq', (proxyReq, req, _res) => {
+                console.log('📤 Proxying:', req.method, req.url)
+              })
+              proxy.on('proxyRes', (proxyRes, req, _res) => {
+                console.log('📥 Response:', proxyRes.statusCode, req.url)
+              })
             },
           },
         },
-      }
+      },
+    }
     : {},
 
   css: [
@@ -137,7 +137,7 @@ export default defineNuxtConfig({
     },
     locales: [
       { code: 'en', name: 'English' },
-      { code: 'km', name: 'Khmer' },
+      { code: 'kh', name: 'Khmer' },
     ],
   },
 

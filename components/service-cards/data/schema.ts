@@ -4,8 +4,8 @@ import { z } from 'zod'
 // Helper for multilingual fields
 const MultilingualString = z.object({
   en: z.string().default(''),
-  km: z.string().default(''),
-}).default({ en: '', km: '' })
+  kh: z.string().default(''),
+}).default({ en: '', kh: '' })
 
 // Schema for our ServiceCard API
 export const ServiceCardSchema = z.object({

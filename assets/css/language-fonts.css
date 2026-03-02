@@ -71,8 +71,8 @@ body {
     letter-spacing: 0;
 }
 
-[lang='km'] {
-    font-family: var(--font-km);
+[lang='kh'] {
+    font-family: 'Kantumruy Pro', sans-serif;
     line-height: 1.7;
     letter-spacing: 0.01em;
 }

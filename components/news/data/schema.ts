@@ -3,8 +3,8 @@ import { z } from 'zod'
 // Helper for multilingual fields (EN and KM only as requested)
 const MultilingualString = z.object({
   en: z.string().default(''),
-  km: z.string().default(''),
-}).default({ en: '', km: '' })
+  kh: z.string().default(''),
+}).default({ en: '', kh: '' })
 
 // Schema for our News API
 export const NewsSchema = z.object({

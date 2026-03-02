@@ -25,7 +25,7 @@ const fontInfo = {
     optimizedFor: 'Excellent readability, friendly appearance, versatile UI usage',
     lineHeight: '1.4-1.5 (sidebar optimized)',
   },
-  km: {
+  kh: {
     name: 'Kantumruy Pro',
     purpose: 'Modern Khmer font designed for digital interfaces',
     optimizedFor: 'Clean Khmer rendering, contemporary design, UI optimization',
@@ -36,7 +36,7 @@ const fontInfo = {
 function getLanguageName(code) {
   const names = {
     en: 'English',
-    km: 'Khmer (ខ្មែរ)',
+    kh: 'Khmer (ខ្មែរ)',
   }
   return names[code] || code
 }
@@ -95,16 +95,8 @@ function getLanguageName(code) {
                 </div>
                 <div class="border-l-2 border-gray-200 pl-4 space-y-2">
                   <div v-for="item in items" :key="item.title" class="rounded-lg bg-gray-50/50 p-3">
-                    <LanguageText
-                      :text="item.title"
-                      :language="lang"
-                      class="mb-1 block text-gray-900 font-medium"
-                    />
-                    <LanguageText
-                      :text="item.subtitle"
-                      :language="lang"
-                      class="text-sm text-gray-600"
-                    />
+                    <LanguageText :text="item.title" :language="lang" class="mb-1 block text-gray-900 font-medium" />
+                    <LanguageText :text="item.subtitle" :language="lang" class="text-sm text-gray-600" />
                   </div>
                 </div>
               </div>

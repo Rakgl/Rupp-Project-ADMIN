@@ -105,7 +105,7 @@ async function handleSaveChanges() {
   // Slug REMOVED
   // Button Link REMOVED
 
-  const locales = ['en', 'km']
+  const locales = ['en', 'kh']
   for (const loc of locales) {
     // Note: Use 'as keyof typeof...' if TS complains, or generic access
     const titleVal = (itemToEdit.value.title as any)[loc] || ''
@@ -193,7 +193,8 @@ function onFileChange(event: Event) {
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" class="h-8 w-8 flex p-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
+            <path fill="currentColor"
+              d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
           </svg>
           <span class="sr-only">{{ t('common.openMenu') }}</span>
         </Button>
@@ -220,16 +221,19 @@ function onFileChange(event: Event) {
           </DialogDescription>
         </DialogHeader>
 
-        <div v-if="isLoading && !itemToEdit" class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
+        <div v-if="isLoading && !itemToEdit"
+          class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
           {{ t('common.loading') }}
         </div>
 
-        <div v-else-if="editError && !itemToEdit" class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div v-else-if="editError && !itemToEdit"
+          class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <strong>{{ t('common.error') }}</strong>
         </div>
 
         <div v-if="itemToEdit" class="overflow-y-auto p-6 space-y-6">
-          <div v-if="editError" class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <div v-if="editError"
+            class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <strong>{{ t('common.error') }}</strong> {{ editError }}
           </div>
 
@@ -238,13 +242,8 @@ function onFileChange(event: Event) {
             <div v-if="itemToEdit.image_url && !newImageFile" class="mb-2">
               <img :src="itemToEdit.image_url" alt="Current Image" class="max-h-32 border rounded-md">
             </div>
-            <Input
-              id="editImage"
-              type="file"
-              :disabled="isLoading"
-              accept="image/png, image/jpeg, image/webp"
-              @change="onFileChange"
-            />
+            <Input id="editImage" type="file" :disabled="isLoading" accept="image/png, image/jpeg, image/webp"
+              @change="onFileChange" />
             <p class="mt-1 text-xs text-muted-foreground">
               Upload a new file to replace the current image.
             </p>
@@ -257,7 +256,8 @@ function onFileChange(event: Event) {
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
               <div>
-                <Label for="title-en" class="mb-1 block text-sm font-medium">Title (English) <span class="text-destructive">*</span></Label>
+                <Label for="title-en" class="mb-1 block text-sm font-medium">Title (English) <span
+                    class="text-destructive">*</span></Label>
                 <Input id="title-en" v-model="itemToEdit.title.en" :disabled="isLoading" />
               </div>
               <div>
@@ -289,14 +289,17 @@ function onFileChange(event: Event) {
           </div>
         </div>
 
-        <DialogFooter v-if="itemToEdit" class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+        <DialogFooter v-if="itemToEdit"
+          class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
           <Button type="button" variant="outline" :disabled="isLoading" @click="isEditDialogOpen = false">
             {{ t('common.cancel') }}
           </Button>
           <Button type="button" :disabled="isSaveDisabled" @click="handleSaveChanges">
-            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{ isLoading ? t('common.saving') : t('common.saveChanges') }}
           </Button>
@@ -316,10 +319,13 @@ function onFileChange(event: Event) {
           <AlertDialogCancel :disabled="isLoading">
             {{ t('common.cancel') }}
           </AlertDialogCancel>
-          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading" @click="confirmDeleteItem">
-            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading"
+            @click="confirmDeleteItem">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{ isLoading ? t('common.deleting') : t('common.yesDelete') }}
           </AlertDialogAction>

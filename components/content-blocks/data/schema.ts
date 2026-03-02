@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const multilingualSchema = z.object({
   en: z.string(),
-  km: z.string(),
+  kh: z.string(),
 })
 
 export const contentBlockSchema = z.object({
