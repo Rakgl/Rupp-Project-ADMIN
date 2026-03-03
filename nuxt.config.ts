@@ -1,7 +1,6 @@
-// nuxt.config.ts - Updated configuration
 export default defineNuxtConfig({
   devtools: {
-    enabled: true, // or false to disable
+    enabled: true,
     vscode: {},
   },
   ssr: false,
@@ -18,7 +17,6 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
   ],
 
-  // Expose base URLs to your app if needed elsewhere
   runtimeConfig: {
     public: {
       apiURL: '/api/v1/admin',
@@ -63,8 +61,7 @@ export default defineNuxtConfig({
   vite: process.env.PROXY_API_URL
     ? {
       server: {
-        compression: false,
-
+        // compression: false,
         proxy: {
           '/api/v1/admin': {
             target: process.env.PROXY_API_URL,
@@ -73,7 +70,6 @@ export default defineNuxtConfig({
             headers: {
               'Accept-Encoding': 'identity',
             },
-
             configure: (proxy, _options) => {
               console.log('🚀 Proxy configured for /api/v1/admin →', process.env.PROXY_API_URL)
               proxy.on('proxyReq', (proxyReq, req, _res) => {
@@ -111,15 +107,13 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // '/**': { headers: { 'Cache-Control': 'no-cache' } },
     '/components': { redirect: '/components/accordion' },
-    '/settings': { redirect: '/settings/profile' },
-    '/admin/**': { middleware: 'permission' },
-    '/customers/**': { middleware: 'permission' },
-    '/stations/**': { middleware: 'permission' },
-    '/users/**': { middleware: 'admin' },
-    '/roles/**': { middleware: 'admin' },
-    '/reports/**': { middleware: 'permission' },
+    '/admin/**': { appMiddleware: 'permission' as any },
+    '/customers/**': { appMiddleware: 'permission' as any },
+    '/stations/**': { appMiddleware: 'permission' as any },
+    '/users/**': { appMiddleware: 'admin' as any },
+    '/roles/**': { appMiddleware: 'admin' as any },
+    '/reports/**': { appMiddleware: 'permission' as any },
   },
 
   imports: {
@@ -127,7 +121,6 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    lazy: false,
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
     detectBrowserLanguage: {

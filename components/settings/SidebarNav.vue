@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { useLocalePath } from '#imports'
 import { cn } from '@/lib/utils'
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const route = useRoute()
 
 interface Item {
@@ -36,19 +38,12 @@ const sidebarNavItems: Item[] = [
 
 <template>
   <nav class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-1">
-    <Button
-      v-for="item in sidebarNavItems"
-      :key="item.titleKey"
-      variant="ghost"
-      :class="
-        cn(
-          'w-full text-left justify-start items-start',
-          route.path === item.href && 'bg-muted hover:bg-muted',
-        )
-      "
-      as-child
-    >
-      <NuxtLink :to="item.href">
+    <Button v-for="item in sidebarNavItems" :key="item.titleKey" variant="ghost" :class="cn(
+      'w-full text-left justify-start items-start',
+      route.path === localePath(item.href) && 'bg-muted hover:bg-muted',
+    )
+      " as-child>
+      <NuxtLink :to="localePath(item.href)">
         {{ t(item.titleKey) }}
       </NuxtLink>
     </Button>

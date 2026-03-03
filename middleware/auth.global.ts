@@ -1,5 +1,4 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  // Public routes that don't require authentication
   const publicRoutes = [
     '/login',
     '/register',
@@ -10,10 +9,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
     '/email-verified',
   ];
 
-  // Check if the current route is public
   const isPublicRoute = publicRoutes.some((route) => to.path.startsWith(route));
 
-  // Use sidebase nuxt-auth status
   const { status } = useAuth();
 
   if (status.value !== 'authenticated' && !isPublicRoute) {

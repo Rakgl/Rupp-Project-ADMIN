@@ -256,7 +256,7 @@ onMounted(async () => {
           (userData as any).avatar_fallback_color || defaultFormValues.avatarFallbackColor,
         language: userLanguage,
       })
-      setLocale(userLanguage)
+      // Intentionally removed setLocale(userLanguage) so navigating doesn't auto-switch the app language to the backend default
     }
     else {
       const errorMessage = response?.message || t('profile.toast.loadError.defaultMessage')

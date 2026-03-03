@@ -1,7 +1,5 @@
 import type { NavMenu, NavMenuItems } from '~/types/nav';
 
-// Note: All 'heading' and 'title' properties are i18n keys.
-
 export const navMenu: NavMenu[] = [
   {
     heading: 'nav.core_administration',
@@ -55,6 +53,22 @@ export const navMenu: NavMenu[] = [
             title: 'nav.items.payment_methods',
             icon: 'i-lucide-credit-card',
             link: '/payment-methods',
+          },
+        ],
+      },
+      {
+        title: 'nav.app_download_links',
+        icon: 'i-lucide-settings',
+        children: [
+          {
+            title: 'nav.get_our_app',
+            icon: 'i-lucide-smartphone-download',
+            link: '/download-links',
+          },
+          {
+            title: 'nav.app_versions',
+            icon: 'i-lucide-smartphone',
+            link: '/app-version',
           },
         ],
       },
@@ -123,11 +137,5 @@ export const navMenuBottom: NavMenuItems = [
     meta: { roles: ['admin'] },
     icon: 'i-lucide-send',
     link: '/feedback',
-  },
-  {
-    title: 'nav.get_our_app',
-    meta: { roles: ['admin'] },
-    icon: 'i-lucide-smartphone-download',
-    link: '/get-app',
   },
 ];

@@ -67,6 +67,7 @@
     "@nuxtjs/i18n": "^10.0.6",
     "@pinia/nuxt": "^0.5.1",
     "@sidebase/nuxt-auth": "0.10.1",
+    "@types/node": "^25.3.3",
     "@unocss/eslint-plugin": "^66.0.0",
     "@vee-validate/zod": "^4.15.0",
     "@vueuse/core": "^12.2.0",
