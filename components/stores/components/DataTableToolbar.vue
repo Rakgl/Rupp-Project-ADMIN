@@ -46,8 +46,7 @@ import { useToast } from '@/components/ui/toast/use-toast'
 // Assume useApi is your composable for API calls.
 // @ts-expect-error
 const props = defineProps<DataTableToolbarProps<TData>>()
-// Mocked components for demonstration purposes
-const DataTableFacetedFilter = { template: '<div></div>' }
+import DataTableFacetedFilter from '@/components/roles/components/DataTableFacetedFilter.vue'
 const DataTableViewOptions = { template: '<div></div>' }
 
 const api = useApi()
@@ -481,29 +480,18 @@ watch(
   <div>
     <div class="flex items-center justify-between">
       <div class="flex flex-1 items-center space-x-2">
-        <Input
-          v-model="localSearchValue"
-          :placeholder="t('stores.toolbar.filter_placeholder')"
-          class="h-8 w-[150px] lg:w-[250px]"
-        />
-        <DataTableFacetedFilter
-          v-if="table.getColumn('status')"
-          :column="table.getColumn('status')!"
-          :title="t('stores.toolbar.status_filter_title')"
-          :options="storeStatuses"
-        />
-        <Button
-          v-if="isFiltered"
-          variant="ghost"
-          class="h-8 px-2 lg:px-3"
-          @click="
-            () => {
-              table.resetColumnFilters();
-              localSearchValue = '';
-            }
-          "
-        >
-          {{ t('stores.toolbar.reset_button') }} <XIcon class="ml-2 h-4 w-4" />
+        <Input v-model="localSearchValue" :placeholder="t('stores.toolbar.filter_placeholder')"
+          class="h-8 w-[150px] lg:w-[250px]" />
+        <DataTableFacetedFilter v-if="table.getColumn('status')" :column="table.getColumn('status')!"
+          :title="t('stores.toolbar.status_filter_title')" :options="storeStatuses" />
+        <Button v-if="isFiltered" variant="ghost" class="h-8 px-2 lg:px-3" @click="
+          () => {
+            table.resetColumnFilters();
+            localSearchValue = '';
+          }
+        ">
+          {{ t('stores.toolbar.reset_button') }}
+          <XIcon class="ml-2 h-4 w-4" />
         </Button>
       </div>
 
@@ -525,117 +513,72 @@ watch(
               </DialogDescription>
             </DialogHeader>
 
-            <div
-              v-if="createStoreError"
-              class="mx-4 my-3 border border-red-300 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/40 dark:text-red-300"
-            >
+            <div v-if="createStoreError"
+              class="mx-4 my-3 border border-red-300 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/40 dark:text-red-300">
               <strong>{{ t('stores.dialog.error_prefix') }}</strong> {{ createStoreError }}
             </div>
 
             <div class="px-4 py-3 md:px-6">
               <Tabs v-model="activeTab" :default-value="TABS[0].id" class="w-full">
-                <TabsList
-                  class="grid grid-cols-4 w-full rounded-lg bg-gray-100 p-1 shadow-sm dark:bg-neutral-800"
-                >
-                  <TabsTrigger
-                    v-for="tab in TABS"
-                    :key="tab.id"
-                    :value="tab.id"
-                    class="flex items-center justify-center gap-1.5 text-xs sm:text-sm"
-                  >
+                <TabsList class="grid grid-cols-4 w-full rounded-lg bg-gray-100 p-1 shadow-sm dark:bg-neutral-800">
+                  <TabsTrigger v-for="tab in TABS" :key="tab.id" :value="tab.id"
+                    class="flex items-center justify-center gap-1.5 text-xs sm:text-sm">
                     <component :is="tab.icon" class="h-4 w-4" />
                     <span>{{ tab.label }}</span>
                   </TabsTrigger>
                 </TabsList>
 
                 <div class="custom-scrollbar mt-4 max-h-[calc(60vh)] overflow-y-auto pr-1">
-                  <TabsContent
-                    value="basic"
-                    class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  >
+                  <TabsContent value="basic" class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
                     <Card>
                       <CardContent class="p-6 space-y-6">
                         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                           <div class="space-y-4">
                             <div>
                               <Label for="storeName">{{ t('stores.form.name.label') }}
-                                <span class="text-red-500">*</span></Label><Input
-                                id="storeName"
-                                v-model="newStoreData.name"
-                                :placeholder="t('stores.form.name.placeholder')"
-                                :disabled="isLoadingCreateStore"
-                              />
+                                <span class="text-red-500">*</span></Label><Input id="storeName"
+                                v-model="newStoreData.name" :placeholder="t('stores.form.name.placeholder')"
+                                :disabled="isLoadingCreateStore" />
                             </div>
                             <div>
                               <Label for="licenseNumber">{{ t('stores.form.license.label') }}</Label><Input
-                                id="licenseNumber"
-                                v-model="newStoreData.license_number"
-                                :placeholder="t('stores.form.license.placeholder')"
-                                :disabled="isLoadingCreateStore"
-                              />
+                                id="licenseNumber" v-model="newStoreData.license_number"
+                                :placeholder="t('stores.form.license.placeholder')" :disabled="isLoadingCreateStore" />
                             </div>
 
                             <div>
-                              <Label for="phone">{{ t('stores.form.phone.label') }}</Label><Input
-                                id="phone"
-                                v-model="newStoreData.phone_number"
-                                type="tel"
-                                :placeholder="t('stores.form.phone.placeholder')"
-                                :disabled="isLoadingCreateStore"
-                              />
+                              <Label for="phone">{{ t('stores.form.phone.label') }}</Label><Input id="phone"
+                                v-model="newStoreData.phone_number" type="tel"
+                                :placeholder="t('stores.form.phone.placeholder')" :disabled="isLoadingCreateStore" />
                             </div>
                             <div>
-                              <Label for="email">{{ t('stores.form.email.label') }}</Label><Input
-                                id="email"
-                                v-model="newStoreData.email"
-                                type="email"
-                                :placeholder="t('stores.form.email.placeholder')"
-                                :disabled="isLoadingCreateStore"
-                              />
+                              <Label for="email">{{ t('stores.form.email.label') }}</Label><Input id="email"
+                                v-model="newStoreData.email" type="email"
+                                :placeholder="t('stores.form.email.placeholder')" :disabled="isLoadingCreateStore" />
                             </div>
                           </div>
                           <div class="space-y-2">
                             <Label>{{ t('stores.form.logo.label') }}</Label>
                             <div
                               class="aspect-square w-full flex flex-col cursor-pointer items-center justify-center border-2 border-gray-300 rounded-md border-dashed p-4 text-center transition-colors dark:border-neutral-600 hover:border-primary dark:hover:border-primary"
-                              @click="triggerLogoInput"
-                            >
-                              <input
-                                ref="logoInput"
-                                type="file"
-                                accept="image/jpeg,image/png,image/gif,image/webp"
-                                class="hidden"
-                                :disabled="isLoadingCreateStore"
-                                @change="handleLogoChange"
-                              >
-                              <img
-                                v-if="logoPreviewUrl"
-                                :src="logoPreviewUrl"
-                                alt="Logo Preview"
-                                class="h-full w-full rounded-md object-contain"
-                              >
-                              <div
-                                v-else
-                                class="flex flex-col items-center justify-center text-gray-500 space-y-2 dark:text-neutral-400"
-                              >
-                                <UploadCloudIcon class="h-12 w-12" />
-                                <p class="text-sm">
-                                  {{ t('stores.form.logo.prompt') }}
-                                </p>
-                                <p class="text-xs">
-                                  {{ t('stores.form.logo.formats') }}
-                                </p>
-                              </div>
+                              @click="triggerLogoInput">
+                              <input ref="logoInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp"
+                                class="hidden" :disabled="isLoadingCreateStore" @change="handleLogoChange">
+                                <img v-if="logoPreviewUrl" :src="logoPreviewUrl" alt="Logo Preview"
+                                  class="h-full w-full rounded-md object-contain">
+                                <div v-else
+                                  class="flex flex-col items-center justify-center text-gray-500 space-y-2 dark:text-neutral-400">
+                                  <UploadCloudIcon class="h-12 w-12" />
+                                  <p class="text-sm">
+                                    {{ t('stores.form.logo.prompt') }}
+                                  </p>
+                                  <p class="text-xs">
+                                    {{ t('stores.form.logo.formats') }}
+                                  </p>
+                                </div>
                             </div>
-                            <Button
-                              v-if="logoPreviewUrl"
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              :disabled="isLoadingCreateStore"
-                              class="mt-2 w-full text-xs"
-                              @click="removeLogo"
-                            >
+                            <Button v-if="logoPreviewUrl" type="button" variant="outline" size="sm"
+                              :disabled="isLoadingCreateStore" class="mt-2 w-full text-xs" @click="removeLogo">
                               <Trash2Icon class="mr-1.5 h-3.5 w-3.5" />
                               {{ t('stores.form.logo.remove_button') }}
                             </Button>
@@ -645,141 +588,95 @@ watch(
                     </Card>
                   </TabsContent>
 
-                  <TabsContent
-                    value="location"
-                    class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  >
+                  <TabsContent value="location" class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
                     <Card>
                       <CardContent class="p-6 space-y-4">
                         <div>
                           <Label>{{ t('stores.form.location.map_label') }}</Label>
-                          <div
-                            id="map-container"
-                            class="h-64 w-full border rounded-md bg-gray-100 dark:bg-neutral-800"
-                          />
+                          <div id="map-container"
+                            class="h-64 w-full border rounded-md bg-gray-100 dark:bg-neutral-800" />
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div>
                             <Label for="latitude">{{
                               t('stores.form.location.latitude.label')
-                            }}</Label><Input
-                              id="latitude"
-                              v-model.number="newStoreData.latitude"
-                              type="number"
-                              step="any"
-                              :placeholder="t('stores.form.location.latitude.placeholder')"
-                              :disabled="isLoadingCreateStore"
-                            />
+                              }}</Label><Input id="latitude" v-model.number="newStoreData.latitude" type="number"
+                              step="any" :placeholder="t('stores.form.location.latitude.placeholder')"
+                              :disabled="isLoadingCreateStore" />
                           </div>
                           <div>
                             <Label for="longitude">{{
                               t('stores.form.location.longitude.label')
-                            }}</Label><Input
-                              id="longitude"
-                              v-model.number="newStoreData.longitude"
-                              type="number"
-                              step="any"
-                              :placeholder="t('stores.form.location.longitude.placeholder')"
-                              :disabled="isLoadingCreateStore"
-                            />
+                              }}</Label><Input id="longitude" v-model.number="newStoreData.longitude" type="number"
+                              step="any" :placeholder="t('stores.form.location.longitude.placeholder')"
+                              :disabled="isLoadingCreateStore" />
                           </div>
                         </div>
                         <div>
                           <Label for="address">{{ t('stores.form.location.address.label') }}
-                            <span class="text-red-500">*</span></Label><Textarea
-                            id="address"
-                            v-model="newStoreData.address"
-                            :placeholder="t('stores.form.location.address.placeholder')"
-                            :disabled="isLoadingCreateStore"
-                          />
+                            <span class="text-red-500">*</span></Label><Textarea id="address"
+                            v-model="newStoreData.address" :placeholder="t('stores.form.location.address.placeholder')"
+                            :disabled="isLoadingCreateStore" />
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                           <div>
                             <Label for="city">{{ t('stores.form.location.city.label') }}
-                              <span class="text-red-500">*</span></Label><Input
-                              id="city"
-                              v-model="newStoreData.city"
+                              <span class="text-red-500">*</span></Label><Input id="city" v-model="newStoreData.city"
                               :placeholder="t('stores.form.location.city.placeholder')"
-                              :disabled="isLoadingCreateStore"
-                            />
+                              :disabled="isLoadingCreateStore" />
                           </div>
                           <div>
-                            <Label for="state">{{ t('stores.form.location.state.label') }}</Label><Input
-                              id="state"
-                              v-model="newStoreData.state"
-                              :placeholder="t('stores.form.location.state.placeholder')"
-                              :disabled="isLoadingCreateStore"
-                            />
+                            <Label for="state">{{ t('stores.form.location.state.label') }}</Label><Input id="state"
+                              v-model="newStoreData.state" :placeholder="t('stores.form.location.state.placeholder')"
+                              :disabled="isLoadingCreateStore" />
                           </div>
                           <div>
                             <Label for="zipCode">{{ t('stores.form.location.zip.label') }}
-                              <span class="text-red-500">*</span></Label><Input
-                              id="zipCode"
-                              v-model="newStoreData.zip_code"
-                              :placeholder="t('stores.form.location.zip.placeholder')"
-                              :disabled="isLoadingCreateStore"
-                            />
+                              <span class="text-red-500">*</span></Label><Input id="zipCode"
+                              v-model="newStoreData.zip_code" :placeholder="t('stores.form.location.zip.placeholder')"
+                              :disabled="isLoadingCreateStore" />
                           </div>
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                           <div>
                             <Label for="country">{{
                               t('stores.form.location.country.label')
-                            }}</Label><Input
-                              id="country"
-                              v-model="newStoreData.country"
+                              }}</Label><Input id="country" v-model="newStoreData.country"
                               :placeholder="t('stores.form.location.country.placeholder')"
-                              :disabled="isLoadingCreateStore"
-                            />
+                              :disabled="isLoadingCreateStore" />
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
 
-                  <TabsContent
-                    value="operations"
-                    class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  >
+                  <TabsContent value="operations" class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
                     <div class="space-y-6">
                       <Card>
                         <CardHeader>
                           <CardTitle class="text-base">
                             {{ t('stores.form.operations.hours_title') }}
                           </CardTitle>
-                        </CardHeader><CardContent class="pt-4 space-y-4">
+                        </CardHeader>
+                        <CardContent class="pt-4 space-y-4">
                           <div class="flex items-center space-x-2">
-                            <Checkbox
-                              id="is24hours"
-                              v-model:checked="newStoreData.is_24_hours"
-                              :disabled="isLoadingCreateStore"
-                            /><Label for="is24hours" class="font-medium">{{
-                              t('stores.form.operations.is_24h_label')
-                            }}</Label>
+                            <Checkbox id="is24hours" v-model:checked="newStoreData.is_24_hours"
+                              :disabled="isLoadingCreateStore" /><Label for="is24hours" class="font-medium">{{
+                                t('stores.form.operations.is_24h_label')
+                              }}</Label>
                           </div>
-                          <div
-                            v-if="!newStoreData.is_24_hours"
-                            class="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                          >
+                          <div v-if="!newStoreData.is_24_hours" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                               <Label for="openingTime">{{
                                 t('stores.form.operations.opening_time_label')
-                              }}</Label><Input
-                                id="openingTime"
-                                v-model="newStoreData.opening_time"
-                                type="time"
-                                :disabled="isLoadingCreateStore || newStoreData.is_24_hours"
-                              />
+                                }}</Label><Input id="openingTime" v-model="newStoreData.opening_time" type="time"
+                                :disabled="isLoadingCreateStore || newStoreData.is_24_hours" />
                             </div>
                             <div>
                               <Label for="closingTime">{{
                                 t('stores.form.operations.closing_time_label')
-                              }}</Label><Input
-                                id="closingTime"
-                                v-model="newStoreData.closing_time"
-                                type="time"
-                                :disabled="isLoadingCreateStore || newStoreData.is_24_hours"
-                              />
+                                }}</Label><Input id="closingTime" v-model="newStoreData.closing_time" type="time"
+                                :disabled="isLoadingCreateStore || newStoreData.is_24_hours" />
                             </div>
                           </div>
                         </CardContent>
@@ -789,52 +686,37 @@ watch(
                           <CardTitle class="text-base">
                             {{ t('stores.form.operations.delivery_title') }}
                           </CardTitle>
-                        </CardHeader><CardContent class="pt-4 space-y-4">
+                        </CardHeader>
+                        <CardContent class="pt-4 space-y-4">
                           <div class="flex items-center space-x-2">
-                            <Checkbox
-                              id="deliversProduct"
-                              v-model:checked="newStoreData.delivers_product"
-                              :disabled="isLoadingCreateStore"
-                            /><Label for="deliversProduct" class="font-medium">{{
-                              t('stores.form.operations.delivers_product_label')
-                            }}</Label>
+                            <Checkbox id="deliversProduct" v-model:checked="newStoreData.delivers_product"
+                              :disabled="isLoadingCreateStore" /><Label for="deliversProduct" class="font-medium">{{
+                                t('stores.form.operations.delivers_product_label')
+                              }}</Label>
                           </div>
                           <div v-if="newStoreData.delivers_product">
                             <Label for="deliveryDetails">{{ t('stores.form.operations.delivery_details_label') }}
-                              <span class="text-red-500">*</span></Label><Textarea
-                              id="deliveryDetails"
-                              v-model="newStoreData.delivery_details"
-                              :placeholder="
-                                t('stores.form.operations.delivery_details_placeholder')
-                              "
-                              :disabled="isLoadingCreateStore || !newStoreData.delivers_product"
-                            />
+                              <span class="text-red-500">*</span></Label><Textarea id="deliveryDetails"
+                              v-model="newStoreData.delivery_details" :placeholder="t('stores.form.operations.delivery_details_placeholder')
+                                " :disabled="isLoadingCreateStore || !newStoreData.delivers_product" />
                           </div>
                         </CardContent>
                       </Card>
                     </div>
                   </TabsContent>
 
-                  <TabsContent
-                    value="status"
-                    class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  >
+                  <TabsContent value="status" class="outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
                     <Card>
                       <CardContent class="pt-6 space-y-4">
                         <div>
                           <Label for="storeStatus">{{
                             t('stores.form.status.profile_status_label')
-                          }}</Label><Select v-model="newStoreData.status" :disabled="isLoadingCreateStore">
+                            }}</Label><Select v-model="newStoreData.status" :disabled="isLoadingCreateStore">
                             <SelectTrigger id="storeStatus">
-                              <SelectValue
-                                :placeholder="t('stores.form.status.select_placeholder')"
-                              />
-                            </SelectTrigger><SelectContent>
-                              <SelectItem
-                                v-for="s in storeStatuses"
-                                :key="s.value"
-                                :value="s.value"
-                              >
+                              <SelectValue :placeholder="t('stores.form.status.select_placeholder')" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem v-for="s in storeStatuses" :key="s.value" :value="s.value">
                                 {{ s.label }}
                               </SelectItem>
                             </SelectContent>
@@ -842,29 +724,29 @@ watch(
                         </div>
                         <div class="flex gap-4">
                           <div class="flex items-center space-x-2">
-                            <Checkbox
-                              id="isVerified"
-                              v-model:checked="newStoreData.is_verified"
-                              :disabled="isLoadingCreateStore"
-                            /><Label for="isVerified" class="flex items-center font-medium"><ShieldCheckIcon class="mr-2 h-4 w-4 text-blue-500" />{{
-                              t('stores.form.status.is_verified_label')
-                            }}</Label>
+                            <Checkbox id="isVerified" v-model:checked="newStoreData.is_verified"
+                              :disabled="isLoadingCreateStore" /><Label for="isVerified"
+                              class="flex items-center font-medium">
+                              <ShieldCheckIcon class="mr-2 h-4 w-4 text-blue-500" />{{
+                                t('stores.form.status.is_verified_label')
+                              }}
+                            </Label>
                           </div>
                           <div class="flex items-center space-x-2">
-                            <Checkbox
-                              id="isHighlighted"
-                              v-model:checked="newStoreData.is_highlighted"
-                            /><Label for="isHighlighted" class="flex items-center font-medium"><ShieldCheckIcon class="mr-2 h-4 w-4 text-blue-500" />{{
-                              t('stores.form.status.is_highlighted')
-                            }}</Label>
+                            <Checkbox id="isHighlighted" v-model:checked="newStoreData.is_highlighted" /><Label
+                              for="isHighlighted" class="flex items-center font-medium">
+                              <ShieldCheckIcon class="mr-2 h-4 w-4 text-blue-500" />{{
+                                t('stores.form.status.is_highlighted')
+                              }}
+                            </Label>
                           </div>
                           <div class="flex items-center space-x-2">
-                            <Checkbox
-                              id="isTopChoice"
-                              v-model:checked="newStoreData.is_top_choice"
-                            /><Label for="isTopChoice" class="flex items-center font-medium"><ShieldCheckIcon class="mr-2 h-4 w-4 text-blue-500" />{{
-                              t('stores.form.status.is_top_choice')
-                            }}</Label>
+                            <Checkbox id="isTopChoice" v-model:checked="newStoreData.is_top_choice" /><Label
+                              for="isTopChoice" class="flex items-center font-medium">
+                              <ShieldCheckIcon class="mr-2 h-4 w-4 text-blue-500" />{{
+                                t('stores.form.status.is_top_choice')
+                              }}
+                            </Label>
                           </div>
                         </div>
                       </CardContent>
@@ -874,35 +756,14 @@ watch(
               </Tabs>
             </div>
 
-            <DialogFooter
-              class="mt-auto border-t px-6 py-4 sm:flex sm:flex-row-reverse dark:border-neutral-700"
-            >
-              <Button
-                type="button"
-                :disabled="isCreateStoreSaveDisabled || isLoadingCreateStore"
-                class="bg-primary text-primary-foreground hover:bg-primary/90"
-                @click="handleCreateStore"
-              >
-                <svg
-                  v-if="isLoadingCreateStore"
-                  class="mr-3 h-5 w-5 animate-spin text-white -ml-1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  />
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
+            <DialogFooter class="mt-auto border-t px-6 py-4 sm:flex sm:flex-row-reverse dark:border-neutral-700">
+              <Button type="button" :disabled="isCreateStoreSaveDisabled || isLoadingCreateStore"
+                class="bg-primary text-primary-foreground hover:bg-primary/90" @click="handleCreateStore">
+                <svg v-if="isLoadingCreateStore" class="mr-3 h-5 w-5 animate-spin text-white -ml-1"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 {{
                   isLoadingCreateStore
@@ -910,12 +771,8 @@ watch(
                     : t('stores.dialog.buttons.create')
                 }}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                :disabled="isLoadingCreateStore"
-                @click="isCreateStoreDialogOpen = false"
-              >
+              <Button type="button" variant="outline" :disabled="isLoadingCreateStore"
+                @click="isCreateStoreDialogOpen = false">
                 {{ t('stores.dialog.buttons.cancel') }}
               </Button>
             </DialogFooter>
@@ -932,20 +789,24 @@ watch(
 /* Add this to ensure your map container has a defined size */
 #map-container {
   height: 300px;
-  z-index: 10; /* Ensures map controls are clickable inside the dialog */
+  z-index: 10;
+  /* Ensures map controls are clickable inside the dialog */
 }
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: hsl(var(--border));
   border-radius: 10px;
 }
+
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: hsl(var(--border));
 }

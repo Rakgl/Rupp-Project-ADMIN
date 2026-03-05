@@ -2,6 +2,16 @@ import type { NavMenu, NavMenuItems } from '~/types/nav';
 
 export const navMenu: NavMenu[] = [
   {
+    heading: 'nav.overview',
+    items: [
+      {
+        title: 'nav.dashboard',
+        icon: 'i-lucide-layout-dashboard',
+        link: '/',
+      },
+    ],
+  },
+  {
     heading: 'nav.core_administration',
     items: [
       {
@@ -84,20 +94,19 @@ export const navMenu: NavMenu[] = [
         link: '/stores',
       },
       {
-        title: 'nav.accessory_inventory',
-        icon: 'i-lucide-shopping-basket',
-        children: [
-          {
-            title: 'nav.accessory',
-            icon: 'i-lucide-circle',
-            link: '/store-products',
-          },
-          {
-            title: 'nav.accessory',
-            icon: 'i-lucide-circle',
-            link: '/store-products',
-          },
-        ],
+        title: 'nav.categories',
+        icon: 'i-lucide-tag',
+        link: '/categories',
+      },
+      {
+        title: 'nav.products',
+        icon: 'i-lucide-package',
+        link: '/products',
+      },
+      {
+        title: 'nav.store_inventory',
+        icon: 'i-lucide-warehouse',
+        link: '/store-inventory',
       },
       {
         title: 'nav.orders_sales',
@@ -114,11 +123,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/orders/pending',
           },
-          // {
-          //   title: 'nav.sales_reports',
-          //   icon: 'i-lucide-circle',
-          //   link: '/reports/sales',
-          // },
+          {
+            title: 'nav.sales_reports',
+            icon: 'i-lucide-circle',
+            link: '/reports/sales',
+          },
         ],
       },
     ],

@@ -238,13 +238,10 @@ onMounted(() => {
       <div class="mb-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1
-              v-t="'translationManagement.title'"
-              class="text-white-900 text-2xl font-bold sm:text-3xl"
-            />
+            <h1 v-t="'translationManagement.title'" class="text-white-900 text-2xl font-bold sm:text-3xl" />
             <p v-t="'translationManagement.description'" class="text-white-600 mt-2" />
           </div>
-          <Button class="w-full bg-blue-600 sm:w-auto hover:bg-blue-700" @click="openModal()">
+          <Button class="w-full sm:w-auto" @click="openModal()">
             <Plus class="mr-2 h-4 w-4" />
             <span v-t="'translationManagement.addTranslation'" />
           </Button>
@@ -256,17 +253,16 @@ onMounted(() => {
         <CardHeader class="pb-4">
           <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div class="md:col-span-2">
-              <Label for="search" class="text-white-700 text-sm font-medium"><LanguageText t-key="translationManagement.search" /></Label>
-              <Input
-                id="search"
-                v-model="filters.search"
-                :placeholder="t('translationManagement.searchPlaceholder')"
-                class="mt-1"
-                @keyup.enter="fetchTranslations"
-              />
+              <Label for="search" class="text-white-700 text-sm font-medium">
+                <LanguageText t-key="translationManagement.search" />
+              </Label>
+              <Input id="search" v-model="filters.search" :placeholder="t('translationManagement.searchPlaceholder')"
+                class="mt-1" @keyup.enter="fetchTranslations" />
             </div>
             <div>
-              <Label for="platform" class="text-white-700 text-sm font-medium"><LanguageText t-key="translationManagement.platform" /></Label>
+              <Label for="platform" class="text-white-700 text-sm font-medium">
+                <LanguageText t-key="translationManagement.platform" />
+              </Label>
               <Select v-model="filters.platform" @update:model-value="fetchTranslations">
                 <SelectTrigger id="platform" class="mt-1">
                   <SelectValue :placeholder="t('translationManagement.allPlatforms')" />
@@ -354,11 +350,8 @@ onMounted(() => {
                       </div>
                     </TableCell>
                   </TableRow>
-                  <TableRow
-                    v-for="translation in translations"
-                    :key="translation.id"
-                    class="border-white-100 hover:bg-white-50/50 border-b transition-colors"
-                  >
+                  <TableRow v-for="translation in translations" :key="translation.id"
+                    class="border-white-100 hover:bg-white-50/50 border-b transition-colors">
                     <TableCell class="py-6">
                       <div class="text-white-900 break-all text-xs font-medium font-mono sm:text-sm">
                         {{ translation.key }}
@@ -366,75 +359,58 @@ onMounted(() => {
                     </TableCell>
                     <TableCell class="py-6">
                       <div class="min-w-0 space-y-3">
-                        <div
-                          v-for="(val, locale) in translation.value"
-                          :key="locale"
-                          class="flex items-start gap-3"
-                        >
-                          <Badge
-                            variant="outline"
-                            class="shrink-0 border-blue-200 bg-blue-50 text-xs text-blue-700 font-mono"
-                          >
+                        <div v-for="(val, locale) in translation.value" :key="locale" class="flex items-start gap-3">
+                          <Badge variant="outline"
+                            class="shrink-0 border-blue-200 bg-blue-50 text-xs text-blue-700 font-mono">
                             {{ locale }}
                           </Badge>
-                          <LanguageText
-                            :t-key="val ? '' : 'translationManagement.noTranslation'"
-                            :text="val || ''"
-                            :language="locale"
-                            class="text-white-700 min-w-0 flex-1 break-words text-sm"
-                            :title="val"
-                          />
+                          <LanguageText :t-key="val ? '' : 'translationManagement.noTranslation'" :text="val || ''"
+                            :language="locale" class="text-white-700 min-w-0 flex-1 break-words text-sm" :title="val" />
                         </div>
                       </div>
                     </TableCell>
                     <TableCell class="py-6">
-                      <Badge
-                        :class="{
-                          'bg-blue-100 text-blue-800 border-blue-200':
-                            translation.platform === 'ADMIN',
-                          'bg-green-100 text-green-800 border-green-200':
-                            translation.platform === 'MOBILE',
-                        }"
-                        variant="outline"
-                      >
+                      <Badge :class="{
+                        'bg-blue-100 text-blue-800 border-blue-200':
+                          translation.platform === 'ADMIN',
+                        'bg-green-100 text-green-800 border-green-200':
+                          translation.platform === 'MOBILE',
+                      }" variant="outline">
                         {{ translation.platform === 'ADMIN' ? 'Admin Panel' : 'Mobile App' }}
                       </Badge>
                     </TableCell>
                     <TableCell class="py-6">
-                      <Badge
-                        :class="{
-                          'bg-green-100 text-green-800 border-green-200':
-                            translation.status === 'ACTIVE',
-                          'bg-red-100 text-red-800 border-red-200': translation.status !== 'ACTIVE',
-                        }"
-                        variant="outline"
-                      >
+                      <Badge :class="{
+                        'bg-green-100 text-green-800 border-green-200':
+                          translation.status === 'ACTIVE',
+                        'bg-red-100 text-red-800 border-red-200': translation.status !== 'ACTIVE',
+                      }" variant="outline">
                         {{ translation.status }}
                       </Badge>
                     </TableCell>
                     <TableCell class="py-6 text-right">
-                      <div
-                        class="flex flex-col items-end justify-end gap-1 sm:flex-row sm:items-center sm:gap-2"
-                      >
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                      <div class="flex flex-col items-end justify-end gap-1 sm:flex-row sm:items-center sm:gap-2">
+                        <Button variant="ghost" size="sm"
                           class="text-white-600 w-full text-xs sm:w-auto hover:bg-blue-50 sm:text-sm hover:text-blue-600"
-                          @click="openModal(translation)"
-                        >
+                          @click="openModal(translation)">
                           <Pencil class="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                          <span class="hidden sm:inline"><LanguageText t-key="actions.edit" /></span>
-                          <span class="sm:hidden"><LanguageText t-key="actions.edit" /></span>
+                          <span class="hidden sm:inline">
+                            <LanguageText t-key="actions.edit" />
+                          </span>
+                          <span class="sm:hidden">
+                            <LanguageText t-key="actions.edit" />
+                          </span>
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                        <Button variant="ghost" size="sm"
                           class="text-white-600 w-full text-xs sm:w-auto hover:bg-red-50 sm:text-sm hover:text-red-600"
-                          @click="confirmDelete(translation.id)"
-                        >
+                          @click="confirmDelete(translation.id)">
                           <Trash2 class="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                          <span class="hidden sm:inline"><LanguageText t-key="actions.delete" /></span>
-                          <span class="sm:hidden"><LanguageText t-key="actions.delete" /></span>
+                          <span class="hidden sm:inline">
+                            <LanguageText t-key="actions.delete" />
+                          </span>
+                          <span class="sm:hidden">
+                            <LanguageText t-key="actions.delete" />
+                          </span>
                         </Button>
                       </div>
                     </TableCell>
@@ -445,8 +421,7 @@ onMounted(() => {
           </div>
         </CardContent>
         <CardFooter
-          class="border-white-200 bg-white-50/25 flex flex-col gap-4 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
-        >
+          class="border-white-200 bg-white-50/25 flex flex-col gap-4 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div class="text-white-600 flex gap-1 text-center text-xs sm:text-left sm:text-sm">
             <LanguageText t-key="pagination.showing" />
             <span class="text-white-900 font-medium">{{ pagination.from || 0 }} </span>
@@ -457,22 +432,14 @@ onMounted(() => {
             <LanguageText t-key="pagination.translations" />
           </div>
           <div class="flex justify-center gap-2 sm:justify-end sm:gap-3">
-            <Button
-              :disabled="pagination.currentPage <= 1"
-              variant="outline"
-              size="sm"
+            <Button :disabled="pagination.currentPage <= 1" variant="outline" size="sm"
               class="border-white-300 text-white-700 hover:bg-white-50 flex-1 sm:flex-none"
-              @click="changePage(pagination.currentPage - 1)"
-            >
+              @click="changePage(pagination.currentPage - 1)">
               <LanguageText t-key="pagination.previous" />
             </Button>
-            <Button
-              :disabled="pagination.currentPage >= pagination.lastPage"
-              variant="outline"
-              size="sm"
+            <Button :disabled="pagination.currentPage >= pagination.lastPage" variant="outline" size="sm"
               class="border-white-300 text-white-700 hover:bg-white-50 flex-1 sm:flex-none"
-              @click="changePage(pagination.currentPage + 1)"
-            >
+              @click="changePage(pagination.currentPage + 1)">
               <LanguageText t-key="pagination.next" />
             </Button>
           </div>
@@ -485,22 +452,16 @@ onMounted(() => {
       <DialogContent class="max-h-[90vh] max-w-[95vw] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader class="space-y-3">
           <DialogTitle class="text-white-900 text-xl font-semibold">
-            <LanguageText
-              :t-key="
-                isEditMode
-                  ? 'translationManagement.edit.title'
-                  : 'translationManagement.create.title'
-              "
-            />
+            <LanguageText :t-key="isEditMode
+                ? 'translationManagement.edit.title'
+                : 'translationManagement.create.title'
+              " />
           </DialogTitle>
           <DialogDescription class="text-white-600">
-            <LanguageText
-              :t-key="
-                isEditMode
-                  ? 'translationManagement.edit.description'
-                  : 'translationManagement.create.description'
-              "
-            />
+            <LanguageText :t-key="isEditMode
+                ? 'translationManagement.edit.description'
+                : 'translationManagement.create.description'
+              " />
           </DialogDescription>
         </DialogHeader>
 
@@ -508,24 +469,21 @@ onMounted(() => {
           <!-- Basic Information -->
           <div class="grid grid-cols-1 gap-6">
             <div class="space-y-2">
-              <Label for="key" class="text-white-700 text-sm font-medium"><LanguageText t-key="translationManagement.form.key.label" /></Label>
-              <Input
-                id="key"
-                v-model="form.key"
-                :placeholder="t('translationManagement.form.key.placeholder')"
-                required
-                class="font-mono"
-              />
+              <Label for="key" class="text-white-700 text-sm font-medium">
+                <LanguageText t-key="translationManagement.form.key.label" />
+              </Label>
+              <Input id="key" v-model="form.key" :placeholder="t('translationManagement.form.key.placeholder')" required
+                class="font-mono" />
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div class="space-y-2">
-                <Label for="platform-modal" class="text-white-700 text-sm font-medium"><LanguageText t-key="translationManagement.form.platform.label" /></Label>
+                <Label for="platform-modal" class="text-white-700 text-sm font-medium">
+                  <LanguageText t-key="translationManagement.form.platform.label" />
+                </Label>
                 <Select v-model="form.platform" required>
                   <SelectTrigger id="platform-modal">
-                    <SelectValue
-                      :placeholder="t('translationManagement.form.platform.placeholder')"
-                    />
+                    <SelectValue :placeholder="t('translationManagement.form.platform.placeholder')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ADMIN">
@@ -539,12 +497,12 @@ onMounted(() => {
               </div>
 
               <div class="space-y-2">
-                <Label for="status-modal" class="text-white-700 text-sm font-medium"><LanguageText t-key="translationManagement.form.status.label" /></Label>
+                <Label for="status-modal" class="text-white-700 text-sm font-medium">
+                  <LanguageText t-key="translationManagement.form.status.label" />
+                </Label>
                 <Select v-model="form.status" required>
                   <SelectTrigger id="status-modal">
-                    <SelectValue
-                      :placeholder="t('translationManagement.form.status.placeholder')"
-                    />
+                    <SelectValue :placeholder="t('translationManagement.form.status.placeholder')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ACTIVE">
@@ -569,55 +527,31 @@ onMounted(() => {
             </div>
 
             <div class="space-y-4">
-              <div
-                v-for="(val, locale) in form.value"
-                :key="locale"
-                class="border-white-200 bg-white-50/50 border rounded-lg p-4"
-              >
+              <div v-for="(val, locale) in form.value" :key="locale"
+                class="border-white-200 bg-white-50/50 border rounded-lg p-4">
                 <div class="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                  <Badge
-                    variant="outline"
-                    class="w-fit border-blue-200 bg-blue-50 text-xs text-blue-700 font-mono"
-                  >
+                  <Badge variant="outline" class="w-fit border-blue-200 bg-blue-50 text-xs text-blue-700 font-mono">
                     {{ locale }}
                   </Badge>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="w-full text-red-600 sm:w-auto hover:bg-red-50 hover:text-red-700"
-                    :disabled="locale === 'en'"
-                    @click.prevent="removeLocale(locale)"
-                  >
+                  <Button variant="ghost" size="sm"
+                    class="w-full text-red-600 sm:w-auto hover:bg-red-50 hover:text-red-700" :disabled="locale === 'en'"
+                    @click.prevent="removeLocale(locale)">
                     <X class="mr-1 h-4 w-4" />
                     Remove
                   </Button>
                 </div>
 
-                <Input
-                  v-model="form.value[locale]"
-                  placeholder="Enter translation value..."
-                  class="bg-white"
-                  :class="getFontClass(locale)"
-                  :style="{ fontFamily: getFontFamily(locale) }"
-                />
+                <Input v-model="form.value[locale]" placeholder="Enter translation value..." class="bg-white"
+                  :class="getFontClass(locale)" :style="{ fontFamily: getFontFamily(locale) }" />
               </div>
             </div>
 
             <!-- Add New Locale -->
             <div
-              class="border-white-300 mt-4 flex flex-col gap-3 border-2 rounded-lg border-dashed p-4 sm:flex-row sm:items-center"
-            >
-              <Input
-                v-model="newLocale"
-                placeholder="Locale code (e.g., fr, es, de)"
-                class="flex-1"
-                @keyup.enter.prevent="addLocale"
-              />
-              <Button
-                variant="outline"
-                class="w-full sm:w-auto sm:shrink-0"
-                @click.prevent="addLocale"
-              >
+              class="border-white-300 mt-4 flex flex-col gap-3 border-2 rounded-lg border-dashed p-4 sm:flex-row sm:items-center">
+              <Input v-model="newLocale" placeholder="Locale code (e.g., fr, es, de)" class="flex-1"
+                @keyup.enter.prevent="addLocale" />
+              <Button variant="outline" class="w-full sm:w-auto sm:shrink-0" @click.prevent="addLocale">
                 <Plus class="mr-1 h-4 w-4" />
                 Add Locale
               </Button>
@@ -628,7 +562,7 @@ onMounted(() => {
             <Button type="button" variant="outline" class="w-full sm:w-auto" @click="closeModal">
               Cancel
             </Button>
-            <Button type="submit" class="w-full bg-blue-600 sm:w-auto hover:bg-blue-700">
+            <Button type="submit" class="w-full sm:w-auto">
               {{ isEditMode ? 'Update Translation' : 'Create Translation' }}
             </Button>
           </DialogFooter>
@@ -649,15 +583,11 @@ onMounted(() => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter class="flex-col gap-2 pt-6 sm:flex-row sm:gap-3">
-          <AlertDialogCancel
-            class="border-white-300 text-white-700 hover:bg-white-50 w-full sm:w-auto"
-          >
+          <AlertDialogCancel class="border-white-300 text-white-700 hover:bg-white-50 w-full sm:w-auto">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction
-            class="w-full bg-red-600 text-white sm:w-auto hover:bg-red-700 focus:ring-red-500"
-            @click="deleteTranslation"
-          >
+          <AlertDialogAction class="w-full bg-red-600 text-white sm:w-auto hover:bg-red-700 focus:ring-red-500"
+            @click="deleteTranslation">
             Delete Translation
           </AlertDialogAction>
         </AlertDialogFooter>

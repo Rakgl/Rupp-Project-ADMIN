@@ -20,19 +20,25 @@ export default defineConfig({
     'bg-red-100', 'text-red-700', 'border-red-200', 'bg-red-500',
     'dark:bg-red-700/20', 'dark:text-red-400', 'dark:border-red-600/30',
     'dark:bg-red-400',
+    // Low Stock Status
+    'bg-yellow-100', 'text-yellow-700', 'border-yellow-200', 'bg-yellow-500',
+    'dark:bg-yellow-700/20', 'dark:text-yellow-400', 'dark:border-yellow-600/30',
+    'dark:bg-yellow-400',
     // Default Status
     'bg-gray-100', 'text-gray-600', 'border-gray-200', 'bg-gray-400',
     'dark:bg-gray-600/20', 'dark:text-gray-400', 'dark:border-gray-500/30',
     // Backgrounds & Text (Badge)
     'bg-green-100', 'text-green-700', 'border-green-200',
     'bg-red-100', 'text-red-700', 'border-red-200',
+    'bg-yellow-100', 'text-yellow-700', 'border-yellow-200',
     'bg-gray-100', 'text-gray-600', 'border-gray-200',
     // Dot Classes (The circle)
     'w-1.5', 'h-1.5', 'mr-1.5', 'rounded-full',
-    'bg-green-500', 'bg-red-500', 'bg-gray-400',
+    'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-gray-400',
     // Dark Mode Versions
     'dark:bg-green-700/20', 'dark:text-green-400', 'dark:border-green-600/30', 'dark:bg-green-400',
     'dark:bg-red-700/20', 'dark:text-red-400', 'dark:border-red-600/30', 'dark:bg-red-400',
+    'dark:bg-yellow-700/20', 'dark:text-yellow-400', 'dark:border-yellow-600/30', 'dark:bg-yellow-400',
     'dark:bg-gray-600/20', 'dark:text-gray-400', 'dark:border-gray-500/30'
   ],
   variants: [

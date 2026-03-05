@@ -108,12 +108,12 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/components': { redirect: '/components/accordion' },
-    '/admin/**': { appMiddleware: 'permission' as any },
-    '/customers/**': { appMiddleware: 'permission' as any },
-    '/stations/**': { appMiddleware: 'permission' as any },
-    '/users/**': { appMiddleware: 'admin' as any },
-    '/roles/**': { appMiddleware: 'admin' as any },
-    '/reports/**': { appMiddleware: 'permission' as any },
+    '/admin/**': { middleware: 'permission' },
+    '/customers/**': { middleware: 'permission' },
+    '/stations/**': { middleware: 'permission' },
+    '/users/**': { middleware: 'admin' },
+    '/roles/**': { middleware: 'admin' },
+    '/reports/**': { middleware: 'permission' },
   },
 
   imports: {
