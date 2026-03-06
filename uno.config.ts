@@ -39,7 +39,22 @@ export default defineConfig({
     'dark:bg-green-700/20', 'dark:text-green-400', 'dark:border-green-600/30', 'dark:bg-green-400',
     'dark:bg-red-700/20', 'dark:text-red-400', 'dark:border-red-600/30', 'dark:bg-red-400',
     'dark:bg-yellow-700/20', 'dark:text-yellow-400', 'dark:border-yellow-600/30', 'dark:bg-yellow-400',
-    'dark:bg-gray-600/20', 'dark:text-gray-400', 'dark:border-gray-500/30'
+    'dark:bg-gray-600/20', 'dark:text-gray-400', 'dark:border-gray-500/30',
+
+    // --- Order Status Badge Classes ---
+    // PENDING
+    'bg-yellow-100', 'text-yellow-700', 'border', 'border-yellow-200',
+    'dark:bg-yellow-900/30', 'dark:text-yellow-400', 'dark:border-yellow-700/30',
+    // PROCESSING
+    'bg-blue-100', 'text-blue-700', 'border-blue-200', 'bg-blue-500',
+    'dark:bg-blue-900/30', 'dark:text-blue-400', 'dark:border-blue-700/30',
+    // SHIPPED
+    'bg-purple-100', 'text-purple-700', 'border-purple-200', 'bg-purple-500',
+    'dark:bg-purple-900/30', 'dark:text-purple-400', 'dark:border-purple-700/30',
+    // DELIVERED
+    'dark:bg-green-900/30', 'dark:border-green-700/30',
+    // CANCELLED
+    'dark:bg-red-900/30', 'dark:border-red-700/30',
   ],
   variants: [
     {

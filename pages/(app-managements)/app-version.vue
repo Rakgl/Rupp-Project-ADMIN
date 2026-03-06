@@ -66,8 +66,7 @@ onMounted(() => {
                 <h2 class="text-2xl font-bold tracking-tight text-foreground">{{ t('app_versions.title') }}</h2>
                 <p class="text-muted-foreground mt-1 text-sm">{{ t('app_versions.description') }}</p>
             </div>
-            <Button
-                class="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
+            <Button>
                 <Icon name="i-lucide-plus" class="mr-2 w-4 h-4" />
                 Add Configuration
             </Button>

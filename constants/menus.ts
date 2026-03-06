@@ -111,7 +111,7 @@ export const navMenu: NavMenu[] = [
       {
         title: 'nav.orders_sales',
         icon: 'i-lucide-credit-card',
-        meta: { roles: ['admin'] },
+        // meta: { roles: ['admin'] },
         children: [
           {
             title: 'nav.all_orders',
@@ -123,11 +123,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/orders/pending',
           },
-          {
-            title: 'nav.sales_reports',
-            icon: 'i-lucide-circle',
-            link: '/reports/sales',
-          },
+          // {
+          //   title: 'nav.sales_reports',
+          //   icon: 'i-lucide-circle',
+          //   link: '/reports/sales',
+          // },
         ],
       },
     ],
