@@ -44,21 +44,16 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-globe',
             link: '/translations',
           },
-          {
-            title: 'nav.store_notifications',
-            icon: 'i-lucide-circle',
-            link: '/store-notifications',
-          },
+          // {
+          //   title: 'nav.store_notifications',
+          //   icon: 'i-lucide-circle',
+          //   link: '/store-notifications',
+          // },
           {
             title: 'settings.sidebar.security',
             icon: 'i-lucide-globe',
             link: '/settings/security',
           },
-          // {
-          //   title: 'nav.items.account_recovery',
-          //   icon: 'i-lucide-shield-check',
-          //   link: '/account-recoveries',
-          // },
           {
             title: 'nav.items.payment_methods',
             icon: 'i-lucide-credit-card',
@@ -88,11 +83,11 @@ export const navMenu: NavMenu[] = [
   {
     heading: 'nav.product_sales',
     items: [
-      {
-        title: 'nav.store',
-        icon: 'i-lucide-store',
-        link: '/stores',
-      },
+      // {
+      //   title: 'nav.store',
+      //   icon: 'i-lucide-store',
+      //   link: '/stores',
+      // },
       {
         title: 'nav.categories',
         icon: 'i-lucide-tag',
@@ -104,14 +99,33 @@ export const navMenu: NavMenu[] = [
         link: '/products',
       },
       {
+        title: 'nav.services',
+        icon: 'i-lucide-wrench',
+        link: '/services',
+      },
+      {
+        title: 'nav.appointments',
+        icon: 'i-lucide-calendar',
+        link: '/appointments',
+      },
+      {
         title: 'nav.store_inventory',
         icon: 'i-lucide-warehouse',
         link: '/store-inventory',
       },
       {
+        title: 'nav.carts',
+        icon: 'i-lucide-shopping-cart',
+        link: '/carts',
+      },
+      {
+        title: 'nav.favorites',
+        icon: 'i-lucide-heart',
+        link: '/favorites',
+      },
+      {
         title: 'nav.orders_sales',
         icon: 'i-lucide-credit-card',
-        // meta: { roles: ['admin'] },
         children: [
           {
             title: 'nav.all_orders',
@@ -123,11 +137,6 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-circle',
             link: '/orders/pending',
           },
-          // {
-          //   title: 'nav.sales_reports',
-          //   icon: 'i-lucide-circle',
-          //   link: '/reports/sales',
-          // },
         ],
       },
     ],

@@ -55,6 +55,24 @@ export default defineConfig({
     'dark:bg-green-900/30', 'dark:border-green-700/30',
     // CANCELLED
     'dark:bg-red-900/30', 'dark:border-red-700/30',
+
+    // --- Appointment Status Badge Classes ---
+
+    // PENDING (Yellow)
+    'bg-yellow-100', 'text-yellow-700', 'border-yellow-200', 'bg-yellow-500',
+    'dark:bg-yellow-900/30', 'dark:text-yellow-400', 'dark:border-yellow-700/30', 'dark:bg-yellow-400',
+
+    // CONFIRMED (Blue/Indigo)
+    'bg-blue-100', 'text-blue-700', 'border-blue-200', 'bg-blue-500',
+    'dark:bg-blue-900/30', 'dark:text-blue-400', 'dark:border-blue-700/30', 'dark:bg-blue-400',
+
+    // COMPLETED (Green)
+    'bg-green-100', 'text-green-700', 'border-green-200', 'bg-green-500',
+    'dark:bg-green-900/30', 'dark:text-green-400', 'dark:border-green-700/30', 'dark:bg-green-400',
+
+    // CANCELLED (Red)
+    'bg-red-100', 'text-red-700', 'border-red-200', 'bg-red-500',
+    'dark:bg-red-900/30', 'dark:text-red-400', 'dark:border-red-700/30', 'dark:bg-red-400',
   ],
   variants: [
     {

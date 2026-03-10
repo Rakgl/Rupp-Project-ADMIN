@@ -605,6 +605,9 @@ watch(editActiveTab, (newTab, oldTab) => {
         <DropdownMenuItem @click="openEditDialog">
           {{ t('stores.row_actions.edit') }}
         </DropdownMenuItem>
+        <DropdownMenuItem @click="navigateTo(`/stores/${props.row.original.id}/pets`)">
+          {{ t('stores.row_actions.manage_pets') }}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem class="text-red-600 hover:!text-red-600" @click="openDeleteDialog">
           {{ t('stores.row_actions.delete') }}
