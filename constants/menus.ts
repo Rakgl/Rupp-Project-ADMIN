@@ -44,11 +44,11 @@ export const navMenu: NavMenu[] = [
             icon: 'i-lucide-globe',
             link: '/translations',
           },
-          // {
-          //   title: 'nav.store_notifications',
-          //   icon: 'i-lucide-circle',
-          //   link: '/store-notifications',
-          // },
+          {
+            title: 'nav.store_notifications',
+            icon: 'i-lucide-circle',
+            link: '/store-notifications',
+          },
           {
             title: 'settings.sidebar.security',
             icon: 'i-lucide-globe',
@@ -83,11 +83,11 @@ export const navMenu: NavMenu[] = [
   {
     heading: 'nav.product_sales',
     items: [
-      // {
-      //   title: 'nav.store',
-      //   icon: 'i-lucide-store',
-      //   link: '/stores',
-      // },
+      {
+        title: 'nav.store',
+        icon: 'i-lucide-store',
+        link: '/stores',
+      },
       {
         title: 'nav.categories',
         icon: 'i-lucide-tag',

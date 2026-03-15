@@ -32,9 +32,12 @@ import { valueUpdater } from '@/lib/utils'
 interface DataTableProps {
     columns: ColumnDef<Favorite, any>[]
     data: Favorite[]
+    loading?: boolean
 }
 
-const props = defineProps<DataTableProps>()
+const props = withDefaults(defineProps<DataTableProps>(), {
+    loading: false
+})
 
 const sorting = ref<SortingState>([])
 const columnFilters = ref<ColumnFiltersState>([])
@@ -77,7 +80,15 @@ const table = useVueTable({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <template v-if="table.getRowModel().rows?.length">
+                    <TableRow v-if="loading">
+                        <TableCell :colspan="columns.length" class="h-24 text-center">
+                            <div class="flex items-center justify-center gap-2 text-muted-foreground italic">
+                                <Icon name="i-lucide-loader-2" class="h-4 w-4 animate-spin" />
+                                Loading favorites...
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                    <template v-else-if="table.getRowModel().rows?.length">
                         <TableRow v-for="row in table.getRowModel().rows" :key="row.id"
                             :data-state="row.getIsSelected() ? 'selected' : undefined">
                             <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">

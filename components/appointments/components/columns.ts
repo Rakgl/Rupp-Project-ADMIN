@@ -39,55 +39,93 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
     accessorKey: 'user',
     header: ({ column }) => {
       const { t } = useI18n()
-      return h(DataTableColumnHeader, { column, title: t('appointments.columns.user') })
+      return h(DataTableColumnHeader, { column, title: t('appointments.columns.user', 'User') })
     },
-    cell: ({ row }) => h('div', { class: 'font-medium' }, row.original.user.name),
+    cell: ({ row }) => {
+        const user = row.original.user
+        return h('div', { class: 'flex flex-col' }, [
+            h('span', { class: 'font-medium' }, user.name || 'Anonymous'),
+            user.phone ? h('span', { class: 'text-xs text-muted-foreground' }, user.phone) : null
+        ])
+    },
   },
   {
     accessorKey: 'pet',
     header: ({ column }) => {
       const { t } = useI18n()
-      return h(DataTableColumnHeader, { column, title: t('appointments.columns.pet') })
+      return h(DataTableColumnHeader, { column, title: t('appointments.columns.pet', 'Pet') })
     },
-    cell: ({ row }) => h('div', {}, row.original.pet.name),
+    cell: ({ row }) => {
+        const pet = row.original.pet
+        return h('div', { class: 'flex flex-col' }, [
+            h('span', { class: 'font-medium' }, pet.name),
+            h('span', { class: 'text-xs text-muted-foreground' }, `${pet.species}${pet.breed ? ` - ${pet.breed}` : ''}`)
+        ])
+    },
   },
   {
     accessorKey: 'service',
     header: ({ column }) => {
       const { t } = useI18n()
-      return h(DataTableColumnHeader, { column, title: t('appointments.columns.service') })
+      return h(DataTableColumnHeader, { column, title: t('appointments.columns.service', 'Service') })
     },
     cell: ({ row }) => {
-      const { locale } = useI18n()
-      try {
-        const serviceName = typeof row.original.service.name === 'string'
-          ? JSON.parse(row.original.service.name)
-          : row.original.service.name
-        return h('div', {}, serviceName[locale.value] || serviceName.en)
-      } catch (e) {
-        return h('div', {}, row.original.service.name)
+      const { locale, t } = useI18n()
+      const service = row.original.service
+      
+      let displayName = ''
+      
+      if (!service.name) {
+        displayName = t('appointments.service.unnamed', 'Unnamed Service')
+      } else {
+        try {
+          // If it's a JSON string, parse it
+          const parsed = typeof service.name === 'string' && service.name.startsWith('{')
+            ? JSON.parse(service.name)
+            : service.name
+          
+          if (typeof parsed === 'object' && parsed !== null) {
+            displayName = parsed[locale.value] || parsed.en || Object.values(parsed)[0] || String(service.name)
+          } else {
+            displayName = String(service.name)
+          }
+        } catch (e) {
+          displayName = String(service.name)
+        }
       }
+
+      return h('div', { class: 'flex flex-col' }, [
+        h('span', { class: !service.name ? 'text-muted-foreground italic' : 'font-medium' }, displayName),
+        service.price ? h('span', { class: 'text-xs text-primary' }, `$${service.price}`) : null
+      ])
     },
   },
   {
     accessorKey: 'start_time',
     header: ({ column }) => {
       const { t } = useI18n()
-      return h(DataTableColumnHeader, { column, title: t('appointments.columns.startTime') })
+      return h(DataTableColumnHeader, { column, title: t('appointments.columns.startTime', 'Date & Time') })
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue('start_time'))
-      return h('div', { class: 'whitespace-nowrap' }, date.toLocaleString([], {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      }))
+      const dateStr = row.getValue('start_time') as string
+      if (!dateStr) return h('div', { class: 'text-muted-foreground' }, 'N/A')
+      
+      try {
+          const date = new Date(dateStr.replace(' ', 'T'))
+          return h('div', { class: 'flex flex-col' }, [
+            h('span', { class: 'whitespace-nowrap' }, date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })),
+            h('span', { class: 'text-xs text-muted-foreground' }, date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))
+          ])
+      } catch (e) {
+          return h('div', {}, dateStr)
+      }
     },
   },
   {
     accessorKey: 'status',
     header: ({ column }) => {
       const { t } = useI18n()
-      return h(DataTableColumnHeader, { column, title: t('appointments.columns.status') })
+      return h(DataTableColumnHeader, { column, title: t('appointments.columns.status', 'Status') })
     },
     cell: ({ row }) => {
       const { t } = useI18n()
@@ -99,7 +137,7 @@ export const appointmentColumns: ColumnDef<Appointment>[] = [
         class: `flex w-fit items-center gap-1.5 px-2 py-0.5 ${config.badgeClass}`
       }, () => [
         h('span', { class: `w-2 h-2 rounded-full ${config.dotClass}` }),
-        t(config.label),
+        t(config.label, status),
       ])
     },
   },

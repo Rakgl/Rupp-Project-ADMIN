@@ -54,8 +54,8 @@ async function fetchData() {
   const api = useApi()
   try {
     const response: any = await api('/appointments', { params })
-    appointmentsData.value = response.data
-    pageCount.value = response.last_page
+    appointmentsData.value = response.data ?? []
+    pageCount.value = response.meta?.last_page ?? 0
   } catch (error) {
     console.error('Failed to fetch appointments:', error)
     appointmentsData.value = []
