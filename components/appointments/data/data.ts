@@ -1,18 +1,22 @@
 export const appointmentStatuses = [
   {
     value: 'PENDING',
-    label: 'Pending',
+    label: 'appointments.statuses.pending',
   },
   {
     value: 'CONFIRMED',
-    label: 'Confirmed',
+    label: 'appointments.statuses.confirmed',
+  },
+  {
+    value: 'IN_CARE',
+    label: 'appointments.statuses.inCare',
   },
   {
     value: 'COMPLETED',
-    label: 'Completed',
+    label: 'appointments.statuses.completed',
   },
   {
     value: 'CANCELLED',
-    label: 'Cancelled',
+    label: 'appointments.statuses.cancelled',
   },
 ]
