@@ -66,6 +66,7 @@ interface CategoryData {
   slug: string
   description: string | null
   status: 'ACTIVE' | 'INACTIVE'
+  type: 'PRODUCT' | 'PET'
   image_url: string | null
   image_file?: File | null
   delete_image?: boolean
@@ -106,6 +107,7 @@ function getInitialCategoryData(): CategoryData {
     slug: '',
     description: '',
     status: 'ACTIVE',
+    type: 'PRODUCT',
     image_url: null,
     image_file: null,
     delete_image: false,
@@ -402,12 +404,20 @@ async function confirmDelete() {
                   </div>
                 </div>
                 <div>
-                  <Label class="text-xs text-gray-500 font-medium dark:text-neutral-400">{{
-                    t('categories.table.columns.created_at', 'Created At') }}</Label>
-                  <p class="text-sm text-gray-900 dark:text-white mt-1">
-                    {{ storeToView.created_at ? new Date(storeToView.created_at).toLocaleDateString() : '-' }}
-                  </p>
+                  <Label class="text-xs text-gray-500 font-medium dark:text-neutral-400">Type</Label>
+                  <div class="mt-1">
+                    <Badge variant="outline" class="capitalize">
+                      {{ storeToView.type?.toLowerCase() || '-' }}
+                    </Badge>
+                  </div>
                 </div>
+              </div>
+              <div>
+                <Label class="text-xs text-gray-500 font-medium dark:text-neutral-400">{{
+                  t('categories.table.columns.created_at', 'Created At') }}</Label>
+                <p class="text-sm text-gray-900 dark:text-white mt-1">
+                  {{ storeToView.created_at ? new Date(storeToView.created_at).toLocaleDateString() : '-' }}
+                </p>
               </div>
             </div>
           </div>
@@ -458,19 +468,33 @@ async function confirmDelete() {
                   <Textarea id="editCategoryDescription" v-model="editCategoryData.description"
                     placeholder="Description" :disabled="isSubmittingEdit" class="mt-1" />
                 </div>
-                <div>
-                  <Label for="editCategoryStatus">{{ t('categories.dialog.edit.label_status', 'Status') }} <span
-                      class="text-red-500">*</span></Label>
-                  <Select v-model="editCategoryData.status" :disabled="isSubmittingEdit">
-                    <SelectTrigger class="w-full mt-1">
-                      <SelectValue :placeholder="t('categories.dialog.edit.label_status', 'Status')" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="status in categoryStatuses" :key="status.value" :value="status.value">
-                        {{ status.label }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label for="editCategoryStatus">{{ t('categories.dialog.edit.label_status', 'Status') }} <span
+                        class="text-red-500">*</span></Label>
+                    <Select v-model="editCategoryData.status" :disabled="isSubmittingEdit">
+                      <SelectTrigger class="w-full mt-1">
+                        <SelectValue :placeholder="t('categories.dialog.edit.label_status', 'Status')" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="status in categoryStatuses" :key="status.value" :value="status.value">
+                          {{ status.label }}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label for="editCategoryType">Type <span class="text-red-500">*</span></Label>
+                    <Select v-model="editCategoryData.type" :disabled="isSubmittingEdit">
+                      <SelectTrigger class="w-full mt-1">
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PRODUCT">Product</SelectItem>
+                        <SelectItem value="PET">Pet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               <div class="space-y-2">

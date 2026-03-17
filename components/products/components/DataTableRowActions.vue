@@ -63,8 +63,10 @@ const { t } = useI18n()
 interface ProductData {
   id?: string
   name: string
+  sku?: string | null
   description: string | null
   price: string | number
+  stock_quantity: number | string
   category_id: string | null
   status: 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK'
   image_url: string | null
@@ -105,8 +107,10 @@ const editProductError = ref<string | null>(null)
 function getInitialProductData(): ProductData {
   return {
     name: '',
+    sku: '',
     description: '',
     price: 0,
+    stock_quantity: 0,
     category_id: null,
     status: 'ACTIVE',
     image_url: null,
@@ -228,6 +232,7 @@ const isEditProductSaveDisabled = computed(() => {
   const data = editProductData.value
   if (isSubmittingEdit.value || isLoadingEditData.value) return true
   if (!data.name?.trim() || data.price === '' || isNaN(Number(data.price))) return true
+  if (data.stock_quantity === '' || isNaN(Number(data.stock_quantity))) return true
   return false
 })
 
@@ -421,11 +426,18 @@ async function confirmDelete() {
                 </div>
                 <div>
                   <Label class="text-xs text-gray-500 font-medium dark:text-neutral-400">{{
-                    t('products.form.category.label', 'Category') }}</Label>
+                    t('products.table.columns.stock_quantity', 'Stock') }}</Label>
                   <p class="text-sm text-gray-900 dark:text-white mt-1">
-                    {{ (storeToView as any).category?.name || '-' }}
+                    {{ storeToView.stock_quantity ?? 0 }}
                   </p>
                 </div>
+              </div>
+              <div>
+                <Label class="text-xs text-gray-500 font-medium dark:text-neutral-400">{{
+                  t('products.form.category.label', 'Category') }}</Label>
+                <p class="text-sm text-gray-900 dark:text-white mt-1">
+                  {{ (storeToView as any).category?.name || '-' }}
+                </p>
               </div>
               <div>
                 <Label class="text-xs text-gray-500 font-medium dark:text-neutral-400">{{
@@ -487,12 +499,20 @@ async function confirmDelete() {
           <div class="px-4 py-3 md:px-6">
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
               <div class="sm:col-span-2 space-y-4">
-                <div>
-                  <Label for="editProductName">{{ t('products.form.name.label', 'Product Name') }} <span
-                      class="text-red-500">*</span></Label>
-                  <Input id="editProductName" v-model="editProductData.name"
-                    :placeholder="t('products.form.name.label', 'Product Name')" :disabled="isSubmittingEdit"
-                    class="mt-1" />
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label for="editProductName">{{ t('products.form.name.label', 'Product Name') }} <span
+                        class="text-red-500">*</span></Label>
+                    <Input id="editProductName" v-model="editProductData.name"
+                      :placeholder="t('products.form.name.label', 'Product Name')" :disabled="isSubmittingEdit"
+                      class="mt-1" />
+                  </div>
+                  <div>
+                    <Label for="editProductSku">{{ t('products.table.columns.sku', 'SKU') }}</Label>
+                    <Input id="editProductSku" v-model="editProductData.sku"
+                      :placeholder="t('products.table.columns.sku', 'SKU')" :disabled="isSubmittingEdit"
+                      class="mt-1" />
+                  </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
@@ -502,18 +522,24 @@ async function confirmDelete() {
                       :disabled="isSubmittingEdit" class="mt-1" />
                   </div>
                   <div>
-                    <Label for="editProductCategory">{{ t('products.form.category.label', 'Category') }}</Label>
-                    <Select id="editProductCategory" v-model="editProductData.category_id" :disabled="isSubmittingEdit">
-                      <SelectTrigger class="w-full mt-1">
-                        <SelectValue placeholder="Select Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem v-for="category in availableCategories" :key="category.id" :value="category.id">
-                          {{ category.name }}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label for="editProductStock">{{ t('products.table.columns.stock_quantity', 'Stock') }} <span
+                        class="text-red-500">*</span></Label>
+                    <Input id="editProductStock" v-model="editProductData.stock_quantity" type="number"
+                      :disabled="isSubmittingEdit" class="mt-1" />
                   </div>
+                </div>
+                <div>
+                  <Label for="editProductCategory">{{ t('products.form.category.label', 'Category') }}</Label>
+                  <Select id="editProductCategory" v-model="editProductData.category_id" :disabled="isSubmittingEdit">
+                    <SelectTrigger class="w-full mt-1">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="category in availableCategories" :key="category.id" :value="category.id">
+                        {{ category.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label for="editProductDescription">{{ t('products.form.description.label', 'Description') }}</Label>

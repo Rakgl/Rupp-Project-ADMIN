@@ -101,6 +101,19 @@ export const productsColumns: ColumnDef<Product>[] = [
     minSize: 100,
   },
   {
+    accessorKey: 'stock_quantity',
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('products.table.columns.stock_quantity', 'Stock') });
+    },
+    cell: ({ row }) => {
+      const stock = row.getValue('stock_quantity') as number
+      const colorClass = stock <= 10 ? 'text-red-500 font-bold' : 'text-sm text-gray-600 dark:text-gray-400'
+      return h('div', { class: colorClass }, stock ?? 0)
+    },
+    minSize: 100,
+  },
+  {
     id: 'category',
     accessorFn: (row: any) => row.category?.name || '-',
     header: ({ column }) => {

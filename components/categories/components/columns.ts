@@ -96,6 +96,18 @@ export const categoriesColumns: ColumnDef<Category>[] = [
     meta: { cellClass: 'text-center' },
   },
   {
+    accessorKey: 'type',
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('categories.table.columns.type', 'Type') });
+    },
+    cell: ({ row }) => {
+      const type = row.original.type;
+      return h(Badge, { variant: 'outline', class: 'capitalize' }, () => type?.toLowerCase() || '-');
+    },
+    minSize: 100,
+  },
+  {
     id: 'actions',
     header: ({ column }) => {
       const { t } = useI18n();

@@ -71,7 +71,7 @@ function getTranslatedServiceName(serviceNameJson: string | null) {
 
   try {
     const parsed = JSON.parse(serviceNameJson)
-    return parsed[locale.value] || parsed['en'] || t('dashboard.appointments.fallback.unknown_service')
+    return parsed['en'] || t('dashboard.appointments.fallback.unknown_service')
   } catch (e) {
     return serviceNameJson // Fallback if regular string
   }

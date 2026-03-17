@@ -67,6 +67,7 @@ const newCategoryData = ref({
   slug: '',
   description: '',
   status: 'ACTIVE',
+  type: 'PRODUCT',
   image_file: null as File | null,
 })
 
@@ -74,7 +75,7 @@ function resetForm() {
   if (createLogoPreviewUrl.value?.startsWith('blob:'))
     URL.revokeObjectURL(createLogoPreviewUrl.value)
 
-  newCategoryData.value = { name: '', slug: '', description: '', status: 'ACTIVE', image_file: null }
+  newCategoryData.value = { name: '', slug: '', description: '', status: 'ACTIVE', type: 'PRODUCT', image_file: null }
   createLogoPreviewUrl.value = null
   createCategoryError.value = null
   if (createLogoInput.value) createLogoInput.value.value = ''
@@ -163,6 +164,7 @@ async function handleCreateCategory() {
       if (newCategoryData.value.description.trim())
         formData.append('description', newCategoryData.value.description.trim())
       formData.append('status', newCategoryData.value.status)
+      formData.append('type', newCategoryData.value.type)
       formData.append('image', newCategoryData.value.image_file)
       body = formData
     } else {
@@ -172,6 +174,7 @@ async function handleCreateCategory() {
         slug: newCategoryData.value.slug.trim() || undefined,
         description: newCategoryData.value.description.trim() || undefined,
         status: newCategoryData.value.status,
+        type: newCategoryData.value.type,
       }
       headers['Content-Type'] = 'application/json'
     }
@@ -259,17 +262,31 @@ async function handleCreateCategory() {
                       <Textarea id="categoryDescription" v-model="newCategoryData.description" placeholder="Description"
                         :disabled="isLoadingCreateCategory" class="mt-1" />
                     </div>
-                    <div>
-                      <Label for="categoryStatus">Status <span class="text-red-500">*</span></Label>
-                      <Select v-model="newCategoryData.status" :disabled="isLoadingCreateCategory">
-                        <SelectTrigger class="w-full mt-1">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ACTIVE">Active</SelectItem>
-                          <SelectItem value="INACTIVE">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label for="categoryStatus">Status <span class="text-red-500">*</span></Label>
+                        <Select v-model="newCategoryData.status" :disabled="isLoadingCreateCategory">
+                          <SelectTrigger class="w-full mt-1">
+                            <SelectValue placeholder="Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ACTIVE">Active</SelectItem>
+                            <SelectItem value="INACTIVE">Inactive</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label for="categoryType">Type <span class="text-red-500">*</span></Label>
+                        <Select v-model="newCategoryData.type" :disabled="isLoadingCreateCategory">
+                          <SelectTrigger class="w-full mt-1">
+                            <SelectValue placeholder="Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PRODUCT">Product</SelectItem>
+                            <SelectItem value="PET">Pet</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
 

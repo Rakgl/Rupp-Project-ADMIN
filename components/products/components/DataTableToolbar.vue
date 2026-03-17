@@ -62,15 +62,17 @@ const createProductError = ref<string | null>(null)
 
 const newProductData = ref({
   name: '',
+  sku: '',
   description: '',
   price: 0,
+  stock_quantity: 0,
   image_url: '',
   category_id: null as string | null,
   status: 'ACTIVE'
 })
 
 function resetForm() {
-  newProductData.value = { name: '', description: '', price: 0, image_url: '', category_id: null, status: 'ACTIVE' }
+  newProductData.value = { name: '', sku: '', description: '', price: 0, stock_quantity: 0, image_url: '', category_id: null, status: 'ACTIVE' }
   createProductError.value = null
 }
 
@@ -99,6 +101,7 @@ const isCreateProductSaveDisabled = computed(() => {
   if (isLoadingCreateProduct.value) return true
   if (!newProductData.value.name.trim()) return true
   if (newProductData.value.price <= 0) return true
+  if (newProductData.value.stock_quantity < 0) return true
   return false
 })
 
@@ -174,10 +177,17 @@ async function handleCreateProduct() {
             </div>
 
             <div class="px-6 py-4 space-y-4">
-              <div class="space-y-2">
-                <Label for="productName">Name <span class="text-red-500">*</span></Label>
-                <Input id="productName" v-model="newProductData.name" placeholder="E.g. Wireless Mouse"
-                  :disabled="isLoadingCreateProduct" />
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <Label for="productName">Name <span class="text-red-500">*</span></Label>
+                  <Input id="productName" v-model="newProductData.name" placeholder="E.g. Wireless Mouse"
+                    :disabled="isLoadingCreateProduct" />
+                </div>
+                <div class="space-y-2">
+                  <Label for="productSku">SKU</Label>
+                  <Input id="productSku" v-model="newProductData.sku" placeholder="E.g. WM-001"
+                    :disabled="isLoadingCreateProduct" />
+                </div>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
@@ -188,18 +198,24 @@ async function handleCreateProduct() {
                 </div>
 
                 <div class="space-y-2">
-                  <Label for="productCategory">Category <span class="text-red-500">*</span></Label>
-                  <Select id="productCategory" v-model="newProductData.category_id" :disabled="isLoadingCreateProduct">
-                    <SelectTrigger class="w-full">
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="category in availableCategories" :key="category.id" :value="category.id">
-                        {{ category.name }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label for="productStock">Stock <span class="text-red-500">*</span></Label>
+                  <Input id="productStock" v-model.number="newProductData.stock_quantity" type="number" min="0"
+                    placeholder="100" :disabled="isLoadingCreateProduct" />
                 </div>
+              </div>
+
+              <div class="space-y-2">
+                <Label for="productCategory">Category <span class="text-red-500">*</span></Label>
+                <Select id="productCategory" v-model="newProductData.category_id" :disabled="isLoadingCreateProduct">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="category in availableCategories" :key="category.id" :value="category.id">
+                      {{ category.name }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div class="space-y-2">

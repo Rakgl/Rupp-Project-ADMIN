@@ -126,10 +126,11 @@ const table = useVueTable({
           </template>
           <TableRow v-else>
             <TableCell
-              v-t="'users.table.noResults'"
               :colspan="columns.length"
               class="h-24 text-center"
-            />
+            >
+              No results found.
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
