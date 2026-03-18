@@ -8,7 +8,7 @@ export const productSchema = z.object({
   price: z.number().or(z.string()),
   category_id: z.string().nullable().optional(),
   category: z.object({ id: z.string(), name: z.string() }).nullable().optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'OUT_OF_STOCK']).default('ACTIVE'),
+  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
   stock_quantity: z.number().or(z.string()).nullable().optional(),
   created_at: z.string().optional(),
   image_url: z.string().nullable().optional()

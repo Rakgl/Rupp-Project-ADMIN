@@ -83,6 +83,20 @@ export const roleColumns: ColumnDef<Role>[] = [
     enableSorting: true,
   },
   {
+    accessorKey: 'phone',
+    header: ({ column }) => {
+      const { t } = useI18n();
+      return h(DataTableColumnHeader, { column, title: t('users.columns.phone', 'Phone') });
+    },
+    cell: ({ row }) => {
+      const raw = row.getValue('phone') as string | null
+      if (!raw) return h('div', { class: 'text-muted-foreground' }, '-')
+      const digits = raw.replace(/^\+855/, '').replace(/^0/, '')
+      return h('div', {}, `+855 ${digits}`)
+    },
+    enableSorting: true,
+  },
+  {
     accessorKey: 'role',
     header: ({ column }) => {
       const { t } = useI18n();

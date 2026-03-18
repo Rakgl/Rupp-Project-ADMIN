@@ -53,7 +53,6 @@ watch(localSearchValue, (newValue) => {
 const productStatuses = computed(() => [
   { value: 'ACTIVE', label: 'Active' },
   { value: 'INACTIVE', label: 'Inactive' },
-  { value: 'OUT_OF_STOCK', label: 'Out of Stock' },
 ])
 
 const isCreateProductDialogOpen = ref(false)

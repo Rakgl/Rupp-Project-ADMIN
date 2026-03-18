@@ -88,6 +88,7 @@ interface EditableUserData {
   id: string | number
   name: string
   username: string
+  phone: string
   email?: string
   status: boolean
   role_id?: string | number | null
@@ -99,6 +100,7 @@ interface EditableUserData {
 interface UserDetail {
   id: string
   name: string
+  phone: string | null
   email: string | null
   username: string
   image: string | null
@@ -181,6 +183,7 @@ async function openEditDialog() {
         id: fetchedData.id,
         name: fetchedData.name,
         username: fetchedData.username || '',
+        phone: fetchedData.phone || '',
         email: fetchedData.email || '',
         status: String(fetchedData.status).toUpperCase() === 'ACTIVE',
         role_id: fetchedData.role_id || null,
@@ -216,6 +219,7 @@ const isSaveDisabled = computed(() => {
   if (
     !userToEdit.value.name.trim()
     || !userToEdit.value.username.trim()
+    || !userToEdit.value.phone.trim()
     || !userToEdit.value.role_id
   ) {
     return true
@@ -244,6 +248,7 @@ async function handleSaveChanges() {
   const formData = new FormData()
   formData.append('name', userToEdit.value.name)
   formData.append('username', userToEdit.value.username)
+  formData.append('phone', userToEdit.value.phone)
   if (userToEdit.value.email)
     formData.append('email', userToEdit.value.email)
   formData.append('status', userToEdit.value.status ? 'ACTIVE' : 'INACTIVE')
@@ -388,10 +393,8 @@ watch(isViewDialogOpen, (isOpen) => {
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" class="h-8 w-8 flex p-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2"
-            />
+            <path fill="currentColor"
+              d="M5 10c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m14 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m-7 0c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2" />
           </svg>
           <span v-t="'users.rowActions.openMenu'" class="sr-only" />
         </Button>
@@ -408,10 +411,7 @@ watch(isViewDialogOpen, (isOpen) => {
           Disable 2FA
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          class="text-destructive focus:text-destructive"
-          @click="isDeleteDialogOpen = true"
-        >
+        <DropdownMenuItem class="text-destructive focus:text-destructive" @click="isDeleteDialogOpen = true">
           <span>{{ t('users.rowActions.delete') }}</span>
           <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
@@ -433,31 +433,20 @@ watch(isViewDialogOpen, (isOpen) => {
         </DialogHeader>
 
         <div class="px-1 py-6">
-          <div
-            v-if="isViewLoading"
-            class="h-48 flex items-center justify-center text-muted-foreground"
-          >
+          <div v-if="isViewLoading" class="h-48 flex items-center justify-center text-muted-foreground">
             {{ t('users.viewDialog.loading') }}
           </div>
-          <div
-            v-else-if="viewError"
-            class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          >
+          <div v-else-if="viewError"
+            class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <strong>{{ t('users.viewDialog.error.title') }}</strong> {{ viewError }}
           </div>
           <div v-else-if="userToView" class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-3">
             <!-- Avatar Section -->
             <div class="flex flex-col items-center pt-2 md:col-span-1">
-              <img
-                v-if="userToView.image"
-                :src="userToView.image"
-                alt="User Avatar"
-                class="h-32 w-32 border-4 border-white rounded-full object-cover shadow-md"
-              >
-              <div
-                v-else
-                class="h-32 w-32 flex items-center justify-center rounded-full bg-muted text-4xl text-muted-foreground font-bold"
-              >
+              <img v-if="userToView.image" :src="userToView.image" alt="User Avatar"
+                class="h-32 w-32 border-4 border-white rounded-full object-cover shadow-md">
+              <div v-else
+                class="h-32 w-32 flex items-center justify-center rounded-full bg-muted text-4xl text-muted-foreground font-bold">
                 {{ userToView.name.charAt(0).toUpperCase() }}
               </div>
               <h3 class="mt-4 text-center text-lg font-semibold">
@@ -471,8 +460,16 @@ watch(isViewDialogOpen, (isOpen) => {
             <div class="pt-2 md:col-span-2 space-y-4">
               <div class="flex flex-col">
                 <Label class="text-xs text-muted-foreground tracking-wider uppercase">{{
-                  t('users.viewDialog.form.email.label')
+                  t('users.viewDialog.form.phone.label', 'Phone')
                 }}</Label>
+                <p class="text-base">
+                  {{ userToView.phone ? `+855 ${userToView.phone.replace(/^\+855/, '').replace(/^0/, '')}` : 'N/A' }}
+                </p>
+              </div>
+              <div class="flex flex-col">
+                <Label class="text-xs text-muted-foreground tracking-wider uppercase">{{
+                  t('users.viewDialog.form.email.label')
+                  }}</Label>
                 <p class="text-base">
                   {{ userToView.email || 'N/A' }}
                 </p>
@@ -480,7 +477,7 @@ watch(isViewDialogOpen, (isOpen) => {
               <div class="flex flex-col">
                 <Label class="text-xs text-muted-foreground tracking-wider uppercase">{{
                   t('users.viewDialog.form.role.label')
-                }}</Label>
+                  }}</Label>
                 <p class="text-base">
                   {{ userToView.role }}
                 </p>
@@ -488,18 +485,15 @@ watch(isViewDialogOpen, (isOpen) => {
               <div class="flex flex-col">
                 <Label class="text-xs text-muted-foreground tracking-wider uppercase">{{
                   t('users.viewDialog.form.status.label')
-                }}</Label>
-                <Badge
-                  :variant="userToView.status === 'ACTIVE' ? 'default' : 'destructive'"
-                  class="w-fit"
-                >
+                  }}</Label>
+                <Badge :variant="userToView.status === 'ACTIVE' ? 'default' : 'destructive'" class="w-fit">
                   {{ userToView.status }}
                 </Badge>
               </div>
               <div class="flex flex-col">
                 <Label class="text-xs text-muted-foreground tracking-wider uppercase">{{
                   t('users.viewDialog.form.lastUpdated.label')
-                }}</Label>
+                  }}</Label>
                 <p class="text-base">
                   {{ new Date(userToView.updated_at).toLocaleString() }}
                 </p>
@@ -518,9 +512,7 @@ watch(isViewDialogOpen, (isOpen) => {
 
     <!-- Edit User Dialog -->
     <Dialog v-model:open="isEditDialogOpen">
-      <DialogContent
-        class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl"
-      >
+      <DialogContent class="max-h-[85vh] w-[95%] flex flex-col rounded-lg shadow-xl md:max-w-2xl sm:max-w-xl">
         <DialogHeader class="flex-shrink-0">
           <DialogTitle class="text-xl font-semibold">
             {{ t('users.editDialog.title') }}
@@ -530,74 +522,68 @@ watch(isViewDialogOpen, (isOpen) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div
-          v-if="isLoading && !userToEdit"
-          class="flex flex-grow items-center justify-center text-sm text-muted-foreground"
-        >
+        <div v-if="isLoading && !userToEdit"
+          class="flex flex-grow items-center justify-center text-sm text-muted-foreground">
           {{ t('users.editDialog.loading') }}
         </div>
-        <div
-          v-else-if="editError && !userToEdit"
-          class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-        >
+        <div v-else-if="editError && !userToEdit"
+          class="m-6 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <strong>{{ t('users.editDialog.error.title') }}</strong> {{ editError }}
         </div>
 
         <div v-if="userToEdit" class="overflow-y-auto p-6">
-          <div
-            v-if="editError"
-            class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          >
+          <div v-if="editError"
+            class="mb-4 border border-destructive/20 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
             <strong>{{ t('users.editDialog.error.title') }}</strong> {{ editError }}
           </div>
           <div class="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-3">
             <div class="flex flex-col items-center md:col-span-1 md:items-start space-y-3">
               <Label class="text-sm font-medium">{{ t('users.editDialog.form.avatar') }}</Label>
-              <ImageUploader
-                v-model="editUserAvatarFile"
-                :existing-images="existingAvatarForUploader"
-                :max-files="1"
-                :disabled="isLoading"
-                class="h-auto w-48 md:w-full"
-                @remove-existing-by-id="handleRemoveExistingAvatar"
-              />
+              <ImageUploader v-model="editUserAvatarFile" :existing-images="existingAvatarForUploader" :max-files="1"
+                :disabled="isLoading" class="h-auto w-48 md:w-full"
+                @remove-existing-by-id="handleRemoveExistingAvatar" />
             </div>
 
             <div class="md:col-span-2 space-y-4">
               <div>
-                <Label for="editUserName" class="mb-1 block text-sm font-medium">{{ t('users.editDialog.form.name.label') }}
+                <Label for="editUserName" class="mb-1 block text-sm font-medium">{{
+                  t('users.editDialog.form.name.label') }}
                   <span class="text-destructive">*</span></Label>
-                <Input
-                  id="editUserName"
-                  v-model="userToEdit.name"
-                  :placeholder="t('users.editDialog.form.name.placeholder')"
-                  :disabled="isLoading"
-                />
+                <Input id="editUserName" v-model="userToEdit.name"
+                  :placeholder="t('users.editDialog.form.name.placeholder')" :disabled="isLoading" />
               </div>
               <div>
-                <Label for="editUserUsername" class="mb-1 block text-sm font-medium">{{ t('users.editDialog.form.username.label') }}
+                <Label for="editUserUsername" class="mb-1 block text-sm font-medium">{{
+                  t('users.editDialog.form.username.label') }}
                   <span class="text-destructive">*</span></Label>
-                <Input
-                  id="editUserUsername"
-                  v-model="userToEdit.username"
-                  :placeholder="t('users.editDialog.form.username.placeholder')"
-                  :disabled="isLoading"
-                />
+                <Input id="editUserUsername" v-model="userToEdit.username"
+                  :placeholder="t('users.editDialog.form.username.placeholder')" :disabled="isLoading" />
+              </div>
+              <div>
+                <Label for="editUserPhone" class="mb-1 block text-sm font-medium">{{
+                  t('users.editDialog.form.phone.label', 'Phone Number') }}
+                  <span class="text-destructive">*</span></Label>
+                <div class="flex">
+                  <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm select-none">+855</span>
+                  <Input
+                    id="editUserPhone"
+                    v-model="userToEdit.phone"
+                    placeholder="123456789"
+                    class="rounded-l-none"
+                    :disabled="isLoading"
+                  />
+                </div>
               </div>
               <div>
                 <Label for="editUserEmail" class="mb-1 block text-sm font-medium">{{
                   t('users.editDialog.form.email.label')
-                }}</Label>
-                <Input
-                  id="editUserEmail"
-                  v-model="userToEdit.email"
-                  type="email"
-                  :placeholder="t('users.editDialog.form.email.placeholder')"
-                  :disabled="isLoading"
-                />
+                  }}</Label>
+                <Input id="editUserEmail" v-model="userToEdit.email" type="email"
+                  :placeholder="t('users.editDialog.form.email.placeholder')" :disabled="isLoading" />
               </div>
               <div>
-                <Label for="editUserRole" class="mb-1 block text-sm font-medium">{{ t('users.editDialog.form.role.label') }}
+                <Label for="editUserRole" class="mb-1 block text-sm font-medium">{{
+                  t('users.editDialog.form.role.label') }}
                   <span class="text-destructive">*</span></Label>
                 <div v-if="isLoadingRoles" class="pt-2 text-sm text-muted-foreground">
                   {{ t('users.editDialog.form.role.loading') }}
@@ -613,11 +599,7 @@ watch(isViewDialogOpen, (isOpen) => {
                           t('users.editDialog.form.role.availableRoles')
                         }}
                       </SelectLabel>
-                      <SelectItem
-                        v-for="role in availableRoles"
-                        :key="role.id"
-                        :value="String(role.id)"
-                      >
+                      <SelectItem v-for="role in availableRoles" :key="role.id" :value="String(role.id)">
                         {{ role.name }}
                       </SelectItem>
                     </SelectGroup>
@@ -627,14 +609,10 @@ watch(isViewDialogOpen, (isOpen) => {
               <div class="flex items-center justify-between pt-2">
                 <Label for="editUserStatus" class="text-sm font-medium">{{
                   t('users.editDialog.form.status.label')
-                }}</Label>
+                  }}</Label>
                 <div class="flex items-center space-x-2">
-                  <Switch
-                    id="editUserStatus"
-                    :checked="userToEdit.status"
-                    :disabled="isLoading"
-                    @update:checked="(newVal) => (userToEdit!.status = newVal)"
-                  />
+                  <Switch id="editUserStatus" :checked="userToEdit.status" :disabled="isLoading"
+                    @update:checked="(newVal) => (userToEdit!.status = newVal)" />
                   <span class="text-sm text-muted-foreground">{{
                     userToEdit.status
                       ? t('users.editDialog.form.status.active')
@@ -650,70 +628,38 @@ watch(isViewDialogOpen, (isOpen) => {
               {{ t('users.editDialog.form.password.title') }}
               <span class="text-sm text-muted-foreground font-normal">{{
                 t('users.editDialog.form.password.optional')
-              }}</span>
+                }}</span>
             </h3>
             <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
               <div>
                 <Label for="editPassword" class="mb-1 block text-sm font-medium">{{
                   t('users.editDialog.form.newPassword.label')
-                }}</Label>
-                <Input
-                  id="editPassword"
-                  v-model="userToEdit.password"
-                  type="password"
-                  :placeholder="t('users.editDialog.form.newPassword.placeholder')"
-                  :disabled="isLoading"
-                />
+                  }}</Label>
+                <Input id="editPassword" v-model="userToEdit.password" type="password"
+                  :placeholder="t('users.editDialog.form.newPassword.placeholder')" :disabled="isLoading" />
               </div>
               <div>
                 <Label for="editConfirmPassword" class="mb-1 block text-sm font-medium">{{
                   t('users.editDialog.form.confirmNewPassword.label')
-                }}</Label>
-                <Input
-                  id="editConfirmPassword"
-                  v-model="userToEdit.confirm_password"
-                  type="password"
-                  :placeholder="t('users.editDialog.form.confirmNewPassword.placeholder')"
-                  :disabled="isLoading"
-                />
+                  }}</Label>
+                <Input id="editConfirmPassword" v-model="userToEdit.confirm_password" type="password"
+                  :placeholder="t('users.editDialog.form.confirmNewPassword.placeholder')" :disabled="isLoading" />
               </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter
-          v-if="userToEdit"
-          class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
-        >
-          <Button
-            type="button"
-            variant="outline"
-            :disabled="isLoading"
-            @click="isEditDialogOpen = false"
-          >
+        <DialogFooter v-if="userToEdit"
+          class="flex flex-shrink-0 flex-col-reverse gap-2 px-6 py-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+          <Button type="button" variant="outline" :disabled="isLoading" @click="isEditDialogOpen = false">
             {{ t('users.editDialog.buttons.cancel') }}
           </Button>
           <Button type="button" :disabled="isSaveDisabled" @click="handleSaveChanges">
-            <svg
-              v-if="isLoading"
-              class="mr-3 h-5 w-5 animate-spin -ml-1"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{
               isLoading
@@ -740,31 +686,13 @@ watch(isViewDialogOpen, (isOpen) => {
               t('users.deleteDialog.buttons.cancel')
             }}
           </AlertDialogCancel>
-          <AlertDialogAction
-            class="bg-destructive hover:bg-destructive/90"
-            :disabled="isLoading"
-            @click="confirmDeleteUser"
-          >
-            <svg
-              v-if="isLoading"
-              class="mr-3 h-5 w-5 animate-spin -ml-1"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
+          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading"
+            @click="confirmDeleteUser">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{
               isLoading
@@ -782,7 +710,8 @@ watch(isViewDialogOpen, (isOpen) => {
         <AlertDialogHeader>
           <AlertDialogTitle>Disable Two-Factor Authentication?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to disable 2FA for <strong>{{ user.name }}</strong>? This will allow them to log in without a security code and they will be required to
+            Are you sure you want to disable 2FA for <strong>{{ user.name }}</strong>? This will allow them to log in
+            without a security code and they will be required to
             set it up again on their next login.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -790,31 +719,13 @@ watch(isViewDialogOpen, (isOpen) => {
           <AlertDialogCancel :disabled="isLoading">
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction
-            class="bg-destructive hover:bg-destructive/90"
-            :disabled="isLoading"
-            @click="confirmDisable2FA"
-          >
-            <svg
-              v-if="isLoading"
-              class="mr-3 h-5 w-5 animate-spin -ml-1"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
+          <AlertDialogAction class="bg-destructive hover:bg-destructive/90" :disabled="isLoading"
+            @click="confirmDisable2FA">
+            <svg v-if="isLoading" class="mr-3 h-5 w-5 animate-spin -ml-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             {{ isLoading ? 'Disabling...' : 'Yes, Disable 2FA' }}
           </AlertDialogAction>

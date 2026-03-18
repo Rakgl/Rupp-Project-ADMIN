@@ -78,6 +78,7 @@ interface RoleData {
 interface CreateUserData {
   name: string
   username: string
+  phone: string
   email?: string
   status: boolean
   role_id?: string | number | null
@@ -91,6 +92,7 @@ const createUserError = ref<string | null>(null)
 const newUserData = ref<CreateUserData>({
   name: '',
   username: '',
+  phone: '',
   email: '',
   status: true,
   role_id: null,
@@ -137,6 +139,7 @@ watch(isCreateUserDialogOpen, (isOpen) => {
     newUserData.value = {
       name: '',
       username: '',
+      phone: '',
       email: '',
       status: true,
       role_id: null,
@@ -154,6 +157,7 @@ const isCreateUserSaveDisabled = computed(() => {
   if (
     !newUserData.value.name.trim()
     || !newUserData.value.username.trim()
+    || !newUserData.value.phone.trim()
     || !newUserData.value.role_id
   ) {
     return true
@@ -187,6 +191,7 @@ async function handleCreateUser() {
   const formData = new FormData()
   formData.append('name', newUserData.value.name)
   formData.append('username', newUserData.value.username)
+  formData.append('phone', newUserData.value.phone)
   if (newUserData.value.email)
     formData.append('email', newUserData.value.email)
   formData.append('status', newUserData.value.status ? 'ACTIVE' : 'INACTIVE')
@@ -314,15 +319,31 @@ async function handleCreateUser() {
                       :disabled="isLoadingCreateUser"
                     />
                   </div>
-                  <div>
-                    <Label for="createUserUsername" class="mb-1 block text-sm font-medium">{{ t('users.dialog.create.form.username.label') }}
-                      <span class="text-destructive">*</span></Label>
-                    <Input
-                      id="createUserUsername"
-                      v-model="newUserData.username"
-                      :placeholder="t('users.dialog.create.form.username.placeholder')"
-                      :disabled="isLoadingCreateUser"
-                    />
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <Label for="createUserUsername" class="mb-1 block text-sm font-medium">{{ t('users.dialog.create.form.username.label') }}
+                        <span class="text-destructive">*</span></Label>
+                      <Input
+                        id="createUserUsername"
+                        v-model="newUserData.username"
+                        :placeholder="t('users.dialog.create.form.username.placeholder')"
+                        :disabled="isLoadingCreateUser"
+                      />
+                    </div>
+                    <div>
+                      <Label for="createUserPhone" class="mb-1 block text-sm font-medium">{{ t('users.dialog.create.form.phone.label', 'Phone Number') }}
+                        <span class="text-destructive">*</span></Label>
+                      <div class="flex">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm select-none">+855</span>
+                        <Input
+                          id="createUserPhone"
+                          v-model="newUserData.phone"
+                          placeholder="123456789"
+                          class="rounded-l-none"
+                          :disabled="isLoadingCreateUser"
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <Label for="createUserEmail" class="mb-1 block text-sm font-medium">{{

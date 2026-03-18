@@ -24,11 +24,6 @@ const statusConfigurations: Record<string, any> = {
     badgeClass: 'bg-red-100 text-red-700 dark:bg-red-700/20 dark:text-red-400 border border-red-200 dark:border-red-600/30',
     dotClass: 'bg-red-500 dark:bg-red-400',
   },
-  OUT_OF_STOCK: {
-    translationKey: 'products.table.status.out_of_stock',
-    badgeClass: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-700/20 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-600/30',
-    dotClass: 'bg-yellow-500 dark:bg-yellow-400',
-  },
   DEFAULT: {
     translationKey: 'products.table.status.unknown',
     badgeClass: 'bg-gray-100 text-gray-600 dark:bg-gray-600/20 dark:text-gray-400 border border-gray-200 dark:border-gray-500/30',

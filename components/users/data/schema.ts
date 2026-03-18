@@ -27,6 +27,7 @@ export type Permission = z.infer<typeof permissionSchema>;
 export const roleSchema = z.object({
   id: z.number(), // Or z.string()
   name: z.string(),
+  phone: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   status: z.string().optional(), // e.g., 'ACTIVE', 'INACTIVE'
   created_by: z.string().optional(),

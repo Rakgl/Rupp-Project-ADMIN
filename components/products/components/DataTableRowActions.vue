@@ -68,7 +68,7 @@ interface ProductData {
   price: string | number
   stock_quantity: number | string
   category_id: string | null
-  status: 'ACTIVE' | 'INACTIVE' | 'OUT_OF_STOCK'
+  status: 'ACTIVE' | 'INACTIVE'
   image_url: string | null
   image_file?: File | null
   delete_image?: boolean
@@ -77,7 +77,6 @@ interface ProductData {
 const productStatuses = computed(() => [
   { value: 'ACTIVE', label: t('products.form.status.option_active', 'Active') },
   { value: 'INACTIVE', label: t('products.form.status.option_inactive', 'Inactive') },
-  { value: 'OUT_OF_STOCK', label: t('products.form.status.option_out_of_stock', 'Out of Stock') },
 ])
 
 const isViewDialogOpen = ref(false)
