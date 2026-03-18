@@ -128,22 +128,11 @@ export const navMenu: NavMenu[] = [
         icon: 'i-lucide-heart',
         link: '/favorites',
       },
-      // {
-      //   title: 'nav.orders_sales',
-      //   icon: 'i-lucide-credit-card',
-      //   children: [
-      //     {
-      //       title: 'nav.all_orders',
-      //       icon: 'i-lucide-circle',
-      //       link: '/orders',
-      //     },
-      //     {
-      //       title: 'nav.pending_orders',
-      //       icon: 'i-lucide-circle',
-      //       link: '/orders/pending',
-      //     },
-      //   ],
-      // },
+      {
+        title: 'nav.all_orders',
+        icon: 'i-lucide-receipt-text',
+        link: '/orders',
+      },
     ],
   },
 ];
